@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEO Visibility Report — April 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #F8F9FA; color: #1F2D5C; font-size: 15px; }
+
+  .report-header { background: #1F2D5C; color: #fff; padding: 28px 36px 24px; }
+  .report-header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .report-header .subtitle { font-size: 13px; color: rgba(255,255,255,0.65); margin-top: 4px; }
+  .badge-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85); letter-spacing: 0.03em; }
+
+  .nav-tabs { display: flex; gap: 0; background: #fff; border-bottom: 1.5px solid #e8eaf0; padding: 0 36px; overflow-x: auto; }
+  .nav-tab { padding: 14px 18px; font-size: 13px; font-weight: 600; color: #888; cursor: pointer; border-bottom: 2.5px solid transparent; white-space: nowrap; transition: color 0.15s, border-color 0.15s; }
+  .nav-tab:hover { color: #1F2D5C; }
+  .nav-tab.active { color: #1F2D5C; border-bottom-color: #4B9CD3; }
+
+  .section { display: none; padding: 28px 36px 48px; }
+  .section.active { display: block; }
+
+  .section-label { font-size: 11px; font-weight: 700; color: #4B9CD3; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .section-title { font-size: 15px; font-weight: 700; color: #1F2D5C; margin-bottom: 5px; }
+  .section-desc { font-size: 13px; color: #888; margin-bottom: 22px; }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .kpi-card { background: #fff; border-radius: 10px; padding: 16px 14px; border: 1px solid #e8eaf0; text-align: center; }
+  .kpi-label { font-size: 10px; color: #aaa; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; font-weight: 600; }
+  .kpi-value { font-size: 22px; font-weight: 700; color: #1F2D5C; line-height: 1.1; }
+  .kpi-sub { font-size: 11px; color: #aaa; margin-top: 4px; }
+  .kpi-delta { font-size: 11px; margin-top: 5px; font-weight: 700; }
+  .positive { color: #2ECC71; }
+  .negative { color: #E74C3C; }
+  .neutral { color: #F39C12; }
+  .na { color: #aaa; }
+
+  /* position lower = better, so delta is inverted */
+  .pos-better { color: #2ECC71; }
+  .pos-worse { color: #E74C3C; }
+
+  .market-block { margin-bottom: 36px; }
+  .market-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1.5px solid #e8eaf0; }
+  .market-flag { font-size: 20px; }
+  .market-name { font-size: 16px; font-weight: 700; color: #1F2D5C; }
+  .market-sub { font-size: 12px; color: #aaa; margin-left: 4px; }
+
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+  .chart-card { background: #fff; border-radius: 10px; border: 1px solid #e8eaf0; padding: 20px; }
+  .chart-title { font-size: 13px; font-weight: 700; color: #1F2D5C; margin-bottom: 3px; }
+  .chart-period { font-size: 11px; color: #aaa; margin-bottom: 14px; }
+
+  .divider { height: 1px; background: #eef0f5; margin: 24px 0; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 10px; font-size: 12px; color: #666; }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  .market-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .market-tab { font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 20px; cursor: pointer; border: 1.5px solid #e8eaf0; color: #888; background: #fff; transition: all 0.15s; }
+  .market-tab.active { background: #1F2D5C; color: #fff; border-color: #1F2D5C; }
+  .market-tab:hover:not(.active) { border-color: #4B9CD3; color: #1F2D5C; }
+  .market-panel { display: none; }
+  .market-panel.active { display: block; }
+
+  .insight-box { background: #f0f4ff; border: 1px solid #c8d6f5; border-radius: 10px; padding: 14px 16px; margin-bottom: 24px; font-size: 13px; color: #333; line-height: 1.6; }
+  .insight-box strong { color: #1F2D5C; }
+
+  .table-wrap { overflow-x: auto; margin-bottom: 24px; }
+  table.data-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table.data-table th { background: #f3f5fb; color: #1F2D5C; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; padding: 9px 12px; text-align: left; border-bottom: 1.5px solid #e8eaf0; white-space: nowrap; }
+  table.data-table td { padding: 9px 12px; border-bottom: 1px solid #f0f2f8; color: #333; }
+  table.data-table tr:last-child td { border-bottom: none; }
+  table.data-table tr:hover td { background: #fafbfd; }
+  .tag-positive { color: #2ECC71; font-weight: 700; }
+  .tag-negative { color: #E74C3C; font-weight: 700; }
+  .tag-neutral { color: #aaa; }
+  .tag-pos-better { color: #2ECC71; font-weight: 700; }
+  .tag-pos-worse { color: #E74C3C; font-weight: 700; }
+
+  .footnote { font-size: 11px; color: #bbb; margin-top: 8px; }
+  .note-box { font-size: 12px; color: #888; background: #fffbf0; border: 1px solid #f5e4b0; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; }
+
+  @media (max-width: 680px) {
+    .chart-grid { grid-template-columns: 1fr; }
+    .report-header, .nav-tabs, .section { padding-left: 16px; padding-right: 16px; }
+    .nav-tabs { padding: 0 10px; }
+    .nav-tab { padding: 12px 10px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="report-header">
+  <h1>SEO Visibility Report</h1>
+  <div class="subtitle">Key Markets · Week over Week · April 6–12 vs April 13–19, 2026</div>
+  <div class="badge-row">
+    <span class="badge">🇬🇧 UK</span>
+    <span class="badge">🇩🇪 DACH</span>
+    <span class="badge">🇦🇺🇳🇿 ANZ</span>
+    <span class="badge">WoW Apr 13–19</span>
+    <span class="badge">Source: Google Search</span>
+  </div>
+</div>
+
+<div class="nav-tabs">
+  <div class="nav-tab active" onclick="switchTab('overview')">Overview</div>
+  <div class="nav-tab" onclick="switchTab('markets')">By Market</div>
+  <div class="nav-tab" onclick="switchTab('table')">Full Data Table</div>
+</div>
+
+<!-- ═══════════════════════ OVERVIEW -->
+<div id="tab-overview" class="section active">
+  <div class="section-title">All markets — SEO snapshot</div>
+  <div class="section-desc">Week over Week comparison · Apr 6–12 vs Apr 13–19, 2026</div>
+
+  <div class="note-box">
+    <strong>How to read position:</strong> A lower average position number is better (position 1 = top of Google). Arrows showing position improvement are green (▼ = moved up), worsening are red (▲ = moved down).
+  </div>
+
+  <div class="insight-box">
+    <strong>Key highlights:</strong> ANZ is the standout performer this week — Australia leads all markets with visibility at 85.2% (▲ +7pp) and avg position improving to 8, while NZ visibility ticked up to 2.1 (+0.8) and % in top 10 improved by 4pp. Combined ANZ traffic forecast: 1,820 (AU 1,767 + NZ 53). Germany saw the sharpest decline — traffic forecast dropped 68% (1,052 → 335) and visibility fell 23.6pp. UK visibility dipped slightly (6.8 → 5.5).
+  </div>
+
+  <!-- Visibility comparison chart -->
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Search visibility — WoW</div>
+      <div class="chart-period">All markets · Apr 6–12 vs Apr 13–19, 2026</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 6–12</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#4B9CD3;"></span>Apr 13–19</span>
+      </div>
+      <div style="position:relative;height:220px;"><canvas id="visibilityChart" role="img" aria-label="Search visibility WoW all markets">Apr 6-12: UK 6.8, Germany 67.2, AU 78.2, NZ 1.3. Apr 13-19: UK 5.5, Germany 43.6, AU 85.2, NZ 2.1.</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Traffic forecast — WoW</div>
+      <div class="chart-period">All markets · Apr 6–12 vs Apr 13–19, 2026</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 6–12</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#4B9CD3;"></span>Apr 13–19</span>
+      </div>
+      <div style="position:relative;height:220px;"><canvas id="trafficChart" role="img" aria-label="Traffic forecast WoW all markets">Apr 6-12: UK 151, Germany 1052, Australia 1667, NZ 61. Apr 13-19: UK 122, Germany 335, Australia 1767, NZ 53.</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Average position — WoW</div>
+      <div class="chart-period">Lower = better · All markets</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 6–12</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#4B9CD3;"></span>Apr 13–19</span>
+      </div>
+      <div style="position:relative;height:220px;"><canvas id="positionChart" role="img" aria-label="Average position WoW all markets">Apr 6-12: UK 31, Germany 28, Australia 10, NZ 34. Apr 13-19: UK 31, Germany 36, Australia 8, NZ 37.</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">% in top 10 — WoW</div>
+      <div class="chart-period">Keywords ranking top 10 · All markets</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 6–12</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#4B9CD3;"></span>Apr 13–19</span>
+      </div>
+      <div style="position:relative;height:220px;"><canvas id="top10Chart" role="img" aria-label="Percent in top 10 WoW all markets">Apr 6-12: UK 43, Germany 59, Australia 79, NZ 29. Apr 13-19: UK 40, Germany 48, Australia 80, NZ 33.</canvas></div>
+    </div>
+  </div>
+
+  <!-- Summary KPIs per market -->
+  <div class="divider"></div>
+  <div class="section-label">Market snapshots — Apr 13–19, 2026</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+    <!-- UK -->
+    <div style="background:#fff;border-radius:10px;border:1px solid #e8eaf0;padding:18px;">
+      <div class="market-header" style="margin-bottom:12px;padding-bottom:8px;">
+        <span class="market-flag">🇬🇧</span>
+        <span class="market-name">United Kingdom</span>
+      </div>
+      <div class="kpi-grid" style="grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:0;">
+        <div class="kpi-card" style="padding:12px 8px;"><div class="kpi-label">Avg Position</div><div class="kpi-value" style="font-size:18px;">31</div><div class="kpi-delta na">→ 0 WoW</div></div>
+        <div class="kpi-card" style="padding:12px 8px;"><div class="kpi-label">Visibility</div><div class="kpi-value" style="font-size:18px;">5.5</div><div class="kpi-delta negative">▼ 1.3 WoW</div></div>
+        <div class="kpi-card" style="padding:12px 8px;"><div class="kpi-label">Traffic fcst</div><div class="kpi-value" style="font-size:18px;">122</div><div class="kpi-delta negative">▼ 29 WoW</div></div>
+        <div class="kpi-card" style="padding:12px 8px;"><div class="kpi-label">% Top 10</div><div class="kpi-value" style="font-size:18px;">40%</div><div class="kpi-delta negative">▼ 3pp WoW</div></div>
+        <div class="kpi-card" style="padding:12px 8px;"><div class="kpi-label">SERP Features</div><div class="kpi-value" style="font-size:18px;">5</div><div class="kpi-delta positive">▲ 1 WoW</div></div>
+      </div>
+    </div>
+
+    <!-- Germany / DACH -->
+    <div style="background:#fff;border-radius:10px;border:1px solid #e8eaf0;padding:18px;">
+      <div class="market-header" style="margin-bottom:12px;padding-bottom:8px;">
+        <span class="market-flag">🇩🇪</span>
+        <span class="market-name">Germany (DACH)</span>
+      </div>
+      <div class="kpi-grid" style="grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:0;">
+        <div class="kpi-card" style="padding:12px 8px;"><div class="kpi-label">Avg Position</div><div class="kpi-value" style="font-size:18px;">36</div><div class="kpi-delta pos-worse">▼ 8 worse</div></div>
+        <div class="kpi-card" style="padding:12px 8px;"><div class="kpi-label">Visibility</div><div class="kpi-value" style="font-size:18px;">43.6</div><div class="kpi-delta negative">▼ 23.6 WoW</div></div>
+        <div class="kpi-card" style="padding:12px 8px;"><div class="kpi-label">Traffic fcst</div><div class="kpi-value" style="font-size:18px;">335</div><div class="kpi-delta negative">▼ 717 WoW</div></div>
+        <div class="kpi-card" style="padding:12px 8px;"><div class="kpi-label">% Top 10</div><div class="kpi-value" style="font-size:18px;">48%</div><div class="kpi-delta negative">▼ 11pp WoW</div></div>
+        <div class="kpi-card" style="padding:12px 8px;"><div class="kpi-label">SERP Features</div><div class="kpi-value" style="font-size:18px;">4</div><div class="kpi-delta na">→ 0 WoW</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ANZ — full width row -->
+  <div style="margin-top:16px;background:#fff;border-radius:10px;border:1px solid #e8eaf0;padding:18px;">
+    <div class="market-header" style="margin-bottom:12px;padding-bottom:8px;">
+      <span class="market-flag">🇦🇺🇳🇿</span>
+      <span class="market-name">ANZ (Australia + New Zealand)</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <!-- Australia sub-block -->
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#4B9CD3;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;">🇦🇺 Australia</div>
+        <div class="kpi-grid" style="grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:0;">
+          <div class="kpi-card" style="padding:12px 8px;"><div class="kpi-label">Avg Position</div><div class="kpi-value" style="font-size:18px;">8</div><div class="kpi-delta pos-better">▲ 2 better</div></div>
+          <div class="kpi-card" style="padding:12px 8px;"><div class="kpi-label">Visibility</div><div class="kpi-value" style="font-size:18px;">85.2</div><div class="kpi-delta positive">▲ +7 WoW</div></div>
+          <div class="kpi-card" style="padding:12px 8px;"><div class="kpi-label">Traffic fcst</div><div class="kpi-value" style="font-size:18px;">1,767</div><div class="kpi-delta positive">▲ 100 WoW</div></div>
+          <div class="kpi-card" style="padding:12px 8px;"><div class="kpi-label">% Top 10</div><div class="kpi-value" style="font-size:18px;">80%</div><div class="kpi-delta positive">▲ 1pp WoW</div></div>
+          <div class="kpi-card" style="padding:12px 8px;"><div class="kpi-label">SERP Features</div><div class="kpi-value" style="font-size:18px;">5</div><div class="kpi-delta positive">▲ 1 WoW</div></div>
+        </div>
+      </div>
+      <!-- NZ sub-block -->
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#4B9CD3;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;">🇳🇿 New Zealand</div>
+        <div class="kpi-grid" style="grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:0;">
+          <div class="kpi-card" style="padding:12px 8px;"><div class="kpi-label">Avg Position</div><div class="kpi-value" style="font-size:18px;">37</div><div class="kpi-delta pos-worse">▼ 3 worse</div></div>
+          <div class="kpi-card" style="padding:12px 8px;"><div class="kpi-label">Visibility</div><div class="kpi-value" style="font-size:18px;">2.1</div><div class="kpi-delta positive">▲ +0.8 WoW</div></div>
+          <div class="kpi-card" style="padding:12px 8px;"><div class="kpi-label">Traffic fcst</div><div class="kpi-value" style="font-size:18px;">53</div><div class="kpi-delta negative">▼ 8 WoW</div></div>
+          <div class="kpi-card" style="padding:12px 8px;"><div class="kpi-label">% Top 10</div><div class="kpi-value" style="font-size:18px;">33%</div><div class="kpi-delta positive">▲ 4pp WoW</div></div>
+          <div class="kpi-card" style="padding:12px 8px;"><div class="kpi-label">SERP Features</div><div class="kpi-value" style="font-size:18px;">5</div><div class="kpi-delta positive">▲ 1 WoW</div></div>
+        </div>
+      </div>
+    </div>
+    <!-- Combined totals strip -->
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid #eef0f5;display:flex;gap:12px;flex-wrap:wrap;">
+      <div class="kpi-card" style="padding:10px 16px;flex:1;min-width:120px;border-top:3px solid #2ECC71;"><div class="kpi-label">ANZ Combined Traffic</div><div class="kpi-value" style="font-size:20px;">1,820</div><div class="kpi-delta positive">▲ 92 WoW (prev: 1,728)</div></div>
+      <div class="kpi-card" style="padding:10px 16px;flex:1;min-width:120px;border-top:3px solid #2ECC71;"><div class="kpi-label">AU Visibility</div><div class="kpi-value" style="font-size:20px;">85.2%</div><div class="kpi-delta positive">Highest across all markets</div></div>
+      <div class="kpi-card" style="padding:10px 16px;flex:1;min-width:120px;border-top:3px solid #2ECC71;"><div class="kpi-label">AU Avg Position</div><div class="kpi-value" style="font-size:20px;">#8</div><div class="kpi-delta positive">Best rank across all markets</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ BY MARKET -->
+<div id="tab-markets" class="section">
+  <div class="section-title">Detailed view by market</div>
+  <div class="section-desc">Select a market to see full WoW metrics</div>
+
+  <div class="market-tabs">
+    <div class="market-tab active" onclick="switchMarket('uk', event)">🇬🇧 UK</div>
+    <div class="market-tab" onclick="switchMarket('de', event)">🇩🇪 DACH</div>
+    <div class="market-tab" onclick="switchMarket('anz', event)">🇦🇺🇳🇿 ANZ</div>
+  </div>
+
+  <!-- UK -->
+  <div id="market-uk" class="market-panel active">
+    <div class="note-box">Position held steady at 31. Visibility dropped slightly (6.8 → 5.5). Traffic forecast down from 151 to 122. SERP features gained 1. % in top 10 decreased by 3pp.</div>
+    <div class="section-label">UK — Week over Week · Apr 6–12 vs Apr 13–19</div>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">Avg Position (prev)</div><div class="kpi-value">31</div></div>
+      <div class="kpi-card"><div class="kpi-label">Avg Position (curr)</div><div class="kpi-value">31</div><div class="kpi-delta na">→ No change</div></div>
+      <div class="kpi-card"><div class="kpi-label">Traffic fcst (prev)</div><div class="kpi-value">151</div></div>
+      <div class="kpi-card"><div class="kpi-label">Traffic fcst (curr)</div><div class="kpi-value">122</div><div class="kpi-delta negative">▼ 29 WoW</div></div>
+      <div class="kpi-card"><div class="kpi-label">Visibility (prev)</div><div class="kpi-value">6.8</div></div>
+      <div class="kpi-card"><div class="kpi-label">Visibility (curr)</div><div class="kpi-value">5.5</div><div class="kpi-delta negative">▼ 1.3 WoW</div></div>
+      <div class="kpi-card"><div class="kpi-label">SERP Features (prev)</div><div class="kpi-value">4</div></div>
+      <div class="kpi-card"><div class="kpi-label">SERP Features (curr)</div><div class="kpi-value">5</div><div class="kpi-delta positive">▲ +1 WoW</div></div>
+      <div class="kpi-card"><div class="kpi-label">% Top 10 (prev)</div><div class="kpi-value">43%</div></div>
+      <div class="kpi-card"><div class="kpi-label">% Top 10 (curr)</div><div class="kpi-value">40%</div><div class="kpi-delta negative">▼ 3pp WoW</div></div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">UK — Visibility & % top 10</div>
+        <div class="chart-period">Apr 6–12 vs Apr 13–19</div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 6–12</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#4B9CD3;"></span>Apr 13–19</span>
+        </div>
+        <div style="position:relative;height:200px;"><canvas id="ukVisChart" role="img" aria-label="UK visibility and top 10 WoW">Visibility: 6.8 vs 5.5. Top 10: 43% vs 40%.</canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">UK — Traffic forecast</div>
+        <div class="chart-period">Apr 6–12 vs Apr 13–19</div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 6–12</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#4B9CD3;"></span>Apr 13–19</span>
+        </div>
+        <div style="position:relative;height:200px;"><canvas id="ukTrafficChart" role="img" aria-label="UK traffic forecast WoW">Apr 6-12: 151. Apr 13-19: 122.</canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DACH / Germany -->
+  <div id="market-de" class="market-panel">
+    <div class="note-box" style="border-color:#fca5a5;background:#fff5f5;">⚠️ Germany saw the sharpest decline this week — traffic forecast dropped by 717 (-68%), visibility fell by 23.6pp, and avg position worsened from 28 to 36. % in top 10 dropped 11pp. Needs attention.</div>
+    <div class="section-label">DACH (Germany) — Week over Week · Apr 6–12 vs Apr 13–19</div>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">Avg Position (prev)</div><div class="kpi-value">28</div></div>
+      <div class="kpi-card"><div class="kpi-label">Avg Position (curr)</div><div class="kpi-value">36</div><div class="kpi-delta pos-worse">▼ 8 worse WoW</div></div>
+      <div class="kpi-card"><div class="kpi-label">Traffic fcst (prev)</div><div class="kpi-value">1,052</div></div>
+      <div class="kpi-card"><div class="kpi-label">Traffic fcst (curr)</div><div class="kpi-value">335</div><div class="kpi-delta negative">▼ 717 WoW</div></div>
+      <div class="kpi-card"><div class="kpi-label">Visibility (prev)</div><div class="kpi-value">67.2</div></div>
+      <div class="kpi-card"><div class="kpi-label">Visibility (curr)</div><div class="kpi-value">43.6</div><div class="kpi-delta negative">▼ 23.6 WoW</div></div>
+      <div class="kpi-card"><div class="kpi-label">SERP Features (prev)</div><div class="kpi-value">4</div></div>
+      <div class="kpi-card"><div class="kpi-label">SERP Features (curr)</div><div class="kpi-value">4</div><div class="kpi-delta na">→ No change</div></div>
+      <div class="kpi-card"><div class="kpi-label">% Top 10 (prev)</div><div class="kpi-value">59%</div></div>
+      <div class="kpi-card"><div class="kpi-label">% Top 10 (curr)</div><div class="kpi-value">48%</div><div class="kpi-delta negative">▼ 11pp WoW</div></div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">DACH — Visibility & % top 10</div>
+        <div class="chart-period">Apr 6–12 vs Apr 13–19</div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 6–12</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#E74C3C;"></span>Apr 13–19</span>
+        </div>
+        <div style="position:relative;height:200px;"><canvas id="deVisChart" role="img" aria-label="DACH visibility and top 10 WoW">Visibility: 67.2 vs 43.6. Top 10: 59% vs 48%.</canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">DACH — Traffic forecast</div>
+        <div class="chart-period">Apr 6–12 vs Apr 13–19</div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 6–12</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#E74C3C;"></span>Apr 13–19</span>
+        </div>
+        <div style="position:relative;height:200px;"><canvas id="deTrafficChart" role="img" aria-label="DACH traffic forecast WoW">Apr 6-12: 1052. Apr 13-19: 335.</canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANZ -->
+  <div id="market-anz" class="market-panel">
+    <div class="note-box" style="border-color:#bbf7d0;background:#f0fdf4;">⭐ ANZ is the top-performing region this week. Australia leads all markets with visibility at 85.2% (+7pp), avg position improving to #8, and traffic forecast up 100. New Zealand saw visibility tick up (+0.8) and % in top 10 improve by 4pp, though avg position slipped slightly. Combined ANZ traffic forecast: 1,820.</div>
+
+    <div class="section-label">🇦🇺 Australia — Week over Week · Apr 6–12 vs Apr 13–19</div>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">Avg Position (prev)</div><div class="kpi-value">10</div></div>
+      <div class="kpi-card"><div class="kpi-label">Avg Position (curr)</div><div class="kpi-value">8</div><div class="kpi-delta pos-better">▲ 2 better WoW</div></div>
+      <div class="kpi-card"><div class="kpi-label">Traffic fcst (prev)</div><div class="kpi-value">1,667</div></div>
+      <div class="kpi-card"><div class="kpi-label">Traffic fcst (curr)</div><div class="kpi-value">1,767</div><div class="kpi-delta positive">▲ 100 WoW</div></div>
+      <div class="kpi-card"><div class="kpi-label">Visibility (prev)</div><div class="kpi-value">78.2</div></div>
+      <div class="kpi-card"><div class="kpi-label">Visibility (curr)</div><div class="kpi-value">85.2</div><div class="kpi-delta positive">▲ +7 WoW</div></div>
+      <div class="kpi-card"><div class="kpi-label">SERP Features (prev)</div><div class="kpi-value">4</div></div>
+      <div class="kpi-card"><div class="kpi-label">SERP Features (curr)</div><div class="kpi-value">5</div><div class="kpi-delta positive">▲ +1 WoW</div></div>
+      <div class="kpi-card"><div class="kpi-label">% Top 10 (prev)</div><div class="kpi-value">79%</div></div>
+      <div class="kpi-card"><div class="kpi-label">% Top 10 (curr)</div><div class="kpi-value">80%</div><div class="kpi-delta positive">▲ 1pp WoW</div></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-label">🇳🇿 New Zealand — Week over Week · Apr 6–12 vs Apr 13–19</div>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">Avg Position (prev)</div><div class="kpi-value">34</div></div>
+      <div class="kpi-card"><div class="kpi-label">Avg Position (curr)</div><div class="kpi-value">37</div><div class="kpi-delta pos-worse">▼ 3 worse WoW</div></div>
+      <div class="kpi-card"><div class="kpi-label">Traffic fcst (prev)</div><div class="kpi-value">61</div></div>
+      <div class="kpi-card"><div class="kpi-label">Traffic fcst (curr)</div><div class="kpi-value">53</div><div class="kpi-delta negative">▼ 8 WoW</div></div>
+      <div class="kpi-card"><div class="kpi-label">Visibility (prev)</div><div class="kpi-value">1.3</div></div>
+      <div class="kpi-card"><div class="kpi-label">Visibility (curr)</div><div class="kpi-value">2.1</div><div class="kpi-delta positive">▲ +0.8 WoW</div></div>
+      <div class="kpi-card"><div class="kpi-label">SERP Features (prev)</div><div class="kpi-value">4</div></div>
+      <div class="kpi-card"><div class="kpi-label">SERP Features (curr)</div><div class="kpi-value">5</div><div class="kpi-delta positive">▲ +1 WoW</div></div>
+      <div class="kpi-card"><div class="kpi-label">% Top 10 (prev)</div><div class="kpi-value">29%</div></div>
+      <div class="kpi-card"><div class="kpi-label">% Top 10 (curr)</div><div class="kpi-value">33%</div><div class="kpi-delta positive">▲ 4pp WoW</div></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">ANZ — Traffic forecast WoW</div>
+        <div class="chart-period">Australia vs New Zealand · Apr 6–12 vs Apr 13–19</div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 6–12</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#2ECC71;"></span>Apr 13–19</span>
+        </div>
+        <div style="position:relative;height:200px;"><canvas id="anzTrafficChart" role="img" aria-label="ANZ traffic forecast WoW by country">AU Apr 6-12: 1667, Apr 13-19: 1767. NZ Apr 6-12: 61, Apr 13-19: 53.</canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">ANZ — Visibility WoW</div>
+        <div class="chart-period">Australia vs New Zealand · Apr 6–12 vs Apr 13–19</div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 6–12</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#2ECC71;"></span>Apr 13–19</span>
+        </div>
+        <div style="position:relative;height:200px;"><canvas id="anzVisChart" role="img" aria-label="ANZ visibility WoW by country">AU visibility: 78.2 vs 85.2. NZ visibility: 1.3 vs 2.1.</canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">ANZ — % in top 10 WoW</div>
+        <div class="chart-period">Australia vs New Zealand</div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 6–12</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#2ECC71;"></span>Apr 13–19</span>
+        </div>
+        <div style="position:relative;height:200px;"><canvas id="anzTop10Chart" role="img" aria-label="ANZ top 10 percentage WoW">AU: 79% vs 80%. NZ: 29% vs 33%.</canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">ANZ — Avg position WoW</div>
+        <div class="chart-period">Lower = better · Australia vs New Zealand</div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 6–12</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#2ECC71;"></span>Apr 13–19</span>
+        </div>
+        <div style="position:relative;height:200px;"><canvas id="anzPosChart" role="img" aria-label="ANZ average position WoW">AU: 10 vs 8 (better). NZ: 34 vs 37 (worse).</canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ TABLE -->
+<div id="tab-table" class="section">
+  <div class="section-title">Full data table — all markets WoW</div>
+  <div class="section-desc">Apr 6–12 vs Apr 13–19, 2026 · Source: Google Search</div>
+  <div class="note-box">For average position: lower number = higher ranking. A move from 28 → 36 is a <em>worsening</em>.</div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Market</th>
+          <th>Metric</th>
+          <th>Apr 6–12</th>
+          <th>Apr 13–19</th>
+          <th>WoW change</th>
+          <th>Direction</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>🇬🇧 UK</td><td>Avg Position</td><td>31</td><td>31</td><td class="tag-neutral">0</td><td class="tag-neutral">→ Held</td></tr>
+        <tr><td>🇬🇧 UK</td><td>Traffic Forecast</td><td>151</td><td>122</td><td class="tag-negative">▼ 29</td><td class="tag-negative">Worse</td></tr>
+        <tr><td>🇬🇧 UK</td><td>Search Visibility</td><td>6.8</td><td>5.5</td><td class="tag-negative">▼ 1.3</td><td class="tag-negative">Worse</td></tr>
+        <tr><td>🇬🇧 UK</td><td>SERP Features</td><td>4</td><td>5</td><td class="tag-positive">▲ 1</td><td class="tag-positive">Better</td></tr>
+        <tr><td>🇬🇧 UK</td><td>% in Top 10</td><td>43%</td><td>40%</td><td class="tag-negative">▼ 3pp</td><td class="tag-negative">Worse</td></tr>
+        <tr style="background:#fafbfd;"><td>🇩🇪 DACH</td><td>Avg Position</td><td>28</td><td>36</td><td class="tag-negative">▼ 8 worse</td><td class="tag-negative">Worse</td></tr>
+        <tr style="background:#fafbfd;"><td>🇩🇪 DACH</td><td>Traffic Forecast</td><td>1,052</td><td>335</td><td class="tag-negative">▼ 717</td><td class="tag-negative">Worse</td></tr>
+        <tr style="background:#fafbfd;"><td>🇩🇪 DACH</td><td>Search Visibility</td><td>67.2</td><td>43.6</td><td class="tag-negative">▼ 23.6</td><td class="tag-negative">Worse</td></tr>
+        <tr style="background:#fafbfd;"><td>🇩🇪 DACH</td><td>SERP Features</td><td>4</td><td>4</td><td class="tag-neutral">0</td><td class="tag-neutral">→ Held</td></tr>
+        <tr style="background:#fafbfd;"><td>🇩🇪 DACH</td><td>% in Top 10</td><td>59%</td><td>48%</td><td class="tag-negative">▼ 11pp</td><td class="tag-negative">Worse</td></tr>
+        <tr><td>🇦🇺 ANZ — Australia</td><td>Avg Position</td><td>10</td><td>8</td><td class="tag-positive">▲ 2 better</td><td class="tag-positive">Better</td></tr>
+        <tr><td>🇦🇺 ANZ — Australia</td><td>Traffic Forecast</td><td>1,667</td><td>1,767</td><td class="tag-positive">▲ 100</td><td class="tag-positive">Better</td></tr>
+        <tr><td>🇦🇺 ANZ — Australia</td><td>Search Visibility</td><td>78.2</td><td>85.2</td><td class="tag-positive">▲ 7</td><td class="tag-positive">Better</td></tr>
+        <tr><td>🇦🇺 ANZ — Australia</td><td>SERP Features</td><td>4</td><td>5</td><td class="tag-positive">▲ 1</td><td class="tag-positive">Better</td></tr>
+        <tr><td>🇦🇺 ANZ — Australia</td><td>% in Top 10</td><td>79%</td><td>80%</td><td class="tag-positive">▲ 1pp</td><td class="tag-positive">Better</td></tr>
+        <tr style="background:#fafbfd;"><td>🇳🇿 ANZ — New Zealand</td><td>Avg Position</td><td>34</td><td>37</td><td class="tag-negative">▼ 3 worse</td><td class="tag-negative">Worse</td></tr>
+        <tr style="background:#fafbfd;"><td>🇳🇿 ANZ — New Zealand</td><td>Traffic Forecast</td><td>61</td><td>53</td><td class="tag-negative">▼ 8</td><td class="tag-negative">Worse</td></tr>
+        <tr style="background:#fafbfd;"><td>🇳🇿 ANZ — New Zealand</td><td>Search Visibility</td><td>1.3</td><td>2.1</td><td class="tag-positive">▲ 0.8</td><td class="tag-positive">Better</td></tr>
+        <tr style="background:#fafbfd;"><td>🇳🇿 ANZ — New Zealand</td><td>SERP Features</td><td>4</td><td>5</td><td class="tag-positive">▲ 1</td><td class="tag-positive">Better</td></tr>
+        <tr style="background:#fafbfd;"><td>🇳🇿 ANZ — New Zealand</td><td>% in Top 10</td><td>29%</td><td>33%</td><td class="tag-positive">▲ 4pp</td><td class="tag-positive">Better</td></tr>
+        <tr><td colspan="2"><strong>🇦🇺🇳🇿 ANZ Combined Traffic</strong></td><td><strong>1,728</strong></td><td><strong>1,820</strong></td><td class="tag-positive"><strong>▲ 92</strong></td><td class="tag-positive"><strong>Better</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="footnote">* Data sourced from Google Search tool. DACH data reflects Google Germany only. WoW = Apr 6–12 vs Apr 13–19, 2026.</div>
+</div>
+
+<script>
+function switchTab(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  const map = { overview: 0, markets: 1, table: 2 };
+  document.querySelectorAll('.nav-tab')[map[name]].classList.add('active');
+}
+
+function switchMarket(name, e) {
+  document.querySelectorAll('.market-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.market-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('market-' + name).classList.add('active');
+  e.target.classList.add('active');
+}
+
+const navy = '#1F2D5C';
+const blue = '#4B9CD3';
+const green = '#2ECC71';
+const red = '#E74C3C';
+
+const baseOpts = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { display: false } },
+  scales: {
+    x: { ticks: { font: { size: 11 }, color: '#888' }, grid: { display: false } },
+    y: { ticks: { font: { size: 11 }, color: '#888' }, grid: { color: 'rgba(0,0,0,0.05)' } }
+  }
+};
+
+// Overview charts
+new Chart(document.getElementById('visibilityChart'), {
+  type: 'bar',
+  data: {
+    labels: ['UK', 'Germany', 'Australia', 'New Zealand'],
+    datasets: [
+      { label: 'Apr 6–12', data: [6.8, 67.2, 78.2, 1.3], backgroundColor: navy, borderRadius: 4 },
+      { label: 'Apr 13–19', data: [5.5, 43.6, 85.2, 2.1], backgroundColor: blue, borderRadius: 4 }
+    ]
+  },
+  options: { ...baseOpts, plugins: { ...baseOpts.plugins, tooltip: { callbacks: { label: ctx => ' ' + ctx.parsed.y + '%' } } } }
+});
+
+new Chart(document.getElementById('trafficChart'), {
+  type: 'bar',
+  data: {
+    labels: ['UK', 'Germany', 'Australia', 'New Zealand'],
+    datasets: [
+      { label: 'Apr 6–12', data: [151, 1052, 1667, 61], backgroundColor: navy, borderRadius: 4 },
+      { label: 'Apr 13–19', data: [122, 335, 1767, 53], backgroundColor: blue, borderRadius: 4 }
+    ]
+  },
+  options: baseOpts
+});
+
+new Chart(document.getElementById('positionChart'), {
+  type: 'bar',
+  data: {
+    labels: ['UK', 'Germany', 'Australia', 'New Zealand'],
+    datasets: [
+      { label: 'Apr 6–12', data: [31, 28, 10, 34], backgroundColor: navy, borderRadius: 4 },
+      { label: 'Apr 13–19', data: [31, 36, 8, 37], backgroundColor: blue, borderRadius: 4 }
+    ]
+  },
+  options: { ...baseOpts, scales: { ...baseOpts.scales, y: { ...baseOpts.scales.y, reverse: false, ticks: { font: { size: 11 }, color: '#888' } } } }
+});
+
+new Chart(document.getElementById('top10Chart'), {
+  type: 'bar',
+  data: {
+    labels: ['UK', 'Germany', 'Australia', 'New Zealand'],
+    datasets: [
+      { label: 'Apr 6–12', data: [43, 59, 79, 29], backgroundColor: navy, borderRadius: 4 },
+      { label: 'Apr 13–19', data: [40, 48, 80, 33], backgroundColor: blue, borderRadius: 4 }
+    ]
+  },
+  options: { ...baseOpts, plugins: { ...baseOpts.plugins, tooltip: { callbacks: { label: ctx => ' ' + ctx.parsed.y + '%' } } }, scales: { ...baseOpts.scales, y: { ...baseOpts.scales.y, max: 100 } } }
+});
+
+// Market detail charts
+new Chart(document.getElementById('ukVisChart'), {
+  type: 'bar',
+  data: { labels: ['Visibility', '% Top 10'], datasets: [
+    { label: 'Apr 6–12', data: [6.8, 43], backgroundColor: navy, borderRadius: 4 },
+    { label: 'Apr 13–19', data: [5.5, 40], backgroundColor: blue, borderRadius: 4 }
+  ]},
+  options: baseOpts
+});
+new Chart(document.getElementById('ukTrafficChart'), {
+  type: 'bar',
+  data: { labels: ['Apr 6–12', 'Apr 13–19'], datasets: [{ data: [151, 122], backgroundColor: [navy, blue], borderRadius: 4 }] },
+  options: baseOpts
+});
+
+new Chart(document.getElementById('deVisChart'), {
+  type: 'bar',
+  data: { labels: ['Visibility', '% Top 10'], datasets: [
+    { label: 'Apr 6–12', data: [67.2, 59], backgroundColor: navy, borderRadius: 4 },
+    { label: 'Apr 13–19', data: [43.6, 48], backgroundColor: red, borderRadius: 4 }
+  ]},
+  options: baseOpts
+});
+new Chart(document.getElementById('deTrafficChart'), {
+  type: 'bar',
+  data: { labels: ['Apr 6–12', 'Apr 13–19'], datasets: [{ data: [1052, 335], backgroundColor: [navy, red], borderRadius: 4 }] },
+  options: baseOpts
+});
+
+// ANZ combined charts
+new Chart(document.getElementById('anzTrafficChart'), {
+  type: 'bar',
+  data: { labels: ['AU', 'NZ'], datasets: [
+    { label: 'Apr 6–12', data: [1667, 61], backgroundColor: navy, borderRadius: 4 },
+    { label: 'Apr 13–19', data: [1767, 53], backgroundColor: green, borderRadius: 4 }
+  ]},
+  options: baseOpts
+});
+new Chart(document.getElementById('anzVisChart'), {
+  type: 'bar',
+  data: { labels: ['AU', 'NZ'], datasets: [
+    { label: 'Apr 6–12', data: [78.2, 1.3], backgroundColor: navy, borderRadius: 4 },
+    { label: 'Apr 13–19', data: [85.2, 2.1], backgroundColor: green, borderRadius: 4 }
+  ]},
+  options: baseOpts
+});
+new Chart(document.getElementById('anzTop10Chart'), {
+  type: 'bar',
+  data: { labels: ['AU', 'NZ'], datasets: [
+    { label: 'Apr 6–12', data: [79, 29], backgroundColor: navy, borderRadius: 4 },
+    { label: 'Apr 13–19', data: [80, 33], backgroundColor: green, borderRadius: 4 }
+  ]},
+  options: { ...baseOpts, scales: { ...baseOpts.scales, y: { ...baseOpts.scales.y, max: 100 } } }
+});
+new Chart(document.getElementById('anzPosChart'), {
+  type: 'bar',
+  data: { labels: ['AU', 'NZ'], datasets: [
+    { label: 'Apr 6–12', data: [10, 34], backgroundColor: navy, borderRadius: 4 },
+    { label: 'Apr 13–19', data: [8, 37], backgroundColor: green, borderRadius: 4 }
+  ]},
+  options: baseOpts
+});
+</script>
+</body>
+</html>
