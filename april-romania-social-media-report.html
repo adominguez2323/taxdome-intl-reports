@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Romania Social Media Report — April 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #F8F9FA; color: #1F2D5C; font-size: 15px; }
+
+  .report-header { background: #1F2D5C; color: #fff; padding: 28px 36px 24px; }
+  .report-header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .report-header .subtitle { font-size: 13px; color: rgba(255,255,255,0.65); margin-top: 4px; }
+  .badge-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85); letter-spacing: 0.03em; }
+  .badge-li { background: rgba(10,102,194,0.35); color: #a8d4f5; }
+  .badge-fb { background: rgba(24,119,242,0.25); color: #93c4fa; }
+  .badge-wia { background: rgba(155,89,182,0.3); color: #d7b4f5; }
+
+  .nav-tabs { display: flex; gap: 0; background: #fff; border-bottom: 1.5px solid #e8eaf0; padding: 0 36px; overflow-x: auto; }
+  .nav-tab { padding: 14px 18px; font-size: 13px; font-weight: 600; color: #888; cursor: pointer; border-bottom: 2.5px solid transparent; white-space: nowrap; transition: color 0.15s, border-color 0.15s; }
+  .nav-tab:hover { color: #1F2D5C; }
+  .nav-tab.active { color: #1F2D5C; border-bottom-color: #4B9CD3; }
+
+  .section { display: none; padding: 28px 36px 48px; }
+  .section.active { display: block; }
+
+  .section-label { font-size: 11px; font-weight: 700; color: #4B9CD3; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .section-title { font-size: 15px; font-weight: 700; color: #1F2D5C; margin-bottom: 5px; }
+  .section-desc { font-size: 13px; color: #888; margin-bottom: 22px; }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: 14px; margin-bottom: 28px; }
+  .kpi-card { background: #fff; border-radius: 10px; padding: 18px 14px; border: 1px solid #e8eaf0; text-align: center; }
+  .kpi-card.li-card { border-top: 3px solid #0a66c2; }
+  .kpi-card.fb-card { border-top: 3px solid #1877f2; }
+  .kpi-card.lp-card { border-top: 3px solid #4B9CD3; }
+  .kpi-card.wia-card { border-top: 3px solid #9b59b6; }
+  .kpi-label { font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 7px; font-weight: 600; }
+  .kpi-value { font-size: 24px; font-weight: 700; color: #1F2D5C; line-height: 1.1; }
+  .kpi-sub { font-size: 11px; color: #aaa; margin-top: 5px; }
+  .kpi-delta { font-size: 12px; margin-top: 6px; font-weight: 700; }
+  .positive { color: #2ECC71; }
+  .negative { color: #E74C3C; }
+  .neutral { color: #F39C12; }
+  .na { color: #aaa; }
+
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+  .chart-card { background: #fff; border-radius: 10px; border: 1px solid #e8eaf0; padding: 20px; }
+  .chart-title { font-size: 13px; font-weight: 700; color: #1F2D5C; margin-bottom: 3px; }
+  .chart-period { font-size: 11px; color: #aaa; margin-bottom: 14px; }
+
+  .platform-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .platform-pill { font-size: 11px; font-weight: 700; padding: 3px 12px; border-radius: 20px; }
+  .pill-li { background: #e8f0fb; color: #0a66c2; }
+  .pill-fb { background: #e7f0fd; color: #1877f2; }
+  .pill-lp { background: #e8f4fb; color: #1F2D5C; }
+  .pill-wia { background: #f3e8fb; color: #9b59b6; }
+
+  .divider { height: 1px; background: #eef0f5; margin: 24px 0; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 10px; font-size: 12px; color: #666; }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  .table-wrap { overflow-x: auto; margin-bottom: 20px; }
+  table.data-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table.data-table th { background: #f3f5fb; color: #1F2D5C; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; padding: 9px 12px; text-align: left; border-bottom: 1.5px solid #e8eaf0; white-space: nowrap; }
+  table.data-table td { padding: 9px 12px; border-bottom: 1px solid #f0f2f8; color: #333; }
+  table.data-table tr:last-child td { border-bottom: none; }
+  table.data-table tr:hover td { background: #fafbfd; }
+  .tag-positive { color: #2ECC71; font-weight: 700; }
+  .tag-negative { color: #E74C3C; font-weight: 700; }
+  .tag-neutral { color: #aaa; }
+
+  .insight-box { background: #f0f4ff; border: 1px solid #c8d6f5; border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; font-size: 13px; color: #333; line-height: 1.6; }
+  .insight-box strong { color: #1F2D5C; }
+
+  .footnote { font-size: 11px; color: #bbb; margin-top: 8px; }
+
+  @media (max-width: 680px) {
+    .chart-grid { grid-template-columns: 1fr; }
+    .report-header, .nav-tabs, .section { padding-left: 16px; padding-right: 16px; }
+    .nav-tabs { padding: 0 10px; }
+    .nav-tab { padding: 12px 10px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="report-header">
+  <h1>Romania Social Media Performance</h1>
+  <div class="subtitle">LinkedIn · Facebook · Landing Page Traffic · WIA · April 2026</div>
+  <div class="badge-row">
+    <span class="badge">🇷🇴 Romania</span>
+    <span class="badge badge-li">LinkedIn</span>
+    <span class="badge badge-fb">Facebook</span>
+    <span class="badge badge-wia">WIA Campaign</span>
+    <span class="badge">WoW Apr 13–19</span>
+    <span class="badge">MoM Mar vs Apr</span>
+  </div>
+</div>
+
+<div class="nav-tabs">
+  <div class="nav-tab active" onclick="switchTab('overview')">Overview</div>
+  <div class="nav-tab" onclick="switchTab('linkedin')">LinkedIn</div>
+  <div class="nav-tab" onclick="switchTab('facebook')">Facebook</div>
+  <div class="nav-tab" onclick="switchTab('traffic')">Landing Page & WIA</div>
+  <div class="nav-tab" onclick="switchTab('table')">Full Data Table</div>
+</div>
+
+<!-- ═══════════════════════ OVERVIEW -->
+<div id="tab-overview" class="section active">
+  <div class="section-title">Performance overview — Romania</div>
+  <div class="section-desc">Key metrics across LinkedIn and Facebook · MoM March vs April 2026</div>
+
+  <div class="insight-box">
+    <strong>April snapshot:</strong> Facebook organic reach grew significantly (+195% MoM to 7,163), while LinkedIn impressions dropped (-83% MoM to 639). Engagement rates declined on both platforms MoM. Landing page traffic from social dropped 48% MoM (225 → 117 clicks), with LinkedIn referrals falling sharply (39 → 8). WIA campaign drove 77 website interactions from total SM in April.
+  </div>
+
+  <!-- LinkedIn MoM -->
+  <div class="platform-header">
+    <span class="platform-pill pill-li">LinkedIn</span>
+    <span class="section-label" style="margin-bottom:0;">MoM · March vs April 2026</span>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi-card li-card">
+      <div class="kpi-label">Impressions</div>
+      <div class="kpi-value">639</div>
+      <div class="kpi-delta negative">▼ 83.2% MoM</div>
+      <div class="kpi-sub">Prev: 3,814</div>
+    </div>
+    <div class="kpi-card li-card">
+      <div class="kpi-label">Engagement Rate</div>
+      <div class="kpi-value">4.38%</div>
+      <div class="kpi-delta negative">▼ 0.26pp MoM</div>
+      <div class="kpi-sub">Prev: 4.64%</div>
+    </div>
+    <div class="kpi-card li-card">
+      <div class="kpi-label">LP from LinkedIn</div>
+      <div class="kpi-value">8</div>
+      <div class="kpi-delta negative">▼ 79.5% MoM</div>
+      <div class="kpi-sub">Prev: 39</div>
+    </div>
+  </div>
+
+  <!-- Facebook MoM -->
+  <div class="platform-header" style="margin-top:4px;">
+    <span class="platform-pill pill-fb">Facebook</span>
+    <span class="section-label" style="margin-bottom:0;">MoM · March vs April 2026</span>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi-card fb-card">
+      <div class="kpi-label">Organic Reach</div>
+      <div class="kpi-value">7,163</div>
+      <div class="kpi-delta positive">▲ 194.8% MoM</div>
+      <div class="kpi-sub">Prev: 2,430</div>
+    </div>
+    <div class="kpi-card fb-card">
+      <div class="kpi-label">Organic Views</div>
+      <div class="kpi-value">8,000</div>
+      <div class="kpi-delta positive">▲ 17.8% MoM</div>
+      <div class="kpi-sub">Prev: 6,791</div>
+    </div>
+    <div class="kpi-card fb-card">
+      <div class="kpi-label">Engagement Rate</div>
+      <div class="kpi-value">1.54%</div>
+      <div class="kpi-delta negative">▼ 5.66pp MoM</div>
+      <div class="kpi-sub">Prev: 7.20%</div>
+    </div>
+    <div class="kpi-card fb-card">
+      <div class="kpi-label">LP from Facebook</div>
+      <div class="kpi-value">109</div>
+      <div class="kpi-delta negative">▼ 39.4% MoM</div>
+      <div class="kpi-sub">Prev: 180</div>
+    </div>
+  </div>
+
+  <!-- LP + WIA MoM -->
+  <div class="platform-header" style="margin-top:4px;">
+    <span class="platform-pill pill-lp">Landing Page</span>
+    <span class="platform-pill pill-wia" style="margin-left:4px;">WIA</span>
+    <span class="section-label" style="margin-bottom:0;">MoM · March vs April 2026</span>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi-card lp-card">
+      <div class="kpi-label">Total LP traffic</div>
+      <div class="kpi-value">117</div>
+      <div class="kpi-delta negative">▼ 48.0% MoM</div>
+      <div class="kpi-sub">Prev: 225</div>
+    </div>
+    <div class="kpi-card wia-card">
+      <div class="kpi-label">WIA from Total SM</div>
+      <div class="kpi-value">77</div>
+      <div class="kpi-delta negative">▼ 48.3% MoM</div>
+      <div class="kpi-sub">Prev: 149</div>
+    </div>
+    <div class="kpi-card lp-card">
+      <div class="kpi-label">Post shares / reposts</div>
+      <div class="kpi-value">26</div>
+      <div class="kpi-delta positive">▲ 116.7% MoM</div>
+      <div class="kpi-sub">Prev: 12</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Overview charts -->
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Reach & impressions — MoM</div>
+      <div class="chart-period">March vs April 2026</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>March</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#4B9CD3;"></span>April</span>
+      </div>
+      <div style="position:relative;height:210px;"><canvas id="reachChart" role="img" aria-label="Reach and impressions MoM comparison">March: LI Impressions 3814, FB Reach 2430, FB Views 6791. April: LI Impressions 639, FB Reach 7163, FB Views 8000.</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Engagement rate — MoM</div>
+      <div class="chart-period">LinkedIn & Facebook ER %</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>March</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#4B9CD3;"></span>April</span>
+      </div>
+      <div style="position:relative;height:210px;"><canvas id="erChart" role="img" aria-label="Engagement rate MoM LinkedIn and Facebook">March: LI ER 4.64%, FB ER 7.20%. April: LI ER 4.38%, FB ER 1.54%.</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Landing page traffic — MoM</div>
+      <div class="chart-period">LP clicks from social by source</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>March</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#4B9CD3;"></span>April</span>
+      </div>
+      <div style="position:relative;height:210px;"><canvas id="lpChart" role="img" aria-label="Landing page traffic from social MoM">March: Total 225, FB 180, LI 39. April: Total 117, FB 109, LI 8.</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">LP traffic source split — April</div>
+      <div class="chart-period">Share of 117 total clicks</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1877f2;"></span>Facebook</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#0a66c2;"></span>LinkedIn</span>
+      </div>
+      <div style="position:relative;height:210px;"><canvas id="lpSplitChart" role="img" aria-label="LP traffic source split April 2026">Facebook: 109 (93%), LinkedIn: 8 (7%).</canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ LINKEDIN -->
+<div id="tab-linkedin" class="section">
+  <div class="platform-header">
+    <span class="platform-pill pill-li">LinkedIn</span>
+    <span style="font-size:14px;font-weight:700;color:#1F2D5C;">Romania performance</span>
+  </div>
+  <div class="section-desc">Impressions and engagement rate · WoW and MoM</div>
+
+  <div class="section-label">Week over Week · Apr 6–12 vs Apr 13–19, 2026</div>
+  <div class="kpi-grid">
+    <div class="kpi-card li-card">
+      <div class="kpi-label">Impressions (prev)</div>
+      <div class="kpi-value">229</div>
+    </div>
+    <div class="kpi-card li-card">
+      <div class="kpi-label">Impressions (curr)</div>
+      <div class="kpi-value">202</div>
+      <div class="kpi-delta negative">▼ 11.79% WoW</div>
+    </div>
+    <div class="kpi-card li-card">
+      <div class="kpi-label">ER (prev)</div>
+      <div class="kpi-value">3.49%</div>
+    </div>
+    <div class="kpi-card li-card">
+      <div class="kpi-label">ER (curr)</div>
+      <div class="kpi-value">7.43%</div>
+      <div class="kpi-delta positive">▲ 3.94pp WoW</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">Month over Month · March vs April 2026</div>
+  <div class="kpi-grid">
+    <div class="kpi-card li-card">
+      <div class="kpi-label">Impressions (Mar)</div>
+      <div class="kpi-value">3,814</div>
+    </div>
+    <div class="kpi-card li-card">
+      <div class="kpi-label">Impressions (Apr)</div>
+      <div class="kpi-value">639</div>
+      <div class="kpi-delta negative">▼ 83.2% MoM</div>
+    </div>
+    <div class="kpi-card li-card">
+      <div class="kpi-label">ER (Mar)</div>
+      <div class="kpi-value">4.64%</div>
+    </div>
+    <div class="kpi-card li-card">
+      <div class="kpi-label">ER (Apr)</div>
+      <div class="kpi-value">4.38%</div>
+      <div class="kpi-delta negative">▼ 0.26pp MoM</div>
+    </div>
+    <div class="kpi-card li-card">
+      <div class="kpi-label">LP from LI (Mar)</div>
+      <div class="kpi-value">39</div>
+    </div>
+    <div class="kpi-card li-card">
+      <div class="kpi-label">LP from LI (Apr)</div>
+      <div class="kpi-value">8</div>
+      <div class="kpi-delta negative">▼ 79.5% MoM</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">LinkedIn impressions — WoW</div>
+      <div class="chart-period">Apr 6–12 vs Apr 13–19, 2026</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 6–12</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#0a66c2;"></span>Apr 13–19</span>
+      </div>
+      <div style="position:relative;height:200px;"><canvas id="liWoWChart" role="img" aria-label="LinkedIn impressions WoW">Apr 6-12: 229 impressions. Apr 13-19: 202 impressions.</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">LinkedIn ER — WoW</div>
+      <div class="chart-period">Engagement rate % comparison</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 6–12</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#0a66c2;"></span>Apr 13–19</span>
+      </div>
+      <div style="position:relative;height:200px;"><canvas id="liErWoWChart" role="img" aria-label="LinkedIn engagement rate WoW">Apr 6-12: 3.49%. Apr 13-19: 7.43%.</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">LinkedIn impressions — MoM</div>
+      <div class="chart-period">March vs April 2026</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>March</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#0a66c2;"></span>April</span>
+      </div>
+      <div style="position:relative;height:200px;"><canvas id="liMoMChart" role="img" aria-label="LinkedIn impressions MoM">March: 3,814. April: 639.</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">LinkedIn LP traffic — MoM</div>
+      <div class="chart-period">Clicks to landing page from LinkedIn</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>March</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#0a66c2;"></span>April</span>
+      </div>
+      <div style="position:relative;height:200px;"><canvas id="liLpChart" role="img" aria-label="LinkedIn LP traffic MoM">March: 39 clicks. April: 8 clicks.</canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ FACEBOOK -->
+<div id="tab-facebook" class="section">
+  <div class="platform-header">
+    <span class="platform-pill pill-fb">Facebook</span>
+    <span style="font-size:14px;font-weight:700;color:#1F2D5C;">Romania performance</span>
+  </div>
+  <div class="section-desc">Reach, views and engagement rate · WoW and MoM</div>
+
+  <div class="section-label">Week over Week · Apr 6–12 vs Apr 13–19, 2026</div>
+  <div class="kpi-grid">
+    <div class="kpi-card fb-card">
+      <div class="kpi-label">Views (prev)</div>
+      <div class="kpi-value">4,989</div>
+    </div>
+    <div class="kpi-card fb-card">
+      <div class="kpi-label">Views (curr)</div>
+      <div class="kpi-value">1,985</div>
+      <div class="kpi-delta negative">▼ 60.21% WoW</div>
+    </div>
+    <div class="kpi-card fb-card">
+      <div class="kpi-label">ER (prev)</div>
+      <div class="kpi-value">1.36%</div>
+    </div>
+    <div class="kpi-card fb-card">
+      <div class="kpi-label">ER (curr)</div>
+      <div class="kpi-value">1.32%</div>
+      <div class="kpi-delta negative">▼ 0.04pp WoW</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">Month over Month · March vs April 2026</div>
+  <div class="kpi-grid">
+    <div class="kpi-card fb-card">
+      <div class="kpi-label">Organic Reach (Mar)</div>
+      <div class="kpi-value">2,430</div>
+    </div>
+    <div class="kpi-card fb-card">
+      <div class="kpi-label">Organic Reach (Apr)</div>
+      <div class="kpi-value">7,163</div>
+      <div class="kpi-delta positive">▲ 194.8% MoM</div>
+    </div>
+    <div class="kpi-card fb-card">
+      <div class="kpi-label">Organic Views (Mar)</div>
+      <div class="kpi-value">6,791</div>
+    </div>
+    <div class="kpi-card fb-card">
+      <div class="kpi-label">Organic Views (Apr)</div>
+      <div class="kpi-value">8,000</div>
+      <div class="kpi-delta positive">▲ 17.8% MoM</div>
+    </div>
+    <div class="kpi-card fb-card">
+      <div class="kpi-label">ER (Mar)</div>
+      <div class="kpi-value">7.20%</div>
+    </div>
+    <div class="kpi-card fb-card">
+      <div class="kpi-label">ER (Apr)</div>
+      <div class="kpi-value">1.54%</div>
+      <div class="kpi-delta negative">▼ 5.66pp MoM</div>
+    </div>
+    <div class="kpi-card fb-card">
+      <div class="kpi-label">LP from FB (Mar)</div>
+      <div class="kpi-value">180</div>
+    </div>
+    <div class="kpi-card fb-card">
+      <div class="kpi-label">LP from FB (Apr)</div>
+      <div class="kpi-value">109</div>
+      <div class="kpi-delta negative">▼ 39.4% MoM</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Facebook views — WoW</div>
+      <div class="chart-period">Apr 6–12 vs Apr 13–19, 2026</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 6–12</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#1877f2;"></span>Apr 13–19</span>
+      </div>
+      <div style="position:relative;height:200px;"><canvas id="fbWoWChart" role="img" aria-label="Facebook views WoW">Apr 6-12: 4,989. Apr 13-19: 1,985.</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Facebook reach & views — MoM</div>
+      <div class="chart-period">Organic reach and views March vs April</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>March</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#1877f2;"></span>April</span>
+      </div>
+      <div style="position:relative;height:200px;"><canvas id="fbMoMChart" role="img" aria-label="Facebook reach and views MoM">March: Reach 2430, Views 6791. April: Reach 7163, Views 8000.</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Facebook ER — WoW vs MoM</div>
+      <div class="chart-period">Engagement rate % across periods</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1877f2;"></span>FB ER %</span>
+      </div>
+      <div style="position:relative;height:200px;"><canvas id="fbErChart" role="img" aria-label="Facebook engagement rate across periods">Mar: 7.20%, Apr: 1.54%, WoW Apr 6-12: 1.36%, WoW Apr 13-19: 1.32%.</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Facebook LP traffic — MoM</div>
+      <div class="chart-period">Clicks to landing page from Facebook</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>March</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#1877f2;"></span>April</span>
+      </div>
+      <div style="position:relative;height:200px;"><canvas id="fbLpChart" role="img" aria-label="Facebook LP traffic MoM">March: 180 clicks. April: 109 clicks.</canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ LANDING PAGE & WIA -->
+<div id="tab-traffic" class="section">
+  <div class="platform-header">
+    <span class="platform-pill pill-lp">Landing Page</span>
+    <span class="platform-pill pill-wia" style="margin-left:6px;">WIA Campaign</span>
+  </div>
+  <div class="section-desc">Website clicks from social media · March vs April 2026</div>
+
+  <div class="section-label">Landing page traffic — MoM</div>
+  <div class="kpi-grid">
+    <div class="kpi-card lp-card">
+      <div class="kpi-label">Total LP (Mar)</div>
+      <div class="kpi-value">225</div>
+    </div>
+    <div class="kpi-card lp-card">
+      <div class="kpi-label">Total LP (Apr)</div>
+      <div class="kpi-value">117</div>
+      <div class="kpi-delta negative">▼ 48.0% MoM</div>
+    </div>
+    <div class="kpi-card fb-card">
+      <div class="kpi-label">LP from FB (Mar)</div>
+      <div class="kpi-value">180</div>
+    </div>
+    <div class="kpi-card fb-card">
+      <div class="kpi-label">LP from FB (Apr)</div>
+      <div class="kpi-value">109</div>
+      <div class="kpi-delta negative">▼ 39.4% MoM</div>
+    </div>
+    <div class="kpi-card li-card">
+      <div class="kpi-label">LP from LI (Mar)</div>
+      <div class="kpi-value">39</div>
+    </div>
+    <div class="kpi-card li-card">
+      <div class="kpi-label">LP from LI (Apr)</div>
+      <div class="kpi-value">8</div>
+      <div class="kpi-delta negative">▼ 79.5% MoM</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">WIA (Women in Accounting) — MoM</div>
+  <div class="kpi-grid">
+    <div class="kpi-card wia-card">
+      <div class="kpi-label">WIA from SM (Mar)</div>
+      <div class="kpi-value">149</div>
+    </div>
+    <div class="kpi-card wia-card">
+      <div class="kpi-label">WIA from SM (Apr)</div>
+      <div class="kpi-value">77</div>
+      <div class="kpi-delta negative">▼ 48.3% MoM</div>
+    </div>
+    <div class="kpi-card lp-card">
+      <div class="kpi-label">Post shares (Mar)</div>
+      <div class="kpi-value">12</div>
+    </div>
+    <div class="kpi-card lp-card">
+      <div class="kpi-label">Post shares (Apr)</div>
+      <div class="kpi-value">26</div>
+      <div class="kpi-delta positive">▲ 116.7% MoM</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">LP traffic by source — MoM</div>
+      <div class="chart-period">Total, Facebook, LinkedIn</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>March</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#4B9CD3;"></span>April</span>
+      </div>
+      <div style="position:relative;height:220px;"><canvas id="lpMoMChart" role="img" aria-label="Landing page traffic by source MoM">March: Total 225, FB 180, LI 39. April: Total 117, FB 109, LI 8.</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">LP source split — March vs April</div>
+      <div class="chart-period">Facebook vs LinkedIn share</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1877f2;"></span>Facebook</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#0a66c2;"></span>LinkedIn</span>
+      </div>
+      <div style="position:relative;height:220px;"><canvas id="lpSplitMoM" role="img" aria-label="LP source split donut March vs April">March: FB 80%, LI 17%. April: FB 93%, LI 7%.</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">WIA interactions — MoM</div>
+      <div class="chart-period">Women in Accounting campaign clicks from SM</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#9b59b6;"></span>WIA from SM</span>
+      </div>
+      <div style="position:relative;height:220px;"><canvas id="wiaChart" role="img" aria-label="WIA interactions MoM">March: 149. April: 77.</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Post shares & reposts — MoM</div>
+      <div class="chart-period">Organic share/repost count</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#2ECC71;"></span>Shares/reposts</span>
+      </div>
+      <div style="position:relative;height:220px;"><canvas id="sharesChart" role="img" aria-label="Post shares MoM">March: 12 shares. April: 26 shares.</canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ TABLE -->
+<div id="tab-table" class="section">
+  <div class="section-title">Full data table — Romania social media</div>
+  <div class="section-desc">All metrics across time frames</div>
+
+  <div class="section-label" style="margin-bottom:8px;">MoM — March vs April 2026</div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Metric</th><th>Platform</th><th>March 2026</th><th>April 2026</th><th>MoM change</th></tr></thead>
+      <tbody>
+        <tr><td>Organic Impressions</td><td>LinkedIn</td><td>3,814</td><td>639</td><td class="tag-negative">▼ 83.2%</td></tr>
+        <tr><td>Organic Reach</td><td>Facebook</td><td>2,430</td><td>7,163</td><td class="tag-positive">▲ 194.8%</td></tr>
+        <tr><td>Organic Views</td><td>Facebook</td><td>6,791</td><td>8,000</td><td class="tag-positive">▲ 17.8%</td></tr>
+        <tr><td>Engagement Rate</td><td>LinkedIn</td><td>4.64%</td><td>4.38%</td><td class="tag-negative">▼ 0.26pp</td></tr>
+        <tr><td>Engagement Rate</td><td>Facebook</td><td>7.20%</td><td>1.54%</td><td class="tag-negative">▼ 5.66pp</td></tr>
+        <tr><td>LP traffic (total)</td><td>All SM</td><td>225</td><td>117</td><td class="tag-negative">▼ 48.0%</td></tr>
+        <tr><td>LP traffic</td><td>Facebook</td><td>180</td><td>109</td><td class="tag-negative">▼ 39.4%</td></tr>
+        <tr><td>LP traffic</td><td>LinkedIn</td><td>39</td><td>8</td><td class="tag-negative">▼ 79.5%</td></tr>
+        <tr><td>WIA from total SM</td><td>All SM</td><td>149</td><td>77</td><td class="tag-negative">▼ 48.3%</td></tr>
+        <tr><td>Post shares / reposts</td><td>All SM</td><td>12</td><td>26</td><td class="tag-positive">▲ 116.7%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-label" style="margin-bottom:8px;margin-top:24px;">WoW — Apr 6–12 vs Apr 13–19, 2026</div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Metric</th><th>Platform</th><th>Apr 6–12</th><th>Apr 13–19</th><th>WoW change</th></tr></thead>
+      <tbody>
+        <tr><td>Impressions</td><td>LinkedIn</td><td>229</td><td>202</td><td class="tag-negative">▼ 11.79%</td></tr>
+        <tr><td>Engagement Rate</td><td>LinkedIn</td><td>3.49%</td><td>7.43%</td><td class="tag-positive">▲ 3.94pp</td></tr>
+        <tr><td>Views</td><td>Facebook</td><td>4,989</td><td>1,985</td><td class="tag-negative">▼ 60.21%</td></tr>
+        <tr><td>Engagement Rate</td><td>Facebook</td><td>1.36%</td><td>1.32%</td><td class="tag-negative">▼ 0.04pp</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="footnote">* MoM data covers Jan–Dec 2026 reporting window, comparing Mar 2026 vs Apr 2026. WoW data covers Apr 6–12 vs Apr 13–19, 2026.</div>
+</div>
+
+<script>
+function switchTab(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  const map = { overview: 0, linkedin: 1, facebook: 2, traffic: 3, table: 4 };
+  document.querySelectorAll('.nav-tab')[map[name]].classList.add('active');
+}
+
+const navy = '#1F2D5C';
+const blue = '#4B9CD3';
+const green = '#2ECC71';
+const amber = '#F39C12';
+const red = '#E74C3C';
+const liBlue = '#0a66c2';
+const fbBlue = '#1877f2';
+const wia = '#9b59b6';
+
+const baseOpts = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { display: false } },
+  scales: {
+    x: { ticks: { font: { size: 11 }, color: '#888' }, grid: { display: false } },
+    y: { ticks: { font: { size: 11 }, color: '#888' }, grid: { color: 'rgba(0,0,0,0.05)' } }
+  }
+};
+
+const pctOpts = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.parsed.y.toFixed(2) + '%' } } },
+  scales: {
+    x: { ticks: { font: { size: 11 }, color: '#888' }, grid: { display: false } },
+    y: { ticks: { font: { size: 11 }, color: '#888', callback: v => v + '%' }, grid: { color: 'rgba(0,0,0,0.05)' } }
+  }
+};
+
+// Overview charts
+new Chart(document.getElementById('reachChart'), {
+  type: 'bar',
+  data: { labels: ['LI Impressions', 'FB Reach', 'FB Views'], datasets: [
+    { label: 'March', data: [3814, 2430, 6791], backgroundColor: navy, borderRadius: 4 },
+    { label: 'April', data: [639, 7163, 8000], backgroundColor: blue, borderRadius: 4 }
+  ]},
+  options: baseOpts
+});
+
+new Chart(document.getElementById('erChart'), {
+  type: 'bar',
+  data: { labels: ['LI ER', 'FB ER'], datasets: [
+    { label: 'March', data: [4.64, 7.20], backgroundColor: navy, borderRadius: 4 },
+    { label: 'April', data: [4.38, 1.54], backgroundColor: blue, borderRadius: 4 }
+  ]},
+  options: pctOpts
+});
+
+new Chart(document.getElementById('lpChart'), {
+  type: 'bar',
+  data: { labels: ['Total LP', 'From FB', 'From LI'], datasets: [
+    { label: 'March', data: [225, 180, 39], backgroundColor: navy, borderRadius: 4 },
+    { label: 'April', data: [117, 109, 8], backgroundColor: blue, borderRadius: 4 }
+  ]},
+  options: baseOpts
+});
+
+new Chart(document.getElementById('lpSplitChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Facebook (93%)', 'LinkedIn (7%)'],
+    datasets: [{ data: [109, 8], backgroundColor: [fbBlue, liBlue], borderWidth: 0, hoverOffset: 6 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '65%' }
+});
+
+// LinkedIn charts
+new Chart(document.getElementById('liWoWChart'), {
+  type: 'bar',
+  data: { labels: ['Apr 6–12', 'Apr 13–19'], datasets: [{ data: [229, 202], backgroundColor: [navy, liBlue], borderRadius: 4 }] },
+  options: baseOpts
+});
+new Chart(document.getElementById('liErWoWChart'), {
+  type: 'bar',
+  data: { labels: ['Apr 6–12', 'Apr 13–19'], datasets: [{ data: [3.49, 7.43], backgroundColor: [navy, liBlue], borderRadius: 4 }] },
+  options: pctOpts
+});
+new Chart(document.getElementById('liMoMChart'), {
+  type: 'bar',
+  data: { labels: ['March', 'April'], datasets: [{ data: [3814, 639], backgroundColor: [navy, liBlue], borderRadius: 4 }] },
+  options: baseOpts
+});
+new Chart(document.getElementById('liLpChart'), {
+  type: 'bar',
+  data: { labels: ['March', 'April'], datasets: [{ data: [39, 8], backgroundColor: [navy, liBlue], borderRadius: 4 }] },
+  options: baseOpts
+});
+
+// Facebook charts
+new Chart(document.getElementById('fbWoWChart'), {
+  type: 'bar',
+  data: { labels: ['Apr 6–12', 'Apr 13–19'], datasets: [{ data: [4989, 1985], backgroundColor: [navy, fbBlue], borderRadius: 4 }] },
+  options: baseOpts
+});
+new Chart(document.getElementById('fbMoMChart'), {
+  type: 'bar',
+  data: { labels: ['Reach', 'Views'], datasets: [
+    { label: 'March', data: [2430, 6791], backgroundColor: navy, borderRadius: 4 },
+    { label: 'April', data: [7163, 8000], backgroundColor: fbBlue, borderRadius: 4 }
+  ]},
+  options: baseOpts
+});
+new Chart(document.getElementById('fbErChart'), {
+  type: 'bar',
+  data: { labels: ['Mar', 'Apr', 'WoW 6–12', 'WoW 13–19'], datasets: [{ data: [7.20, 1.54, 1.36, 1.32], backgroundColor: [navy, fbBlue, navy, fbBlue], borderRadius: 4 }] },
+  options: pctOpts
+});
+new Chart(document.getElementById('fbLpChart'), {
+  type: 'bar',
+  data: { labels: ['March', 'April'], datasets: [{ data: [180, 109], backgroundColor: [navy, fbBlue], borderRadius: 4 }] },
+  options: baseOpts
+});
+
+// LP & WIA charts
+new Chart(document.getElementById('lpMoMChart'), {
+  type: 'bar',
+  data: { labels: ['Total LP', 'From FB', 'From LI'], datasets: [
+    { label: 'March', data: [225, 180, 39], backgroundColor: navy, borderRadius: 4 },
+    { label: 'April', data: [117, 109, 8], backgroundColor: blue, borderRadius: 4 }
+  ]},
+  options: baseOpts
+});
+
+new Chart(document.getElementById('lpSplitMoM'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Facebook', 'LinkedIn', 'Other'],
+    datasets: [
+      { label: 'March', data: [180, 39, 6], backgroundColor: [fbBlue, liBlue, '#ccc'], borderWidth: 2, borderColor: '#fff' },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.label + ': ' + ctx.parsed } } },
+    cutout: '55%'
+  }
+});
+
+new Chart(document.getElementById('wiaChart'), {
+  type: 'bar',
+  data: { labels: ['March', 'April'], datasets: [{ data: [149, 77], backgroundColor: [navy, wia], borderRadius: 4 }] },
+  options: baseOpts
+});
+
+new Chart(document.getElementById('sharesChart'), {
+  type: 'bar',
+  data: { labels: ['March', 'April'], datasets: [{ data: [12, 26], backgroundColor: [navy, green], borderRadius: 4 }] },
+  options: baseOpts
+});
+</script>
+</body>
+</html>
