@@ -1,0 +1,329 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--Y:#FAC300;--B:#2851F5;--N:#000724;--W:#fff}
+body{font-family:'DM Sans',sans-serif;background:#000724}
+.wrap{width:100%;max-width:680px;margin:0 auto}
+.vp{overflow:hidden;border-radius:8px;aspect-ratio:16/9;position:relative}
+.trk{display:flex;height:100%;transition:transform 0.42s cubic-bezier(0.77,0,0.18,1)}
+.slide{min-width:100%;height:100%;position:relative;overflow:hidden;display:flex;align-items:center}
+.s-blue{background:var(--B)}
+.s-navy{background:var(--N)}
+.s-yellow{background:var(--Y)}
+.hx{position:absolute;clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);transform:rotate(15deg)}
+.inn{position:relative;z-index:2;display:flex;width:100%;height:100%;padding:0 46px;align-items:center;gap:20px}
+.L{flex:0 0 auto;max-width:272px}
+.R{flex:1;display:flex;justify-content:flex-end;align-items:center;height:100%;padding:16px 0}
+
+.logo{display:flex;align-items:center;gap:7px;margin-bottom:16px}
+.lhex{width:26px;height:26px;clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center}
+.lhex s{font-size:7.5px;font-weight:900;color:#fff;text-decoration:none}
+.lwrd{font-size:11px;font-weight:800;letter-spacing:1.8px;color:#fff}
+.s-yellow .lwrd{color:var(--N)}
+.s-yellow .lhex{background:rgba(0,7,36,0.14)}
+.s-yellow .lhex s{color:var(--N)}
+
+.tag{display:inline-block;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:3px;font-size:8.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.7);padding:3px 8px;margin-bottom:9px}
+.s-yellow .tag{background:rgba(0,7,36,0.08);border-color:rgba(0,7,36,0.15);color:rgba(0,7,36,0.5)}
+
+.hl{font-size:30px;font-weight:900;line-height:1.08;color:#fff;margin-bottom:11px;letter-spacing:-1px}
+.hl i{font-style:normal;color:rgba(255,255,255,0.42)}
+.s-yellow .hl{color:var(--N)}
+.s-yellow .hl i{color:rgba(0,7,36,0.32)}
+.sub{font-size:12.5px;line-height:1.68;color:rgba(255,255,255,0.58);margin-bottom:20px;max-width:258px}
+.s-yellow .sub{color:rgba(0,7,36,0.56)}
+.cta{display:inline-block;background:var(--Y);color:var(--N);font-weight:800;font-size:12.5px;border:none;cursor:pointer;padding:10px 22px;border-radius:4px;letter-spacing:0.1px;transition:filter .15s,transform .12s}
+.cta:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.cta:active{transform:scale(0.97)}
+.s-navy .cta{background:var(--B);color:#fff}
+.s-yellow .cta{background:var(--N);color:#fff}
+
+/* Badges */
+.badges-scene{position:relative;width:240px;height:210px}
+.fbadge{position:absolute;background:#fff;border-radius:10px;padding:8px 13px;display:flex;align-items:center;gap:7px;box-shadow:0 8px 28px rgba(0,7,36,0.38);font-size:11.5px;font-weight:700;color:#111;white-space:nowrap}
+
+/* Dashboard */
+.dash{background:#fff;border-radius:14px;padding:15px 17px;width:226px;box-shadow:0 14px 44px rgba(0,7,36,0.45)}
+.dc-avatar{width:28px;height:28px;border-radius:50%;background:#e8e8e8;margin-bottom:8px;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700;color:#888}
+.dc-ttl{font-size:14px;font-weight:900;color:#111;margin-bottom:10px;letter-spacing:-0.3px}
+.dc-row{display:flex;align-items:center;gap:7px;padding:6.5px 0;border-bottom:1px solid #f0f0f0}
+.dc-row:last-of-type{border:none}
+.dc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dc-lbl{font-size:9.5px;color:#999;font-weight:500}
+.dc-val{font-size:12.5px;font-weight:800;color:#111}
+.dc-right{text-align:right}
+.dc-auth{font-size:9px;color:#bbb}
+.dc-authv{font-size:12px;font-weight:700;color:#555}
+.dc-up{margin-top:9px;padding-top:9px;border-top:1px solid #f0f0f0}
+.dc-uplbl{font-size:9.5px;font-weight:700;color:#111;margin-bottom:5px}
+.dc-month{font-size:10.5px;color:#aaa;font-weight:500}
+.dc-day{font-size:26px;font-weight:900;color:#111;line-height:1}
+
+/* Chat */
+.chat{background:#fff;border-radius:14px;overflow:hidden;width:228px;box-shadow:0 14px 44px rgba(0,7,36,0.45)}
+.ch-head{padding:10px 14px;border-bottom:1px solid #f2f2f2}
+.ch-ttl{font-size:12px;font-weight:700;color:#111}
+.ch-tabs{display:flex;gap:12px;margin-top:5px}
+.ch-tab{font-size:9.5px;font-weight:600;color:#ccc;padding-bottom:3px}
+.ch-tab.on{color:var(--B);border-bottom:2px solid var(--B)}
+.ch-body{padding:10px 14px;display:flex;flex-direction:column;gap:6px}
+.ch-team{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.ch-team-lbl{font-size:10px;font-weight:700;color:#333}
+.ch-badge{background:var(--B);color:#fff;font-size:8.5px;font-weight:700;padding:2px 6px;border-radius:10px}
+.msg{background:#f5f5f7;border-radius:7px;padding:6px 9px;font-size:9.5px;color:#333;line-height:1.45}
+.msg-from{font-size:8px;font-weight:700;color:#bbb;margin-bottom:2px}
+.ch-linked{background:#f0f0f5;border-radius:6px;padding:5px 9px;display:flex;align-items:center;gap:6px;margin-top:1px}
+
+/* Stat cards */
+.stat-grid{display:flex;flex-direction:column;gap:8px;max-width:230px}
+.stat-card{background:rgba(0,7,36,0.07);border:1px solid rgba(0,7,36,0.1);border-radius:6px;padding:11px 14px;display:flex;align-items:center;gap:12px}
+.stat-icon{width:32px;height:32px;border-radius:6px;background:rgba(0,7,36,0.09);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.stat-num{font-size:20px;font-weight:900;color:var(--N);line-height:1}
+.stat-lbl{font-size:10.5px;color:rgba(0,7,36,0.5);font-weight:500;margin-top:1px}
+
+/* Trust */
+.trust-col{display:flex;flex-direction:column;gap:8px;max-width:232px}
+.t-rating{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);border-radius:8px;padding:12px 18px;display:flex;align-items:center;gap:14px}
+.t-stars{color:var(--Y);font-size:13px;letter-spacing:2px;margin-bottom:2px}
+.t-num{font-size:32px;font-weight:900;color:#fff;line-height:1}
+.t-sub{font-size:9px;color:rgba(255,255,255,0.38);font-weight:500;margin-top:2px}
+.t-quote{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);border-radius:8px;padding:13px 14px}
+.t-qq{font-size:22px;color:var(--Y);line-height:0.8;margin-bottom:6px;font-family:Georgia,serif}
+.t-quote-text{font-size:10px;color:rgba(255,255,255,0.78);line-height:1.6;margin-bottom:9px}
+.t-divider{width:24px;height:1.5px;background:rgba(255,255,255,0.15);margin-bottom:7px}
+.t-name{font-size:10px;font-weight:700;color:#fff;margin-bottom:1px}
+.t-role{font-size:9px;color:rgba(255,255,255,0.42);font-weight:500}
+
+/* Shield */
+.shield-col{display:flex;flex-direction:column;align-items:center;gap:9px}
+.ttag{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);border-radius:4px;padding:6px 14px;font-size:11px;font-weight:700;color:#fff;text-align:center;white-space:nowrap}
+
+/* NAV */
+.dots-row{display:flex;justify-content:center;gap:7px;margin-top:11px}
+.d{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.18);cursor:pointer;transition:background .2s,transform .2s}
+.d.on{background:#FAC300;transform:scale(1.4)}
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:9px;padding:0 2px}
+.arr{width:34px;height:34px;border-radius:4px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.arr:hover{background:rgba(255,255,255,0.14);color:#fff}
+.cnt{font-size:11px;color:rgba(255,255,255,0.28);font-weight:500}
+</style>
+
+<div class="wrap">
+<div class="vp">
+<div class="trk" id="tr">
+
+  <!-- 1 · HERO -->
+  <div class="slide s-blue">
+    <div class="hx" style="width:380px;height:380px;background:rgba(0,7,36,0.28);right:-95px;top:-85px"></div>
+    <div class="inn">
+      <div class="L">
+        <div class="logo"><div class="lhex"><s>TD</s></div><span class="lwrd">TAXDOME</span></div>
+        <div class="tag">For accounting firms · DACH</div>
+        <h2 class="hl">Your team is<br>buried in<br><i>manual work.</i></h2>
+        <p class="sub">Chasing clients, re-sending documents, updating spreadsheets — your firm deserves better than this.</p>
+        <button class="cta">Run Your Firm Automatically</button>
+      </div>
+      <div class="R" style="justify-content:center">
+        <div class="badges-scene">
+          <div class="fbadge" style="top:8px;left:0;transform:rotate(-5deg)"><span>⚠️</span>Missing docs</div>
+          <div class="fbadge" style="top:4px;right:0;transform:rotate(4deg)"><span>🔴</span>Spreadsheet chaos</div>
+          <div class="fbadge" style="top:76px;left:8px;transform:rotate(3deg)"><span>⏰</span>Client chasing</div>
+          <div class="fbadge" style="top:72px;right:-8px;transform:rotate(-4deg)"><span>❌</span>Wrong assignees</div>
+          <div class="fbadge" style="bottom:14px;left:28px;transform:rotate(-2deg)"><span>📂</span>Duplicate work</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 · Every client on autopilot -->
+  <div class="slide s-navy">
+    <div class="hx" style="width:360px;height:360px;background:rgba(40,81,245,0.2);right:-90px;top:-80px"></div>
+    <div class="inn">
+      <div class="L">
+        <div class="logo"><div class="lhex"><s>TD</s></div><span class="lwrd">TAXDOME</span></div>
+        <div class="tag">Automate everything</div>
+        <h2 class="hl">Every client.<br>Every deadline.<br><i>On autopilot.</i></h2>
+        <p class="sub">Stop tracking work across emails and sticky notes. Every client, document and deadline managed in one workflow — automatically.</p>
+        <button class="cta">Get Control</button>
+      </div>
+      <div class="R">
+        <div class="dash">
+          <div class="dc-avatar">MT</div>
+          <div class="dc-ttl">2025 Tax Return</div>
+          <div class="dc-row">
+            <div class="dc-dot" style="background:#7C5CE0"></div>
+            <div style="flex:1"><div class="dc-lbl">Taxes owed</div><div class="dc-val">€8,561.00</div></div>
+            <div class="dc-right"><div class="dc-auth">Tax authorities</div><div class="dc-authv">3</div></div>
+          </div>
+          <div class="dc-row">
+            <div class="dc-dot" style="background:#F5A623"></div>
+            <div style="flex:1"><div class="dc-lbl">Estimated taxes</div><div class="dc-val">€7,500.00</div></div>
+            <div class="dc-right"><div class="dc-auth">Tax authorities</div><div class="dc-authv">2</div></div>
+          </div>
+          <div class="dc-row">
+            <div class="dc-dot" style="background:#27AE60"></div>
+            <div style="flex:1"><div class="dc-lbl">Refunds</div><div class="dc-val">€30,883.00</div></div>
+            <div class="dc-right"><div class="dc-auth">Tax authorities</div><div class="dc-authv">3</div></div>
+          </div>
+          <div class="dc-up">
+            <div class="dc-uplbl">Upcoming deadlines</div>
+            <div class="dc-month">April &nbsp;Tuesday</div>
+            <div class="dc-day">14</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 · Still juggling tools -->
+  <div class="slide s-blue">
+    <div class="hx" style="width:340px;height:340px;background:rgba(0,7,36,0.26);right:-80px;top:-70px"></div>
+    <div class="inn">
+      <div class="L">
+        <div class="logo"><div class="lhex"><s>TD</s></div><span class="lwrd">TAXDOME</span></div>
+        <div class="tag">One platform · Everything connected</div>
+        <h2 class="hl">Still juggling<br>5 different<br><i>tools?</i></h2>
+        <p class="sub">Email, WhatsApp, shared drives, spreadsheets, e-signature tools — replace all of them with one secure client portal.</p>
+        <button class="cta">See It In Action</button>
+      </div>
+      <div class="R">
+        <div class="chat">
+          <div class="ch-head">
+            <div class="ch-ttl">Müller GmbH · Q1 Filing</div>
+            <div class="ch-tabs">
+              <div class="ch-tab on">Chat</div>
+              <div class="ch-tab">Documents</div>
+              <div class="ch-tab">Linked jobs</div>
+            </div>
+          </div>
+          <div class="ch-body">
+            <div class="ch-team"><span class="ch-team-lbl">Team chat</span><span class="ch-badge">18</span></div>
+            <div class="msg"><div class="msg-from">You</div>Could you please send the missing documents? We have a filing deadline this week.</div>
+            <div class="msg"><div class="msg-from">Mr. Müller</div>I'm sorry — I forgot. Which documents do you still need?</div>
+            <div class="ch-linked">
+              <span style="font-size:10px">📁</span>
+              <span style="font-size:9.5px;font-weight:600;color:#333;flex:1">VAT returns Q1 2025</span>
+              <span style="font-size:8.5px;background:var(--B);color:#fff;padding:1px 6px;border-radius:8px;font-weight:700">2</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 · Scale — yellow, clients not mandates -->
+  <div class="slide s-yellow">
+    <div class="hx" style="width:340px;height:340px;background:rgba(0,7,36,0.09);right:-80px;top:-70px"></div>
+    <div class="inn">
+      <div class="L">
+        <div class="logo"><div class="lhex"><s>TD</s></div><span class="lwrd">TAXDOME</span></div>
+        <div class="tag">Grow without burning out</div>
+        <h2 class="hl">Handle more<br>clients.<br><i>Same team.</i></h2>
+        <p class="sub">Firms use TaxDome to grow their capacity — without a single extra hire. Less chaos, more revenue.</p>
+        <button class="cta">See How Firms Scale</button>
+      </div>
+      <div class="R">
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-icon">⏱</div>
+            <div><div class="stat-num">40%</div><div class="stat-lbl">Less time on admin tasks</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📋</div>
+            <div><div class="stat-num">0</div><div class="stat-lbl">Manual follow-ups needed</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🗂</div>
+            <div><div class="stat-num">1</div><div class="stat-lbl">Platform for everything</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5 · Trust + Sebastian quote -->
+  <div class="slide s-navy">
+    <div class="hx" style="width:360px;height:360px;background:rgba(40,81,245,0.2);right:-90px;top:-80px"></div>
+    <div class="inn">
+      <div class="L">
+        <div class="logo"><div class="lhex"><s>TD</s></div><span class="lwrd">TAXDOME</span></div>
+        <div class="tag">Trusted by 15,000+ firms worldwide</div>
+        <h2 class="hl">Software that<br><i>grows with<br>your firm.</i></h2>
+        <p class="sub">Firms use TaxDome to stop firefighting and start scaling — with automation that actually works.</p>
+        <button class="cta">Start Your Free Trial</button>
+      </div>
+      <div class="R">
+        <div class="trust-col">
+          <div class="t-rating">
+            <div>
+              <div class="t-stars">★★★★★</div>
+              <div class="t-num">4.9</div>
+            </div>
+            <div>
+              <div style="font-size:11px;font-weight:700;color:#fff;margin-bottom:2px">30,000+ ratings</div>
+              <div class="t-sub">worldwide</div>
+            </div>
+          </div>
+          <div class="t-quote">
+            <div class="t-qq">"</div>
+            <div class="t-quote-text">Automation through pipelines is a real value add. We can easily send tasks and questionnaires automatically and map our processes much more effectively.</div>
+            <div class="t-divider"></div>
+            <div class="t-name">Sebastian Schmeer</div>
+            <div class="t-role">Firm Owner · Schmeer Tax Advisory & Auditing</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6 · EU Security — last -->
+  <div class="slide s-blue">
+    <div class="hx" style="width:380px;height:380px;background:rgba(0,7,36,0.28);right:-95px;top:-85px"></div>
+    <div class="inn">
+      <div class="L">
+        <div class="logo"><div class="lhex"><s>TD</s></div><span class="lwrd">TAXDOME</span></div>
+        <div class="tag">Data security · GDPR</div>
+        <h2 class="hl">EU-grade<br>security.<br><i>No compromises.</i></h2>
+        <p class="sub">All client data stored in Frankfurt, Germany — under strict EU standards. GDPR compliant. Enterprise-level encryption. Always.</p>
+        <button class="cta">Learn More</button>
+      </div>
+      <div class="R">
+        <div class="shield-col">
+          <svg width="86" height="96" viewBox="0 0 86 96" fill="none">
+            <path d="M43 3L5 19V46C5 66 21 84 43 91C65 84 81 66 81 46V19L43 3Z" fill="rgba(0,7,36,0.45)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+            <path d="M43 14L17 27V46C17 62 28 76 43 83C58 76 69 62 69 46V27L43 14Z" fill="rgba(0,7,36,0.28)" stroke="rgba(255,255,255,0.16)" stroke-width="1"/>
+            <text x="43" y="55" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="18" font-weight="900" fill="#FAC300">EU</text>
+          </svg>
+          <div class="ttag">🇩🇪 &nbsp;Server location: Frankfurt, DE</div>
+          <div class="ttag">✓ &nbsp;GDPR compliant</div>
+          <div class="ttag">🔒 &nbsp;Enterprise-level encryption</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="nav-row">
+  <button class="arr" id="prev">&#8592;</button>
+  <div>
+    <div class="dots-row" id="dots"></div>
+    <div class="cnt" id="cnt" style="text-align:center;margin-top:6px">1 / 6</div>
+  </div>
+  <button class="arr" id="next">&#8594;</button>
+</div>
+</div>
+
+<script>
+const tr=document.getElementById('tr'),dotsEl=document.getElementById('dots'),cnt=document.getElementById('cnt');
+const N=6;let c=0;
+for(let i=0;i<N;i++){const d=document.createElement('div');d.className='d'+(i===0?' on':'');d.onclick=()=>go(i);dotsEl.appendChild(d);}
+function go(n){c=(n+N)%N;tr.style.transform=`translateX(-${c*100}%)`;document.querySelectorAll('.d').forEach((d,i)=>d.classList.toggle('on',i===c));cnt.textContent=`${c+1} / ${N}`;}
+document.getElementById('prev').onclick=()=>go(c-1);
+document.getElementById('next').onclick=()=>go(c+1);
+let sx=0;
+tr.parentElement.addEventListener('touchstart',e=>sx=e.touches[0].clientX,{passive:true});
+tr.parentElement.addEventListener('touchend',e=>{const dx=sx-e.changedTouches[0].clientX;if(Math.abs(dx)>40)go(c+(dx>0?1:-1));},{passive:true});
+</script>
