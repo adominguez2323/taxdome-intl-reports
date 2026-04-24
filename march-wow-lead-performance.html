@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Lead Generation Performance — WoW | March 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy: #1F2D5C;
+    --blue: #4B9CD3;
+    --blue-light: #EBF4FB;
+    --green: #2ECC71;
+    --amber: #F39C12;
+    --red: #E74C3C;
+    --bg: #F0F3FA;
+    --card: #FFFFFF;
+    --border: #E2E8F0;
+    --text: #1A1F36;
+    --muted: #7B8DB0;
+    --dach: #1F2D5C;
+    --ro: #4B9CD3;
+    --uk: #F39C12;
+    --anz: #2ECC71;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 32px 28px 48px;
+    min-width: 700px;
+  }
+
+  /* ── HEADER ── */
+  .report-header {
+    margin-bottom: 32px;
+    border-bottom: 2px solid var(--navy);
+    padding-bottom: 20px;
+  }
+  .report-header .eyebrow {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 6px;
+  }
+  .report-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .report-header .period {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+  .report-header .period span {
+    color: var(--navy);
+    font-weight: 600;
+  }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--navy);
+    margin: 36px 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── MARKET CARDS (KPI grid per market) ── */
+  .markets-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 8px;
+  }
+
+  .market-card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 20px 22px;
+    box-shadow: 0 2px 12px rgba(31,45,92,0.07);
+    border-top: 4px solid var(--navy);
+  }
+  .market-card.dach { border-top-color: var(--dach); }
+  .market-card.ro   { border-top-color: var(--ro); }
+  .market-card.uk   { border-top-color: var(--uk); }
+  .market-card.anz  { border-top-color: var(--anz); }
+
+  .market-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .market-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .market-tag {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: var(--bg);
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .metrics-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+
+  .metric-cell {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .metric-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .metric-values {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    align-items: baseline;
+    margin-bottom: 4px;
+  }
+  .metric-week {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+  .metric-week span {
+    display: block;
+    font-size: 11px;
+    color: var(--text);
+    font-weight: 500;
+  }
+  .metric-arrow {
+    font-size: 8px;
+    color: var(--muted);
+    align-self: center;
+    margin: 0 1px;
+  }
+  .metric-delta {
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'DM Mono', monospace;
+    padding: 2px 5px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+  .metric-delta.pos { color: var(--green); background: rgba(46,204,113,0.1); }
+  .metric-delta.neg { color: var(--red);   background: rgba(231,76,60,0.1); }
+  .metric-delta.neu { color: var(--muted); background: rgba(123,141,176,0.08); }
+
+  /* ── CHART SECTION ── */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 8px;
+  }
+  .chart-card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 20px 22px;
+    box-shadow: 0 2px 12px rgba(31,45,92,0.07);
+  }
+  .chart-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 16px;
+  }
+  .chart-wrap {
+    position: relative;
+    height: 200px;
+  }
+
+  /* ── CONVERSION CHART FULL WIDTH ── */
+  .chart-card.full {
+    grid-column: 1 / -1;
+  }
+
+  /* ── WoW DELTA TABLE ── */
+  .delta-table-wrap {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 20px 22px;
+    box-shadow: 0 2px 12px rgba(31,45,92,0.07);
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+  thead th {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    padding: 8px 12px;
+    border-bottom: 2px solid var(--border);
+    text-align: left;
+  }
+  thead th:not(:first-child) { text-align: right; }
+  tbody td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tbody td:not(:first-child) { text-align: right; font-family: 'DM Mono', monospace; font-size: 12px; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--bg); }
+  .row-label { font-weight: 600; color: var(--navy); }
+  .market-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .td-pos { color: var(--green); font-weight: 700; }
+  .td-neg { color: var(--red);   font-weight: 700; }
+  .td-neu { color: var(--muted); }
+
+  /* ── FOOTER ── */
+  .report-footer {
+    margin-top: 36px;
+    font-size: 10.5px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="report-header">
+  <div class="eyebrow">TaxDome · International Growth</div>
+  <h1>Lead Generation & Conversion Performance</h1>
+  <div class="period">
+    Week-over-Week ·
+    <span>Mar 16–22, 2026</span> vs <span>Mar 23–29, 2026</span> ·
+    Markets: DACH · RO · UK · ANZ
+  </div>
+</div>
+
+<!-- ── SECTION 1: MARKET KPI CARDS ── -->
+<div class="section-title">Market Snapshots</div>
+
+<div class="markets-grid">
+
+  <!-- DACH -->
+  <div class="market-card dach">
+    <div class="market-card-header">
+      <div class="market-name">🇩🇪 DACH</div>
+      <div class="market-tag">Austria · Germany · Switzerland</div>
+    </div>
+    <div class="metrics-row">
+      <div class="metric-cell">
+        <div class="metric-label">Leads</div>
+        <div class="metric-values">
+          <div class="metric-week"><span>10</span>W1</div>
+          <div class="metric-arrow">→</div>
+          <div class="metric-week"><span>3</span>W2</div>
+        </div>
+        <div class="metric-delta neg">−70.00%</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">MQL</div>
+        <div class="metric-values">
+          <div class="metric-week"><span>7</span>W1</div>
+          <div class="metric-arrow">→</div>
+          <div class="metric-week"><span>2</span>W2</div>
+        </div>
+        <div class="metric-delta neg">−71.43%</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">SQL</div>
+        <div class="metric-values">
+          <div class="metric-week"><span>5</span>W1</div>
+          <div class="metric-arrow">→</div>
+          <div class="metric-week"><span>0</span>W2</div>
+        </div>
+        <div class="metric-delta neg">−100%</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">Lead→MQL</div>
+        <div class="metric-values">
+          <div class="metric-week"><span>70%</span>W1</div>
+          <div class="metric-arrow">→</div>
+          <div class="metric-week"><span>66.7%</span>W2</div>
+        </div>
+        <div class="metric-delta neg">−3.33%</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">MQL→SQL</div>
+        <div class="metric-values">
+          <div class="metric-week"><span>71.4%</span>W1</div>
+          <div class="metric-arrow">→</div>
+          <div class="metric-week"><span>0%</span>W2</div>
+        </div>
+        <div class="metric-delta neg">−71.43%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RO -->
+  <div class="market-card ro">
+    <div class="market-card-header">
+      <div class="market-name">🇷🇴 RO</div>
+      <div class="market-tag">Romania</div>
+    </div>
+    <div class="metrics-row">
+      <div class="metric-cell">
+        <div class="metric-label">Leads</div>
+        <div class="metric-values">
+          <div class="metric-week"><span>23</span>W1</div>
+          <div class="metric-arrow">→</div>
+          <div class="metric-week"><span>25</span>W2</div>
+        </div>
+        <div class="metric-delta pos">+8.70%</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">MQL</div>
+        <div class="metric-values">
+          <div class="metric-week"><span>6</span>W1</div>
+          <div class="metric-arrow">→</div>
+          <div class="metric-week"><span>13</span>W2</div>
+        </div>
+        <div class="metric-delta pos">+116.67%</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">SQL</div>
+        <div class="metric-values">
+          <div class="metric-week"><span>4</span>W1</div>
+          <div class="metric-arrow">→</div>
+          <div class="metric-week"><span>9</span>W2</div>
+        </div>
+        <div class="metric-delta pos">+125.00%</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">Lead→MQL</div>
+        <div class="metric-values">
+          <div class="metric-week"><span>26.1%</span>W1</div>
+          <div class="metric-arrow">→</div>
+          <div class="metric-week"><span>52%</span>W2</div>
+        </div>
+        <div class="metric-delta pos">+25.91%</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">MQL→SQL</div>
+        <div class="metric-values">
+          <div class="metric-week"><span>66.7%</span>W1</div>
+          <div class="metric-arrow">→</div>
+          <div class="metric-week"><span>69.2%</span>W2</div>
+        </div>
+        <div class="metric-delta pos">+2.56%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UK -->
+  <div class="market-card uk">
+    <div class="market-card-header">
+      <div class="market-name">🇬🇧 UK</div>
+      <div class="market-tag">United Kingdom</div>
+    </div>
+    <div class="metrics-row">
+      <div class="metric-cell">
+        <div class="metric-label">Leads</div>
+        <div class="metric-values">
+          <div class="metric-week"><span>13</span>W1</div>
+          <div class="metric-arrow">→</div>
+          <div class="metric-week"><span>5</span>W2</div>
+        </div>
+        <div class="metric-delta neg">−61.54%</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">MQL</div>
+        <div class="metric-values">
+          <div class="metric-week"><span>6</span>W1</div>
+          <div class="metric-arrow">→</div>
+          <div class="metric-week"><span>3</span>W2</div>
+        </div>
+        <div class="metric-delta neg">−50.00%</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">SQL</div>
+        <div class="metric-values">
+          <div class="metric-week"><span>4</span>W1</div>
+          <div class="metric-arrow">→</div>
+          <div class="metric-week"><span>3</span>W2</div>
+        </div>
+        <div class="metric-delta neg">−25.00%</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">Lead→MQL</div>
+        <div class="metric-values">
+          <div class="metric-week"><span>46.2%</span>W1</div>
+          <div class="metric-arrow">→</div>
+          <div class="metric-week"><span>60%</span>W2</div>
+        </div>
+        <div class="metric-delta pos">+13.85%</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">MQL→SQL</div>
+        <div class="metric-values">
+          <div class="metric-week"><span>66.7%</span>W1</div>
+          <div class="metric-arrow">→</div>
+          <div class="metric-week"><span>100%</span>W2</div>
+        </div>
+        <div class="metric-delta pos">+33.33%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANZ -->
+  <div class="market-card anz">
+    <div class="market-card-header">
+      <div class="market-name">🇦🇺 ANZ</div>
+      <div class="market-tag">Australia · New Zealand</div>
+    </div>
+    <div class="metrics-row">
+      <div class="metric-cell">
+        <div class="metric-label">Leads</div>
+        <div class="metric-values">
+          <div class="metric-week"><span>10</span>W1</div>
+          <div class="metric-arrow">→</div>
+          <div class="metric-week"><span>10</span>W2</div>
+        </div>
+        <div class="metric-delta neu">0.00%</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">MQL</div>
+        <div class="metric-values">
+          <div class="metric-week"><span>7</span>W1</div>
+          <div class="metric-arrow">→</div>
+          <div class="metric-week"><span>7</span>W2</div>
+        </div>
+        <div class="metric-delta neu">0.00%</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">SQL</div>
+        <div class="metric-values">
+          <div class="metric-week"><span>6</span>W1</div>
+          <div class="metric-arrow">→</div>
+          <div class="metric-week"><span>6</span>W2</div>
+        </div>
+        <div class="metric-delta neu">0.00%</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">Lead→MQL</div>
+        <div class="metric-values">
+          <div class="metric-week"><span>70%</span>W1</div>
+          <div class="metric-arrow">→</div>
+          <div class="metric-week"><span>70%</span>W2</div>
+        </div>
+        <div class="metric-delta neu">0.00%</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">MQL→SQL</div>
+        <div class="metric-values">
+          <div class="metric-week"><span>85.7%</span>W1</div>
+          <div class="metric-arrow">→</div>
+          <div class="metric-week"><span>85.7%</span>W2</div>
+        </div>
+        <div class="metric-delta neu">0.00%</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── SECTION 2: CHARTS ── -->
+<div class="section-title">Volume Trends</div>
+
+<div class="charts-grid">
+
+  <!-- Leads by Market W1 vs W2 -->
+  <div class="chart-card">
+    <div class="chart-title">Leads — W1 vs W2</div>
+    <div class="chart-wrap">
+      <canvas id="chartLeads"></canvas>
+    </div>
+  </div>
+
+  <!-- MQL by Market W1 vs W2 -->
+  <div class="chart-card">
+    <div class="chart-title">MQL — W1 vs W2</div>
+    <div class="chart-wrap">
+      <canvas id="chartMQL"></canvas>
+    </div>
+  </div>
+
+  <!-- SQL by Market W1 vs W2 -->
+  <div class="chart-card">
+    <div class="chart-title">SQL — W1 vs W2</div>
+    <div class="chart-wrap">
+      <canvas id="chartSQL"></canvas>
+    </div>
+  </div>
+
+  <!-- WoW % Change: Leads, MQL, SQL grouped -->
+  <div class="chart-card">
+    <div class="chart-title">WoW % Change by Stage</div>
+    <div class="chart-wrap">
+      <canvas id="chartWoW"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── SECTION 3: CONVERSION RATES ── -->
+<div class="section-title">Conversion Rates</div>
+
+<div class="charts-grid">
+  <div class="chart-card full">
+    <div class="chart-title">Lead → MQL & MQL → SQL Conversion Rates — W1 vs W2 (by Market)</div>
+    <div class="chart-wrap" style="height:240px">
+      <canvas id="chartConversion"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ── SECTION 4: WoW DELTA TABLE ── -->
+<div class="section-title">Week-over-Week Summary Table</div>
+
+<div class="delta-table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Market</th>
+        <th>Leads W1</th>
+        <th>Leads W2</th>
+        <th>Leads WoW</th>
+        <th>MQL W1</th>
+        <th>MQL W2</th>
+        <th>MQL WoW</th>
+        <th>SQL W1</th>
+        <th>SQL W2</th>
+        <th>SQL WoW</th>
+        <th>L→MQL W1</th>
+        <th>L→MQL W2</th>
+        <th>L→MQL Δ</th>
+        <th>MQL→SQL W1</th>
+        <th>MQL→SQL W2</th>
+        <th>MQL→SQL Δ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="row-label"><span class="market-dot" style="background:var(--dach)"></span>DACH</td>
+        <td>10</td><td>3</td><td class="td-neg">−70.00%</td>
+        <td>7</td><td>2</td><td class="td-neg">−71.43%</td>
+        <td>5</td><td>0</td><td class="td-neg">−100.00%</td>
+        <td>70.00%</td><td>66.67%</td><td class="td-neg">−3.33pp</td>
+        <td>71.43%</td><td>0.00%</td><td class="td-neg">−71.43pp</td>
+      </tr>
+      <tr>
+        <td class="row-label"><span class="market-dot" style="background:var(--ro)"></span>RO</td>
+        <td>23</td><td>25</td><td class="td-pos">+8.70%</td>
+        <td>6</td><td>13</td><td class="td-pos">+116.67%</td>
+        <td>4</td><td>9</td><td class="td-pos">+125.00%</td>
+        <td>26.09%</td><td>52.00%</td><td class="td-pos">+25.91pp</td>
+        <td>66.67%</td><td>69.23%</td><td class="td-pos">+2.56pp</td>
+      </tr>
+      <tr>
+        <td class="row-label"><span class="market-dot" style="background:var(--uk)"></span>UK</td>
+        <td>13</td><td>5</td><td class="td-neg">−61.54%</td>
+        <td>6</td><td>3</td><td class="td-neg">−50.00%</td>
+        <td>4</td><td>3</td><td class="td-neg">−25.00%</td>
+        <td>46.15%</td><td>60.00%</td><td class="td-pos">+13.85pp</td>
+        <td>66.67%</td><td>100.00%</td><td class="td-pos">+33.33pp</td>
+      </tr>
+      <tr>
+        <td class="row-label"><span class="market-dot" style="background:var(--anz)"></span>ANZ</td>
+        <td>10</td><td>10</td><td class="td-neu">0.00%</td>
+        <td>7</td><td>7</td><td class="td-neu">0.00%</td>
+        <td>6</td><td>6</td><td class="td-neu">0.00%</td>
+        <td>70.00%</td><td>70.00%</td><td class="td-neu">0.00pp</td>
+        <td>85.71%</td><td>85.71%</td><td class="td-neu">0.00pp</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- FOOTER -->
+<div class="report-footer">
+  <span>TaxDome International Growth · Lead Performance Report</span>
+  <span>Data period: March 16 – 29, 2026</span>
+</div>
+
+<script>
+  const markets = ['DACH', 'RO', 'UK', 'ANZ'];
+  const colors  = ['#1F2D5C', '#4B9CD3', '#F39C12', '#2ECC71'];
+  const alphaColors = ['rgba(31,45,92,0.15)', 'rgba(75,156,211,0.15)', 'rgba(243,156,18,0.15)', 'rgba(46,204,113,0.15)'];
+
+  const w1Leads = [10, 23, 13, 10];
+  const w2Leads = [3,  25,  5, 10];
+  const w1MQL   = [7,   6,  6,  7];
+  const w2MQL   = [2,  13,  3,  7];
+  const w1SQL   = [5,   4,  4,  6];
+  const w2SQL   = [0,   9,  3,  6];
+
+  const w1LeadMQL   = [70.00, 26.09, 46.15, 70.00];
+  const w2LeadMQL   = [66.67, 52.00, 60.00, 70.00];
+  const w1MQLSQL    = [71.43, 66.67, 66.67, 85.71];
+  const w2MQLSQL    = [0,     69.23, 100.0, 85.71];
+
+  const wowLeads    = [-70.00,  8.70, -61.54,   0];
+  const wowMQL      = [-71.43, 116.67, -50.00,  0];
+  const wowSQL      = [-100.0, 125.00, -25.00,  0];
+
+  const defaultOptions = (yLabel) => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: true, labels: { font: { family: 'DM Sans', size: 11 }, color: '#7B8DB0', boxWidth: 10 } } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { family: 'DM Sans', size: 11 }, color: '#7B8DB0' } },
+      y: { grid: { color: '#F0F3FA' }, ticks: { font: { family: 'DM Mono', size: 10 }, color: '#7B8DB0' }, title: { display: !!yLabel, text: yLabel, color: '#7B8DB0', font: { size: 10 } } }
+    }
+  });
+
+  // Chart: Leads W1 vs W2
+  new Chart(document.getElementById('chartLeads'), {
+    type: 'bar',
+    data: {
+      labels: markets,
+      datasets: [
+        { label: 'W1 (Mar 16–22)', data: w1Leads, backgroundColor: colors.map(c => c + 'CC'), borderRadius: 5, borderSkipped: false },
+        { label: 'W2 (Mar 23–29)', data: w2Leads, backgroundColor: alphaColors, borderColor: colors, borderWidth: 2, borderRadius: 5, borderSkipped: false }
+      ]
+    },
+    options: defaultOptions('Count')
+  });
+
+  // Chart: MQL W1 vs W2
+  new Chart(document.getElementById('chartMQL'), {
+    type: 'bar',
+    data: {
+      labels: markets,
+      datasets: [
+        { label: 'W1 (Mar 16–22)', data: w1MQL, backgroundColor: colors.map(c => c + 'CC'), borderRadius: 5, borderSkipped: false },
+        { label: 'W2 (Mar 23–29)', data: w2MQL, backgroundColor: alphaColors, borderColor: colors, borderWidth: 2, borderRadius: 5, borderSkipped: false }
+      ]
+    },
+    options: defaultOptions('Count')
+  });
+
+  // Chart: SQL W1 vs W2
+  new Chart(document.getElementById('chartSQL'), {
+    type: 'bar',
+    data: {
+      labels: markets,
+      datasets: [
+        { label: 'W1 (Mar 16–22)', data: w1SQL, backgroundColor: colors.map(c => c + 'CC'), borderRadius: 5, borderSkipped: false },
+        { label: 'W2 (Mar 23–29)', data: w2SQL, backgroundColor: alphaColors, borderColor: colors, borderWidth: 2, borderRadius: 5, borderSkipped: false }
+      ]
+    },
+    options: defaultOptions('Count')
+  });
+
+  // Chart: WoW % Change by stage
+  new Chart(document.getElementById('chartWoW'), {
+    type: 'bar',
+    data: {
+      labels: markets,
+      datasets: [
+        { label: 'Leads WoW %', data: wowLeads, backgroundColor: wowLeads.map(v => v > 0 ? 'rgba(46,204,113,0.75)' : v < 0 ? 'rgba(231,76,60,0.75)' : 'rgba(123,141,176,0.4)'), borderRadius: 5, borderSkipped: false },
+        { label: 'MQL WoW %',   data: wowMQL,   backgroundColor: wowMQL.map(v =>   v > 0 ? 'rgba(46,204,113,0.45)' : v < 0 ? 'rgba(231,76,60,0.45)' : 'rgba(123,141,176,0.2)'), borderRadius: 5, borderSkipped: false },
+        { label: 'SQL WoW %',   data: wowSQL,   backgroundColor: wowSQL.map(v =>   v > 0 ? 'rgba(46,204,113,0.25)' : v < 0 ? 'rgba(231,76,60,0.25)' : 'rgba(123,141,176,0.1)'), borderColor: wowSQL.map(v => v > 0 ? '#2ECC71' : v < 0 ? '#E74C3C' : '#CBD5E0'), borderWidth: 1.5, borderRadius: 5, borderSkipped: false }
+      ]
+    },
+    options: {
+      ...defaultOptions('WoW %'),
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { family: 'DM Sans', size: 11 }, color: '#7B8DB0' } },
+        y: { grid: { color: '#F0F3FA' }, ticks: { font: { family: 'DM Mono', size: 10 }, color: '#7B8DB0', callback: v => v + '%' } }
+      }
+    }
+  });
+
+  // Chart: Conversion Rates
+  new Chart(document.getElementById('chartConversion'), {
+    type: 'bar',
+    data: {
+      labels: ['Lead→MQL W1', 'Lead→MQL W2', 'MQL→SQL W1', 'MQL→SQL W2'],
+      datasets: markets.map((m, i) => ({
+        label: m,
+        data: [w1LeadMQL[i], w2LeadMQL[i], w1MQLSQL[i], w2MQLSQL[i]],
+        backgroundColor: colors[i] + 'CC',
+        borderRadius: 5,
+        borderSkipped: false
+      }))
+    },
+    options: {
+      ...defaultOptions('%'),
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { family: 'DM Sans', size: 11 }, color: '#7B8DB0' } },
+        y: { grid: { color: '#F0F3FA' }, max: 120, ticks: { font: { family: 'DM Mono', size: 10 }, color: '#7B8DB0', callback: v => v + '%' } }
+      }
+    }
+  });
+</script>
+</body>
+</html>
