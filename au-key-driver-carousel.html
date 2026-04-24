@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AU Key Driver Carousel</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #f0f0f5;
+    padding: 24px 20px 32px;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV BAR ── */
+  .nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .nav-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .td-mark {
+    width: 34px; height: 34px;
+    background: #1a1060;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 11px; font-weight: 800;
+    color: white;
+  }
+
+  .nav-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    color: #1a1060;
+  }
+
+  .nav-sub {
+    font-size: 11px;
+    color: #888;
+    margin-top: 1px;
+  }
+
+  .nav-pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .pill {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 100px;
+  }
+
+  .pill-navy { background: #1a1060; color: white; }
+  .pill-gold { background: #f5b800; color: #1a1060; }
+  .pill-outline { background: transparent; color: #1a1060; border: 1.5px solid #1a1060; }
+
+  /* ── COUNTER ── */
+  .counter-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .counter-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+  }
+
+  .counter-dots {
+    display: flex;
+    gap: 5px;
+  }
+
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #d0d0e0;
+    transition: background 0.2s, width 0.2s;
+    cursor: pointer;
+  }
+
+  .dot.active {
+    background: #1a1060;
+    width: 20px;
+    border-radius: 4px;
+  }
+
+  /* ── TRACK ── */
+  .carousel-wrap {
+    position: relative;
+    overflow: hidden;
+    border-radius: 18px;
+  }
+
+  .carousel-track {
+    display: flex;
+    gap: 0;
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+  }
+
+  /* ── SLIDE BASE ── */
+  .slide {
+    flex: 0 0 100%;
+    min-width: 100%;
+    border-radius: 18px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1a1060 0%, #2d1fa3 58%, #3d2bc0 100%);
+    color: white;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    min-height: 340px;
+    position: relative;
+  }
+
+  .slide::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 55% 70% at 72% 25%, rgba(110,90,255,0.4) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .slide-left {
+    flex: 1;
+    padding: 30px 26px 26px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+  }
+
+  .slide-right {
+    width: 290px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 22px 20px 0;
+  }
+
+  /* full-width slide (testimonial) */
+  .slide.wide .slide-left {
+    padding-bottom: 30px;
+  }
+
+  /* ── SLIDE CONTENT ── */
+  .slide-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 14px;
+    width: fit-content;
+  }
+
+  .pain-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 12px;
+  }
+
+  .pain-chip {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 100px;
+    font-size: 10px;
+    padding: 3px 9px;
+    display: flex; align-items: center; gap: 4px;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .chip-icon {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    font-size: 7px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .ci-warn { background: #f59e0b; color: #1a1060; }
+  .ci-err  { background: #ef4444; color: white; }
+  .ci-clk  { background: rgba(255,255,255,0.25); color: white; }
+
+  .slide-headline {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.15;
+    color: white;
+    margin-bottom: 10px;
+  }
+
+  .slide-headline span { color: rgba(232,229,255,0.72); }
+
+  .slide-body {
+    font-size: 13px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 22px;
+    max-width: 300px;
+  }
+
+  .slide-cta {
+    display: inline-block;
+    background: #f5b800;
+    color: #1a1060;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 11px 22px;
+    border-radius: 8px;
+    width: fit-content;
+    letter-spacing: 0.01em;
+  }
+
+  .td-logo-xs {
+    width: 28px; height: 28px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 8px; font-weight: 800;
+    color: white;
+    margin-bottom: 14px;
+  }
+
+  /* ── MOCKUP: TASK LIST ── */
+  .mc {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    width: 100%;
+    box-shadow: 0 10px 36px rgba(0,0,0,0.38);
+    color: #1a1060;
+  }
+
+  .mc-hdr {
+    background: #f5f5f5;
+    border-bottom: 1px solid #e8e8e8;
+    padding: 7px 11px;
+    display: flex; align-items: center; gap: 5px;
+    font-size: 10px; font-weight: 600; color: #444;
+  }
+
+  .mc-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .d-r { background: #ef4444; }
+  .d-a { background: #f59e0b; }
+  .d-g { background: #22c55e; }
+
+  .mc-row {
+    padding: 7px 11px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex; align-items: center; justify-content: space-between; gap: 6px;
+  }
+
+  .mc-row:last-child { border-bottom: none; }
+  .mc-name { font-weight: 700; color: #1a1060; font-size: 10px; white-space: nowrap; }
+  .mc-task { color: #777; font-size: 9px; }
+
+  .sp {
+    font-size: 8px; font-weight: 700;
+    padding: 3px 7px; border-radius: 100px; white-space: nowrap; flex-shrink: 0;
+  }
+
+  .sp-due  { background: #fef2f2; color: #dc2626; }
+  .sp-wait { background: #fffbeb; color: #d97706; }
+  .sp-done { background: #f0fdf4; color: #16a34a; }
+
+  /* ── MOCKUP: CALENDAR ── */
+  .cal {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    width: 250px;
+    box-shadow: 0 10px 36px rgba(0,0,0,0.38);
+  }
+
+  .cal-hdr {
+    background: #1a1060;
+    color: white;
+    padding: 8px 12px;
+    font-size: 10px; font-weight: 700;
+  }
+
+  .cal-row {
+    padding: 7px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 9px;
+  }
+
+  .cal-row:last-child { border-bottom: none; }
+  .cal-label { color: #444; }
+  .cal-date  { font-weight: 700; color: #1a1060; }
+  .cal-dot   { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .cal-inner { display: flex; align-items: center; gap: 7px; }
+
+  /* ── MOCKUP: CHAT ── */
+  .chat {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    width: 250px;
+    box-shadow: 0 10px 36px rgba(0,0,0,0.38);
+  }
+
+  .chat-hdr {
+    background: #2d1fa3;
+    color: white;
+    padding: 9px 12px;
+    font-size: 10px; font-weight: 700;
+  }
+
+  .chat-hdr-sub { font-size: 8px; opacity: 0.65; font-weight: 400; }
+
+  .chat-body { padding: 9px 10px; display: flex; flex-direction: column; gap: 5px; }
+
+  .bbl {
+    padding: 6px 9px;
+    border-radius: 9px;
+    font-size: 9px; line-height: 1.45;
+    max-width: 88%;
+  }
+
+  .b-in  { background: #f1f0ff; color: #2d1fa3; border-bottom-left-radius: 2px; align-self: flex-start; }
+  .b-out { background: #2d1fa3; color: white; border-bottom-right-radius: 2px; align-self: flex-end; }
+
+  /* ── MOCKUP: STATS ── */
+  .stats-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 230px;
+  }
+
+  .stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 14px 16px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.28);
+    display: flex; align-items: center; gap: 14px;
+  }
+
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: #1a1060;
+    flex-shrink: 0;
+    line-height: 1;
+    min-width: 52px;
+  }
+
+  .stat-num.green { color: #16a34a; }
+  .stat-num.gold  { color: #d97706; }
+
+  .stat-label { font-size: 11px; line-height: 1.4; color: #555; }
+
+  /* ── MOCKUP: TESTIMONIAL ── */
+  .testi {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 18px;
+    max-width: 560px;
+  }
+
+  .q-mark {
+    font-family: 'Syne', sans-serif;
+    font-size: 38px; line-height: 0.8;
+    color: #f5b800;
+    margin-bottom: 8px;
+  }
+
+  .q-text {
+    font-size: 13px; line-height: 1.6;
+    color: rgba(255,255,255,0.9);
+    font-style: italic;
+    margin-bottom: 12px;
+  }
+
+  .q-author { display: flex; align-items: center; gap: 10px; }
+
+  .q-av {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: #f5b800;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 10px; color: #1a1060;
+    flex-shrink: 0;
+  }
+
+  .q-name { font-size: 11px; font-weight: 700; color: white; }
+  .q-firm { font-size: 9px; color: rgba(255,255,255,0.5); }
+
+  /* ── MOCKUP: APP ── */
+  .app {
+    background: #f5f5f7;
+    border-radius: 12px;
+    overflow: hidden;
+    width: 250px;
+    box-shadow: 0 10px 36px rgba(0,0,0,0.38);
+  }
+
+  .app-hdr {
+    background: white;
+    padding: 10px 12px;
+    display: flex; align-items: center; gap: 9px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .app-icon {
+    width: 36px; height: 36px;
+    background: #1a1060;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 9px; font-weight: 800; color: white;
+  }
+
+  .app-meta { flex: 1; }
+  .app-name    { font-size: 11px; font-weight: 700; color: #1a1060; }
+  .app-tagline { font-size: 8px; color: #666; }
+  .app-btn     { background: #2d1fa3; color: white; border: none; border-radius: 20px; font-size: 9px; font-weight: 700; padding: 5px 11px; }
+
+  .app-stats {
+    display: grid; grid-template-columns: repeat(3,1fr);
+    padding: 8px 12px; gap: 4px;
+    background: white; border-bottom: 1px solid #eee;
+  }
+
+  .ast { text-align: center; }
+  .ast-val   { font-size: 13px; font-weight: 800; color: #1a1060; }
+  .ast-label { font-size: 7px; color: #888; }
+
+  .app-rating {
+    display: flex; align-items: center; gap: 5px;
+    padding: 7px 12px 9px;
+    background: white;
+  }
+
+  .stars { color: #f59e0b; font-size: 11px; }
+  .rtxt  { font-size: 9px; color: #555; }
+
+  /* ── ARROWS ── */
+  .arrow-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .arrow-btn {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+    transition: background 0.15s, transform 0.1s;
+    flex-shrink: 0;
+  }
+
+  .arrow-btn:hover { background: #f0eeff; }
+  .arrow-btn:active { transform: scale(0.95); }
+  .arrow-btn:disabled { opacity: 0.35; cursor: default; }
+
+  .arrow-btn svg { width: 16px; height: 16px; }
+
+  .slide-counter-text {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a1060;
+    min-width: 40px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-bar">
+  <div class="nav-left">
+    <div class="td-mark">TD</div>
+    <div>
+      <div class="nav-title">AU Key Driver Campaign</div>
+      <div class="nav-sub">Carousel Mockup · May 2026</div>
+    </div>
+  </div>
+  <div class="nav-pills">
+    <span class="pill pill-gold">Australia</span>
+    <span class="pill pill-navy">6 slides</span>
+    <span class="pill pill-outline">Meta + LinkedIn</span>
+  </div>
+</div>
+
+<div class="counter-row">
+  <div class="counter-label">Slide <span id="cur">1</span> of 6</div>
+  <div class="counter-dots" id="dots">
+    <div class="dot active" onclick="goTo(0)"></div>
+    <div class="dot" onclick="goTo(1)"></div>
+    <div class="dot" onclick="goTo(2)"></div>
+    <div class="dot" onclick="goTo(3)"></div>
+    <div class="dot" onclick="goTo(4)"></div>
+    <div class="dot" onclick="goTo(5)"></div>
+  </div>
+</div>
+
+<div class="carousel-wrap">
+  <div class="carousel-track" id="track">
+
+    <!-- ── SLIDE 1 — HERO ── -->
+    <div class="slide">
+      <div class="slide-left">
+        <div>
+          <div class="td-logo-xs">TD</div>
+          <div class="pain-row">
+            <div class="pain-chip"><span class="chip-icon ci-warn">!</span>Missing BAS docs</div>
+            <div class="pain-chip"><span class="chip-icon ci-err">✕</span>Chasing clients</div>
+            <div class="pain-chip"><span class="chip-icon ci-clk">⏱</span>28 Oct deadline</div>
+            <div class="pain-chip"><span class="chip-icon ci-err">✕</span>5 different tools</div>
+          </div>
+          <div class="slide-headline">EOFY turns your<br><span>practice into a</span><br>war room?</div>
+          <div class="slide-body">Missing BAS docs, chasing clients, five tools that don't talk to each other — your practice deserves better than this.</div>
+        </div>
+        <div class="slide-cta">See How →</div>
+      </div>
+      <div class="slide-right">
+        <div class="mc">
+          <div class="mc-hdr">
+            <div class="mc-dot d-r"></div>
+            <div class="mc-dot d-a"></div>
+            <div class="mc-dot d-g"></div>
+            <span style="margin-left:4px;">Client Tasks — Q1 BAS</span>
+          </div>
+          <div class="mc-row">
+            <div><div class="mc-name">Mitchell &amp; Sons</div><div class="mc-task">BAS Q1 Jul–Sep</div></div>
+            <div class="sp sp-due">Overdue</div>
+          </div>
+          <div class="mc-row">
+            <div><div class="mc-name">Sunrise Electrical</div><div class="mc-task">BAS Q1 Jul–Sep</div></div>
+            <div class="sp sp-wait">Awaiting docs</div>
+          </div>
+          <div class="mc-row">
+            <div><div class="mc-name">Blue Hills Plumbing</div><div class="mc-task">BAS Q1 Jul–Sep</div></div>
+            <div class="sp sp-done">Lodged ✓</div>
+          </div>
+          <div class="mc-row">
+            <div><div class="mc-name">Parker Building Co.</div><div class="mc-task">EOFY Tax Return</div></div>
+            <div class="sp sp-wait">In review</div>
+          </div>
+          <div class="mc-row">
+            <div><div class="mc-name">Kowalski Constructs</div><div class="mc-task">Payroll &amp; BAS</div></div>
+            <div class="sp sp-due">Due 28 Oct</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 2 — AUTOPILOT ── -->
+    <div class="slide">
+      <div class="slide-left">
+        <div>
+          <div class="td-logo-xs">TD</div>
+          <div class="slide-tag">Automate everything</div>
+          <div class="slide-headline">Every BAS.<br><span>Every deadline.</span><br>On autopilot.</div>
+          <div class="slide-body">Stop tracking lodgements across emails and spreadsheets. Every client, document, and BAS deadline managed in one workflow — automatically.</div>
+        </div>
+        <div class="slide-cta">Get Control →</div>
+      </div>
+      <div class="slide-right">
+        <div class="cal">
+          <div class="cal-hdr">FY2025–26 Lodgement Calendar</div>
+          <div class="cal-row">
+            <div class="cal-inner"><div class="cal-dot" style="background:#22c55e;"></div><div class="cal-label">BAS Q1 (Jul–Sep)</div></div>
+            <div class="cal-date">28 Oct ✓</div>
+          </div>
+          <div class="cal-row">
+            <div class="cal-inner"><div class="cal-dot" style="background:#f59e0b;"></div><div class="cal-label">BAS Q2 (Oct–Dec)</div></div>
+            <div class="cal-date">28 Feb</div>
+          </div>
+          <div class="cal-row">
+            <div class="cal-inner"><div class="cal-dot" style="background:#94a3b8;"></div><div class="cal-label">BAS Q3 (Jan–Mar)</div></div>
+            <div class="cal-date">28 Apr</div>
+          </div>
+          <div class="cal-row">
+            <div class="cal-inner"><div class="cal-dot" style="background:#ef4444;"></div><div class="cal-label">BAS Q4 (Apr–Jun)</div></div>
+            <div class="cal-date">28 Jul</div>
+          </div>
+          <div class="cal-row">
+            <div class="cal-inner"><div class="cal-dot" style="background:#ef4444;"></div><div class="cal-label">Individual returns</div></div>
+            <div class="cal-date">31 Oct</div>
+          </div>
+          <div class="cal-row">
+            <div class="cal-inner"><div class="cal-dot" style="background:#94a3b8;"></div><div class="cal-label">EOFY close</div></div>
+            <div class="cal-date">30 Jun</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 3 — SILOS ── -->
+    <div class="slide">
+      <div class="slide-left">
+        <div>
+          <div class="td-logo-xs">TD</div>
+          <div class="pain-row">
+            <div class="pain-chip"><span class="chip-icon ci-err">✕</span>Xero PM</div>
+            <div class="pain-chip"><span class="chip-icon ci-err">✕</span>Karbon</div>
+            <div class="pain-chip"><span class="chip-icon ci-err">✕</span>FYI + Annature</div>
+            <div class="pain-chip"><span class="chip-icon ci-err">✕</span>Email</div>
+          </div>
+          <div class="slide-headline">Still juggling<br><span>5 different tools</span><br>to run your firm?</div>
+          <div class="slide-body">Xero PM, Karbon, FYI, Annature, email — replace your entire stack with one secure platform built for Australian accounting firms.</div>
+        </div>
+        <div class="slide-cta">Start Now →</div>
+      </div>
+      <div class="slide-right">
+        <div class="chat">
+          <div class="chat-hdr">
+            Client Portal
+            <div class="chat-hdr-sub">Mitchell &amp; Sons · Secure</div>
+          </div>
+          <div class="chat-body">
+            <div class="bbl b-in">When will the BAS be lodged?</div>
+            <div class="bbl b-out">Hi Sarah — lodged today! Docs are in your portal.</div>
+            <div class="bbl b-in">Can you resend the invoice? I can't find it.</div>
+            <div class="bbl b-out">Check your portal — it's pinned to this job 👍</div>
+            <div class="bbl b-in">Do I need to sign anything?</div>
+            <div class="bbl b-out">E-sign request sent to your email now.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 4 — SCALE ── -->
+    <div class="slide">
+      <div class="slide-left">
+        <div>
+          <div class="td-logo-xs">TD</div>
+          <div class="slide-tag">Grow without burning out</div>
+          <div class="slide-headline">Handle more<br><span>clients.</span><br>Same team.</div>
+          <div class="slide-body">Australian practices use TaxDome to grow their capacity without a single extra hire. Less chasing, more time for advisory work.</div>
+        </div>
+        <div class="slide-cta">See How Firms Scale →</div>
+      </div>
+      <div class="slide-right">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-num green">40%</div>
+            <div class="stat-label">less time on admin and client chasing</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num gold">0</div>
+            <div class="stat-label">missed BAS or tax deadlines</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" style="color:#2d1fa3;">1</div>
+            <div class="stat-label">platform for your entire firm</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 5 — TRUST ── -->
+    <div class="slide wide">
+      <div class="slide-left">
+        <div>
+          <div class="td-logo-xs">TD</div>
+          <div class="testi">
+            <div class="q-mark">"</div>
+            <div class="q-text">We were running Xero PM, Karbon, and email for client comms. EOFY was a nightmare. TaxDome replaced the lot — now I can see every job, every client, every deadline in one place.</div>
+            <div class="q-author">
+              <div class="q-av">SK</div>
+              <div>
+                <div class="q-name">Sarah K.</div>
+                <div class="q-firm">Principal · Clarity Accounting · Melbourne, VIC · 8 staff · 420 clients</div>
+              </div>
+            </div>
+          </div>
+          <div class="slide-headline" style="font-size:21px; margin-bottom:8px;">Software that grows<br><span>with your practice.</span></div>
+          <div class="slide-body" style="margin-bottom:18px;">Join Australian accounting practices that have simplified their workflow with TaxDome.</div>
+        </div>
+        <div class="slide-cta">Book a Demo →</div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 6 — CLIENT PORTAL ── -->
+    <div class="slide">
+      <div class="slide-left">
+        <div>
+          <div class="td-logo-xs">TD</div>
+          <div class="pain-row">
+            <div class="pain-chip"><span class="chip-icon ci-clk">⏱</span>Chasing clients by email</div>
+            <div class="pain-chip"><span class="chip-icon ci-warn">!</span>No secure portal</div>
+          </div>
+          <div class="slide-headline">Still chasing<br><span>clients by email</span><br>every quarter?</div>
+          <div class="slide-body">Give your clients a secure portal — documents, e-signatures, and messages in one app. Rated 4.9★ on the App Store AU with 30,000+ reviews.</div>
+        </div>
+        <div class="slide-cta">Start Now →</div>
+      </div>
+      <div class="slide-right">
+        <div class="app">
+          <div class="app-hdr">
+            <div class="app-icon">TD</div>
+            <div class="app-meta">
+              <div class="app-name">TaxDome Client Portal</div>
+              <div class="app-tagline">Your accounting firm, in your pocket</div>
+            </div>
+            <button class="app-btn">GET</button>
+          </div>
+          <div class="app-stats">
+            <div class="ast"><div class="ast-val">30K</div><div class="ast-label">Ratings</div></div>
+            <div class="ast"><div class="ast-val">4.9</div><div class="ast-label">Stars</div></div>
+            <div class="ast"><div class="ast-val">4+</div><div class="ast-label">Age</div></div>
+          </div>
+          <div class="app-rating">
+            <span class="stars">★★★★★</span>
+            <span class="rtxt">4.9 · App Store AU</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /track -->
+</div><!-- /wrap -->
+
+<div class="arrow-row">
+  <button class="arrow-btn" id="prev" onclick="move(-1)" disabled>
+    <svg viewBox="0 0 24 24" fill="none" stroke="#1a1060" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+  </button>
+  <span class="slide-counter-text" id="counter">1 / 6</span>
+  <button class="arrow-btn" id="next" onclick="move(1)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#1a1060" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="9 18 15 12 9 6"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+  var cur = 0;
+  var total = 6;
+
+  function update() {
+    document.getElementById('track').style.transform = 'translateX(-' + (cur * 100) + '%)';
+    document.getElementById('cur').textContent = cur + 1;
+    document.getElementById('counter').textContent = (cur + 1) + ' / ' + total;
+    document.getElementById('prev').disabled = cur === 0;
+    document.getElementById('next').disabled = cur === total - 1;
+    var dots = document.getElementById('dots').children;
+    for (var i = 0; i < dots.length; i++) {
+      dots[i].className = i === cur ? 'dot active' : 'dot';
+    }
+  }
+
+  function move(dir) {
+    cur = Math.max(0, Math.min(total - 1, cur + dir));
+    update();
+  }
+
+  function goTo(i) {
+    cur = i;
+    update();
+  }
+
+  // swipe support
+  var startX = 0;
+  var wrap = document.querySelector('.carousel-wrap');
+  wrap.addEventListener('touchstart', function(e){ startX = e.touches[0].clientX; });
+  wrap.addEventListener('touchend', function(e){
+    var dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) > 40) move(dx < 0 ? 1 : -1);
+  });
+</script>
+
+</body>
+</html>
