@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SEO Report – Apr 13–26, 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --bg:#f5f5f3;--surface:#ffffff;--surface2:#f0efeb;--border:#e2e1db;
+  --text:#1a1a18;--text2:#6b6b67;--text3:#9b9b97;
+  --green:#1D9E75;--red:#E24B4A;--blue:#378ADD;--blue-light:#e6f1fb;
+  --radius:12px;--radius-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:2rem 1rem}
+.page{max-width:960px;margin:0 auto}
+
+/* header */
+.report-header{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.report-title{font-size:22px;font-weight:600;color:var(--text)}
+.report-sub{font-size:13px;color:var(--text2);margin-top:4px}
+.period-badge{background:var(--blue-light);color:#185FA5;font-size:12px;font-weight:500;padding:6px 14px;border-radius:20px}
+
+/* legend */
+.legend{display:flex;gap:20px;margin-bottom:1.5rem;flex-wrap:wrap}
+.leg{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2)}
+.leg-dot{width:12px;height:12px;border-radius:3px}
+
+/* summary bar */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:1.5rem}
+.summary-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.25rem}
+.summary-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.summary-val{font-size:22px;font-weight:600}
+.summary-sub{font-size:12px;color:var(--text3);margin-top:3px}
+
+/* market cards */
+.market-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.25rem}
+.market-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.5rem}
+.market-name{font-size:17px;font-weight:600;display:flex;align-items:center;gap:8px}
+.market-note{font-size:11px;color:var(--text3);background:var(--surface2);padding:3px 10px;border-radius:20px}
+.metrics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:1.25rem}
+.metric-box{background:var(--surface2);border-radius:var(--radius-sm);padding:10px 12px}
+.metric-box-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.metric-box-val{font-size:20px;font-weight:600;line-height:1}
+.metric-box-prev{font-size:11px;color:var(--text3);margin-top:3px}
+.metric-box-delta{font-size:12px;font-weight:500;margin-top:3px}
+.up{color:var(--green)}.dn{color:var(--red)}.flat{color:var(--text3)}
+
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chart-wrap{background:var(--surface2);border-radius:var(--radius-sm);padding:10px 12px}
+.chart-wrap-label{font-size:11px;color:var(--text2);margin-bottom:8px;font-weight:500}
+.chart-canvas-wrap{position:relative;height:100px}
+
+/* ANZ note */
+.anz-note{font-size:11px;color:var(--text3);margin-bottom:10px;padding:6px 10px;background:#f9f8f5;border-left:3px solid var(--blue);border-radius:0 var(--radius-sm) var(--radius-sm) 0}
+
+/* toggle */
+.toggle-row{display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap}
+.toggle-btn{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:6px 16px;font-size:13px;cursor:pointer;color:var(--text2);transition:all .15s}
+.toggle-btn.active{background:var(--text);color:#fff;border-color:var(--text)}
+
+footer{text-align:center;font-size:12px;color:var(--text3);margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border)}
+@media(max-width:600px){
+  .metrics-grid{grid-template-columns:repeat(2,1fr)}
+  .charts-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="report-header">
+    <div>
+      <div class="report-title">SEO Performance Report</div>
+      <div class="report-sub">Weekly comparison by market</div>
+    </div>
+    <div class="period-badge">Apr 13 – 26, 2026</div>
+  </div>
+
+  <div class="legend">
+    <span class="leg"><span class="leg-dot" style="background:#378ADD88"></span>Apr 13–19</span>
+    <span class="leg"><span class="leg-dot" style="background:#1D9E75"></span>Apr 20–26</span>
+    <span class="leg"><span class="leg-dot up" style="background:var(--green)"></span>Improved</span>
+    <span class="leg"><span class="leg-dot" style="background:var(--red)"></span>Declined</span>
+  </div>
+
+  <!-- filter -->
+  <div class="toggle-row" id="filterRow">
+    <button class="toggle-btn active" data-filter="all">All markets</button>
+    <button class="toggle-btn" data-filter="UK">UK</button>
+    <button class="toggle-btn" data-filter="Romania">Romania</button>
+    <button class="toggle-btn" data-filter="ANZ">ANZ</button>
+    <button class="toggle-btn" data-filter="Germany">Germany</button>
+  </div>
+
+  <!-- summary -->
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-label">Total traffic (Apr 20–26)</div>
+      <div class="summary-val" id="s-traffic">—</div>
+      <div class="summary-sub" id="s-traffic-sub">—</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Avg visibility (Apr 20–26)</div>
+      <div class="summary-val" id="s-vis">—</div>
+      <div class="summary-sub" id="s-vis-sub">—</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Best performer</div>
+      <div class="summary-val" id="s-best">—</div>
+      <div class="summary-sub">by visibility gain</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Needs attention</div>
+      <div class="summary-val" id="s-worst">—</div>
+      <div class="summary-sub">biggest visibility drop</div>
+    </div>
+  </div>
+
+  <div id="cards"></div>
+
+  <footer>Generated Apr 27, 2026 &nbsp;·&nbsp; Data source: Google Search Console via SEO tool &nbsp;·&nbsp; ANZ = Australia + New Zealand (averaged)</footer>
+</div>
+
+<script>
+const BLUE='#378ADD', GREEN='#1D9E75';
+const markets=[
+  {
+    name:'UK', flag:'🇬🇧', note:null,
+    prev:{vis:5.5,  traffic:122,  pos:31, top10:40},
+    curr:{vis:9,    traffic:187,  pos:30, top10:42}
+  },
+  {
+    name:'Romania', flag:'🇷🇴', note:'No data for Apr 13–19',
+    prev:null,
+    curr:{vis:46.5, traffic:821,  pos:36, top10:61}
+  },
+  {
+    name:'ANZ', flag:'🌏', note:'AU + NZ averaged (vis, pos, top10) | traffic summed',
+    prev:{vis:(85.2+2.1)/2, traffic:1767+53, pos:(8+37)/2, top10:(80+33)/2},
+    curr:{vis:(77.3+1.8)/2, traffic:1632+44, pos:(10+39)/2, top10:(74+33)/2}
+  },
+  {
+    name:'Germany', flag:'🇩🇪', note:null,
+    prev:{vis:43.6, traffic:335,  pos:36, top10:48},
+    curr:{vis:32.1, traffic:234,  pos:36, top10:51}
+  },
+];
+
+function f(v,dec=1){
+  if(v==null) return 'N/A';
+  return dec===0 ? Math.round(v).toLocaleString() : parseFloat(v.toFixed(dec));
+}
+function deltaHtml(prev,curr,reverse,dec=1,unit=''){
+  if(prev==null) return '<span class="flat">no prior data</span>';
+  const d=curr-prev;
+  if(Math.abs(d)<0.05) return '<span class="flat">—</span>';
+  const better=reverse? d<0 : d>0;
+  const cls=better?'up':'dn';
+  const sign=d>0?'+':'';
+  return `<span class="${cls}">${sign}${f(d,dec)}${unit}</span>`;
+}
+
+// summary
+const withPrev=markets.filter(m=>m.prev);
+const totalTrafficCurr=markets.reduce((a,m)=>a+m.curr.traffic,0);
+const totalTrafficPrev=withPrev.reduce((a,m)=>a+m.prev.traffic,0);
+const avgVisCurr=markets.reduce((a,m)=>a+m.curr.vis,0)/markets.length;
+const avgVisPrev=withPrev.reduce((a,m)=>a+m.prev.vis,0)/withPrev.length;
+const visDiffs=withPrev.map(m=>({name:m.name,d:m.curr.vis-m.prev.vis}));
+const best=visDiffs.reduce((a,b)=>a.d>b.d?a:b);
+const worst=visDiffs.reduce((a,b)=>a.d<b.d?a:b);
+document.getElementById('s-traffic').textContent=Math.round(totalTrafficCurr).toLocaleString();
+document.getElementById('s-traffic-sub').textContent=`was ${Math.round(totalTrafficPrev).toLocaleString()} prev week`;
+document.getElementById('s-vis').textContent=parseFloat(avgVisCurr.toFixed(1))+'%';
+document.getElementById('s-vis-sub').textContent=`was ${parseFloat(avgVisPrev.toFixed(1))}% prev week`;
+document.getElementById('s-best').textContent=best.name;
+document.getElementById('s-worst').textContent=worst.name;
+
+// cards
+const cardsEl=document.getElementById('cards');
+const chartInstances={};
+
+function renderCards(filter){
+  // destroy old charts
+  Object.values(chartInstances).forEach(c=>{c.forEach(ch=>ch.destroy())});
+  Object.keys(chartInstances).forEach(k=>delete chartInstances[k]);
+  cardsEl.innerHTML='';
+
+  markets.filter(m=>filter==='all'||m.name===filter).forEach((m,i)=>{
+    const p=m.prev, c=m.curr, hasPrev=!!p;
+    const id=`m${m.name.replace(/\s/g,'')}`;
+
+    const card=document.createElement('div');
+    card.className='market-card';
+    card.setAttribute('data-market',m.name);
+    card.innerHTML=`
+      <div class="market-header">
+        <div class="market-name">${m.flag} ${m.name}</div>
+        ${m.note?`<div class="market-note">${m.note}</div>`:''}
+      </div>
+      ${m.name==='ANZ'?`<div class="anz-note">ANZ combines Google Australia and Google New Zealand. Visibility, position and % top 10 are averaged; traffic is summed.</div>`:''}
+      <div class="metrics-grid">
+        <div class="metric-box">
+          <div class="metric-box-label">Search visibility</div>
+          <div class="metric-box-val">${f(c.vis)}%</div>
+          <div class="metric-box-prev">${hasPrev?'was '+f(p.vis)+'%':'—'}</div>
+          <div class="metric-box-delta">${deltaHtml(hasPrev?p.vis:null,c.vis,false,1,'%')}</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-box-label">Traffic forecast</div>
+          <div class="metric-box-val">${f(c.traffic,0)}</div>
+          <div class="metric-box-prev">${hasPrev?'was '+f(p.traffic,0):'—'}</div>
+          <div class="metric-box-delta">${deltaHtml(hasPrev?p.traffic:null,c.traffic,false,0)}</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-box-label">Avg position</div>
+          <div class="metric-box-val">${f(c.pos,0)}</div>
+          <div class="metric-box-prev">${hasPrev?'was '+f(p.pos,0):'—'}</div>
+          <div class="metric-box-delta">${deltaHtml(hasPrev?p.pos:null,c.pos,true,1)}</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-box-label">% in top 10</div>
+          <div class="metric-box-val">${f(c.top10,0)}%</div>
+          <div class="metric-box-prev">${hasPrev?'was '+f(p.top10,0)+'%':'—'}</div>
+          <div class="metric-box-delta">${deltaHtml(hasPrev?p.top10:null,c.top10,false,0,'%')}</div>
+        </div>
+      </div>
+      <div class="charts-row">
+        <div class="chart-wrap">
+          <div class="chart-wrap-label">Visibility &amp; % top 10 comparison</div>
+          <div class="chart-canvas-wrap"><canvas id="${id}a"></canvas></div>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-wrap-label">Traffic forecast</div>
+          <div class="chart-canvas-wrap"><canvas id="${id}b"></canvas></div>
+        </div>
+      </div>`;
+    cardsEl.appendChild(card);
+
+    const visData  = hasPrev?[p.vis,c.vis]:[null,c.vis];
+    const top10Data= hasPrev?[p.top10,c.top10]:[null,c.top10];
+    const trafficData=hasPrev?[p.traffic,c.traffic]:[null,c.traffic];
+
+    const ca=new Chart(document.getElementById(`${id}a`),{
+      type:'bar',
+      data:{
+        labels:['Vis 13–19','Vis 20–26','Top10 13–19','Top10 20–26'],
+        datasets:[{
+          data:[visData[0],visData[1],top10Data[0],top10Data[1]],
+          backgroundColor:[BLUE+'88',GREEN+'cc',BLUE+'44',GREEN+'66'],
+          borderRadius:4
+        }]
+      },
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ct=>ct.raw!=null?f(ct.raw,1):'N/A'}}},scales:{x:{ticks:{color:'#888',font:{size:9}},grid:{display:false}},y:{display:false}},layout:{padding:{top:4}}}
+    });
+
+    const cb=new Chart(document.getElementById(`${id}b`),{
+      type:'bar',
+      data:{
+        labels:['Apr 13–19','Apr 20–26'],
+        datasets:[{data:trafficData,backgroundColor:[BLUE+'88',GREEN+'cc'],borderRadius:4}]
+      },
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ct=>ct.raw!=null?Math.round(ct.raw).toLocaleString():'N/A'}}},scales:{x:{ticks:{color:'#888',font:{size:9}},grid:{display:false}},y:{display:false}},layout:{padding:{top:4}}}
+    });
+
+    chartInstances[id]=[ca,cb];
+  });
+}
+
+renderCards('all');
+
+document.getElementById('filterRow').addEventListener('click',e=>{
+  const btn=e.target.closest('.toggle-btn');
+  if(!btn) return;
+  document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCards(btn.dataset.filter);
+});
+</script>
+</body>
+</html>
