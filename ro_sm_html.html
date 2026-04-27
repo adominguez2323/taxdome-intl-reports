@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Romania SM Report — April 2026</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:2rem;background:#f9f9f7;color:#1a1a18;max-width:900px;margin:0 auto}
+  h1{font-size:22px;font-weight:500;margin-bottom:4px}
+  .subtitle{font-size:13px;color:#73726c;margin-bottom:1.5rem}
+  .tab-row{display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap}
+  .tab{padding:6px 16px;border-radius:20px;border:1px solid #ccc;font-size:13px;cursor:pointer;background:transparent;color:#73726c;transition:all .15s}
+  .tab.active{background:#fff;border-color:#888;color:#1a1a18;font-weight:500}
+  .panel{display:none}.panel.active{display:block}
+  .sec{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:#b4b2a9;margin:1.25rem 0 .75rem}
+  .sec:first-child{margin-top:0}
+  .grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+  .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  @media(max-width:600px){.grid4,.grid3{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:1fr}}
+  .card{background:#fff;border-radius:8px;padding:14px 16px;border:1px solid #e8e6e0}
+  .lbl{font-size:11px;color:#73726c;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+  .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+  .vals{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .v-old{font-size:16px;font-weight:500;color:#b4b2a9}
+  .arr{font-size:13px;color:#b4b2a9}
+  .v-new{font-size:21px;font-weight:500;color:#1a1a18}
+  .delta{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;margin-top:6px}
+  .up{background:#EAF3DE;color:#27500A}
+  .down{background:#FAEEDA;color:#633806}
+  .neutral{background:#f1efe8;color:#73726c;border:1px solid #e8e6e0}
+  .divider{border:none;border-top:1px solid #e8e6e0;margin:1.25rem 0}
+  .note{font-size:12px;color:#b4b2a9;margin-top:.75rem;font-style:italic}
+</style>
+</head>
+<body>
+
+<h1>Romania — social media report</h1>
+<p class="subtitle">April 2026 · organic performance</p>
+
+<div class="tab-row">
+  <button class="tab active" onclick="show('wow',this)">WoW · Apr 20–27</button>
+  <button class="tab" onclick="show('monthly',this)">Mar vs Apr</button>
+  <button class="tab" onclick="show('traffic',this)">LP &amp; traffic</button>
+</div>
+
+<!-- WOW PANEL -->
+<div id="wow" class="panel active">
+  <p class="sec">Week-over-week · Apr 13–19 → Apr 20–27</p>
+  <div class="grid4">
+    <div class="card">
+      <div class="lbl"><span class="dot" style="background:#0A66C2"></span>LI impressions</div>
+      <div class="vals"><span class="v-old">202</span><span class="arr">→</span><span class="v-new">456</span></div>
+      <div class="delta up">+125.74%</div>
+    </div>
+    <div class="card">
+      <div class="lbl"><span class="dot" style="background:#0A66C2"></span>LI eng. rate</div>
+      <div class="vals"><span class="v-old">7.43%</span><span class="arr">→</span><span class="v-new">5.04%</span></div>
+      <div class="delta down">-2.39 pp</div>
+    </div>
+    <div class="card">
+      <div class="lbl"><span class="dot" style="background:#1877F2"></span>FB views</div>
+      <div class="vals"><span class="v-old">1,985</span><span class="arr">→</span><span class="v-new">553</span></div>
+      <div class="delta down">-72.14%</div>
+    </div>
+    <div class="card">
+      <div class="lbl"><span class="dot" style="background:#1877F2"></span>FB eng. rate</div>
+      <div class="vals"><span class="v-old">1.32%</span><span class="arr">→</span><span class="v-new">3.91%</span></div>
+      <div class="delta up">+2.59 pp</div>
+    </div>
+  </div>
+  <p class="note">Previous week: Apr 13–19 &nbsp;|&nbsp; Current week: Apr 20–27</p>
+</div>
+
+<!-- MONTHLY PANEL -->
+<div id="monthly" class="panel">
+  <p class="sec">Reach &amp; views</p>
+  <div class="grid3">
+    <div class="card">
+      <div class="lbl"><span class="dot" style="background:#0A66C2"></span>LI impressions</div>
+      <div class="vals"><span class="v-old">3,814</span><span class="arr">→</span><span class="v-new">1,095</span></div>
+      <div class="delta neutral">Month in progress</div>
+    </div>
+    <div class="card">
+      <div class="lbl"><span class="dot" style="background:#1877F2"></span>FB organic reach</div>
+      <div class="vals"><span class="v-old">2,430</span><span class="arr">→</span><span class="v-new">7,365</span></div>
+      <div class="delta up">+203.09%</div>
+    </div>
+    <div class="card">
+      <div class="lbl"><span class="dot" style="background:#1877F2"></span>FB organic views</div>
+      <div class="vals"><span class="v-old">6,791</span><span class="arr">→</span><span class="v-new">8,212</span></div>
+      <div class="delta up">+20.92%</div>
+    </div>
+  </div>
+  <p class="sec">Engagement</p>
+  <div class="grid3">
+    <div class="card">
+      <div class="lbl"><span class="dot" style="background:#0A66C2"></span>LI eng. rate</div>
+      <div class="vals"><span class="v-old">4.64%</span><span class="arr">→</span><span class="v-new">4.66%</span></div>
+      <div class="delta up">+0.02 pp</div>
+    </div>
+    <div class="card">
+      <div class="lbl"><span class="dot" style="background:#1877F2"></span>FB eng. rate</div>
+      <div class="vals"><span class="v-old">7.20%</span><span class="arr">→</span><span class="v-new">1.66%</span></div>
+      <div class="delta down">-5.54 pp</div>
+    </div>
+    <div class="card">
+      <div class="lbl"><span class="dot" style="background:#888780"></span>Post shares</div>
+      <div class="vals"><span class="v-old">12</span><span class="arr">→</span><span class="v-new">26</span></div>
+      <div class="delta up">+116.67%</div>
+    </div>
+  </div>
+  <p class="note">March = full month &nbsp;|&nbsp; April = month to date (as of Apr 27)</p>
+</div>
+
+<!-- TRAFFIC PANEL -->
+<div id="traffic" class="panel">
+  <p class="sec">Organic traffic to landing page</p>
+  <div class="grid3">
+    <div class="card">
+      <div class="lbl"><span class="dot" style="background:#639922"></span>Total LP clicks (SM)</div>
+      <div class="vals"><span class="v-old">225</span><span class="arr">→</span><span class="v-new">135</span></div>
+      <div class="delta down">-40.00%</div>
+    </div>
+    <div class="card">
+      <div class="lbl"><span class="dot" style="background:#1877F2"></span>LP from Facebook</div>
+      <div class="vals"><span class="v-old">180</span><span class="arr">→</span><span class="v-new">121</span></div>
+      <div class="delta down">-32.78%</div>
+    </div>
+    <div class="card">
+      <div class="lbl"><span class="dot" style="background:#0A66C2"></span>LP from LinkedIn</div>
+      <div class="vals"><span class="v-old">39</span><span class="arr">→</span><span class="v-new">13</span></div>
+      <div class="delta down">-66.67%</div>
+    </div>
+  </div>
+  <p class="sec">Walk-ins &amp; conversions</p>
+  <div class="grid2">
+    <div class="card">
+      <div class="lbl"><span class="dot" style="background:#BA7517"></span>WIA from total SM</div>
+      <div class="vals"><span class="v-old">149</span><span class="arr">→</span><span class="v-new">77</span></div>
+      <div class="delta down">-48.32%</div>
+    </div>
+  </div>
+  <p class="note">March = full month &nbsp;|&nbsp; April = month to date (as of Apr 27)</p>
+</div>
+
+<script>
+  function show(id, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+
+</body>
+</html>
