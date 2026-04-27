@@ -3,702 +3,1104 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pipeline Report — April 2026</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>International Pipeline Report — April 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Inter', sans-serif; background: #F8F9FA; color: #1F2D5C; font-size: 15px; }
+  :root {
+    --navy: #1F2D5C;
+    --blue: #4B9CD3;
+    --blue-light: #E8F4FD;
+    --green: #2ECC71;
+    --amber: #F39C12;
+    --red: #E74C3C;
+    --bg: #F0F3F9;
+    --card: #FFFFFF;
+    --border: #E2E8F0;
+    --text: #1A2340;
+    --muted: #6B7A99;
+    --navy-mid: #2D3F7B;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+  }
 
-  .report-header { background: #1F2D5C; color: #fff; padding: 28px 36px 24px; }
-  .report-header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
-  .report-header .subtitle { font-size: 13px; color: rgba(255,255,255,0.65); margin-top: 4px; }
-  .badge-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
-  .badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85); letter-spacing: 0.03em; }
-  .icp-badge { background: rgba(46,204,113,0.25); color: #2ECC71; }
+  /* HEADER */
+  .report-header {
+    background: var(--navy);
+    padding: 24px 32px 20px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .report-header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.02em;
+  }
+  .report-header .subtitle {
+    font-size: 12px;
+    color: rgba(255,255,255,0.55);
+    margin-top: 3px;
+    font-family: 'DM Mono', monospace;
+  }
+  .report-badge {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.8);
+    white-space: nowrap;
+    font-family: 'DM Mono', monospace;
+  }
 
-  .nav-tabs { display: flex; gap: 0; background: #fff; border-bottom: 1.5px solid #e8eaf0; padding: 0 36px; overflow-x: auto; }
-  .nav-tab { padding: 14px 18px; font-size: 13px; font-weight: 600; color: #888; cursor: pointer; border-bottom: 2.5px solid transparent; white-space: nowrap; transition: color 0.15s, border-color 0.15s; }
-  .nav-tab:hover { color: #1F2D5C; }
-  .nav-tab.active { color: #1F2D5C; border-bottom-color: #4B9CD3; }
+  /* TABS */
+  .tab-nav {
+    background: var(--navy);
+    padding: 0 32px;
+    display: flex;
+    gap: 4px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .tab-btn {
+    padding: 12px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.01em;
+  }
+  .tab-btn:hover { color: rgba(255,255,255,0.85); }
+  .tab-btn.active {
+    color: #fff;
+    border-bottom-color: var(--blue);
+  }
+  .tab-content { display: none; padding: 28px 32px 40px; }
+  .tab-content.active { display: block; }
 
-  .section { display: none; padding: 28px 36px 48px; }
-  .section.active { display: block; }
+  /* KPI GRID */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 18px 20px;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--blue);
+    border-radius: 12px 12px 0 0;
+  }
+  .kpi-card.green::before { background: var(--green); }
+  .kpi-card.amber::before { background: var(--amber); }
+  .kpi-card.red::before { background: var(--red); }
+  .kpi-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .kpi-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: -0.02em;
+    font-family: 'DM Mono', monospace;
+  }
+  .kpi-delta {
+    font-size: 12px;
+    margin-top: 5px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .kpi-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .pos { color: var(--green); }
+  .neg { color: var(--red); }
+  .neu { color: var(--amber); }
 
-  .section-label { font-size: 11px; font-weight: 700; color: #4B9CD3; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
-  .section-title { font-size: 15px; font-weight: 700; color: #1F2D5C; margin-bottom: 5px; }
-  .section-desc { font-size: 13px; color: #888; margin-bottom: 22px; }
+  /* SECTION HEADERS */
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 12px;
+    margin-top: 28px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
 
-  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 28px; }
-  .kpi-card { background: #fff; border-radius: 10px; padding: 18px 16px; border: 1px solid #e8eaf0; text-align: center; }
-  .kpi-label { font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 7px; font-weight: 600; }
-  .kpi-value { font-size: 24px; font-weight: 700; color: #1F2D5C; line-height: 1.1; }
-  .kpi-sub { font-size: 11px; color: #aaa; margin-top: 5px; }
-  .kpi-delta { font-size: 12px; margin-top: 6px; font-weight: 700; }
-  .positive { color: #2ECC71; }
-  .negative { color: #E74C3C; }
-  .neutral { color: #F39C12; }
-  .na { color: #aaa; }
+  /* CHART GRID */
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .chart-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .chart-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--border);
+  }
+  .chart-card.full { grid-column: 1 / -1; }
+  .chart-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .chart-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  canvas { max-height: 260px; }
 
-  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
-  .chart-card { background: #fff; border-radius: 10px; border: 1px solid #e8eaf0; padding: 20px; }
-  .chart-title { font-size: 13px; font-weight: 700; color: #1F2D5C; margin-bottom: 3px; }
-  .chart-period { font-size: 11px; color: #aaa; margin-bottom: 14px; }
-  .full-chart-card { background: #fff; border-radius: 10px; border: 1px solid #e8eaf0; padding: 20px; margin-bottom: 20px; }
+  /* TABLE */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .data-table th {
+    text-align: left;
+    padding: 9px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    border-bottom: 2px solid var(--border);
+    background: #F8FAFC;
+  }
+  .data-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: #F8FAFC; }
+  .data-table .num { font-family: 'DM Mono', monospace; font-size: 12px; }
+  .data-table .total-row td { font-weight: 700; background: #F0F3F9; color: var(--navy); }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'DM Mono', monospace;
+  }
+  .tag.pos { background: #D4F5E5; color: #1A7A4A; }
+  .tag.neg { background: #FDECEA; color: #B02A1A; }
+  .tag.neu { background: #FEF3DB; color: #8A5900; }
 
-  .divider { height: 1px; background: #eef0f5; margin: 24px 0; }
+  /* COVERAGE BAR */
+  .coverage-wrap { margin-bottom: 20px; }
+  .cov-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .cov-row:last-child { border-bottom: none; }
+  .cov-region {
+    width: 90px;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--navy);
+    flex-shrink: 0;
+  }
+  .cov-bar-wrap {
+    flex: 1;
+    height: 10px;
+    background: #E8EDF5;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .cov-bar {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.8s ease;
+  }
+  .cov-pct {
+    width: 48px;
+    text-align: right;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .cov-meta {
+    font-size: 11px;
+    color: var(--muted);
+    width: 160px;
+    flex-shrink: 0;
+    font-family: 'DM Mono', monospace;
+  }
 
-  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 10px; font-size: 12px; color: #666; }
-  .legend-item { display: flex; align-items: center; gap: 5px; }
-  .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  /* REGION TABS (Tab 2) */
+  .region-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .region-btn {
+    padding: 7px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .region-btn:hover { border-color: var(--blue); color: var(--navy); }
+  .region-btn.active {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: #fff;
+  }
+  .region-panel { display: none; }
+  .region-panel.active { display: block; }
 
-  .market-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-  .market-tab { font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 20px; cursor: pointer; border: 1.5px solid #e8eaf0; color: #888; background: #fff; transition: all 0.15s; }
-  .market-tab.active { background: #1F2D5C; color: #fff; border-color: #1F2D5C; }
-  .market-tab:hover:not(.active) { border-color: #4B9CD3; color: #1F2D5C; }
-  .market-panel { display: none; }
-  .market-panel.active { display: block; }
+  /* PACE INDICATOR */
+  .pace-card {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+    border-radius: 12px;
+    padding: 20px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .pace-circle {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 4px solid rgba(255,255,255,0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .pace-pct { font-size: 18px; font-weight: 700; font-family: 'DM Mono', monospace; }
+  .pace-lbl { font-size: 9px; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.1em; }
+  .pace-info h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .pace-info p { font-size: 12px; opacity: 0.7; line-height: 1.5; }
 
-  .table-wrap { overflow-x: auto; margin-bottom: 20px; }
-  table.data-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-  table.data-table th { background: #f3f5fb; color: #1F2D5C; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; padding: 9px 12px; text-align: left; border-bottom: 1.5px solid #e8eaf0; white-space: nowrap; }
-  table.data-table td { padding: 9px 12px; border-bottom: 1px solid #f0f2f8; color: #333; }
-  table.data-table tr:last-child td { border-bottom: none; }
-  table.data-table tr:hover td { background: #fafbfd; }
-  .tag-positive { color: #2ECC71; font-weight: 700; }
-  .tag-negative { color: #E74C3C; font-weight: 700; }
-  .tag-neutral { color: #aaa; }
-
-  /* Cohort styles */
-  .cohort-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
-  .cohort-card { background: #fff; border-radius: 10px; border: 1.5px solid #e8eaf0; padding: 16px 14px; text-align: center; position: relative; }
-  .cohort-card.icp { border-color: #2ECC71; background: #f0fdf6; }
-  .cohort-name { font-size: 12px; font-weight: 700; color: #1F2D5C; margin-bottom: 4px; }
-  .cohort-range { font-size: 11px; color: #aaa; margin-bottom: 10px; }
-  .cohort-count { font-size: 28px; font-weight: 700; color: #1F2D5C; }
-  .cohort-pct { font-size: 13px; color: #888; margin-top: 4px; }
-  .icp-tag { position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 700; background: #2ECC71; color: #fff; padding: 2px 6px; border-radius: 20px; letter-spacing: 0.05em; }
-
-  .cohort-note { font-size: 12px; color: #888; background: #f0fdf6; border: 1px solid #c3f4d7; border-radius: 8px; padding: 10px 14px; margin-bottom: 20px; }
-  .cohort-note strong { color: #1F2D5C; }
-
-  .footnote { font-size: 11px; color: #bbb; margin-top: 8px; }
-
-  @media (max-width: 680px) {
-    .chart-grid { grid-template-columns: 1fr; }
-    .report-header, .nav-tabs, .section { padding-left: 16px; padding-right: 16px; }
-    .nav-tabs { padding: 0 10px; }
-    .nav-tab { padding: 12px 10px; font-size: 12px; }
+  @media (max-width: 700px) {
+    .chart-grid, .chart-grid-3 { grid-template-columns: 1fr; }
+    .tab-content { padding: 20px 16px; }
+    .report-header { padding: 18px 16px; flex-direction: column; align-items: flex-start; }
+    .tab-nav { padding: 0 16px; }
   }
 </style>
 </head>
 <body>
 
 <div class="report-header">
-  <h1>Pipeline Generation Report</h1>
-  <div class="subtitle">International Markets · Generated April 20, 2026</div>
-  <div class="badge-row">
-    <span class="badge">WoW Apr 13–19</span>
-    <span class="badge">MoM Mar vs Apr</span>
-    <span class="badge">YoY Apr 2025 vs 2026</span>
-    <span class="badge">4 Key Markets</span>
-    <span class="badge icp-badge">ICP: CH3 (5–9) and above</span>
+  <div>
+    <h1>International Pipeline Report</h1>
+    <div class="subtitle">Pipeline Generated (ARR) · WoW · MoM · YoY · Quota Coverage</div>
   </div>
+  <div class="report-badge">April 1–26, 2026</div>
 </div>
 
-<div class="nav-tabs">
-  <div class="nav-tab active" onclick="switchTab('all')">All International</div>
-  <div class="nav-tab" onclick="switchTab('markets')">Key Markets</div>
-  <div class="nav-tab" onclick="switchTab('cohorts')">Cohorts</div>
-  <div class="nav-tab" onclick="switchTab('table')">Full Data Table</div>
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('overview', this)">📊 Overview — All Markets</button>
+  <button class="tab-btn" onclick="switchTab('markets', this)">🌍 Key Markets</button>
 </div>
 
-<!-- ═══════════════════════════════════ ALL INTERNATIONAL -->
-<div id="tab-all" class="section active">
-  <div class="section-title">All International Markets</div>
-  <div class="section-desc">Pipeline and Closed revenue — WoW, MoM, YoY</div>
+<!-- ===================== TAB 1: OVERVIEW ===================== -->
+<div id="tab-overview" class="tab-content active">
 
-  <!-- WoW -->
-  <div class="section-label">Week over Week · Apr 6–12 vs Apr 13–19, 2026</div>
+  <div class="section-label">Pipeline KPIs — April 2026 (All Markets)</div>
   <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-label">Pipeline (curr)</div>
-      <div class="kpi-value">$88,000</div>
-      <div class="kpi-delta negative">▼ 65.19% WoW</div>
-      <div class="kpi-sub">Prev: $252,800</div>
+    <div class="kpi-card green">
+      <div class="kpi-label">April Pipeline (MTD)</div>
+      <div class="kpi-value">$550.7K</div>
+      <div class="kpi-delta pos">▲ 390.8% YoY</div>
+      <div class="kpi-sub">vs $120.4K Apr 2025</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Closed (curr)</div>
-      <div class="kpi-value">$9,940</div>
-      <div class="kpi-delta positive">▲ 185.87% WoW</div>
-      <div class="kpi-sub">Prev: $3,477</div>
+    <div class="kpi-card green">
+      <div class="kpi-label">WoW Pipeline</div>
+      <div class="kpi-value">$170.1K</div>
+      <div class="kpi-delta pos">▲ 93.3% WoW</div>
+      <div class="kpi-sub">Apr 20 vs Apr 13 week</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Pipeline drop</div>
-      <div class="kpi-value">-$164,800</div>
-      <div class="kpi-delta negative">WoW delta</div>
+    <div class="kpi-card red">
+      <div class="kpi-label">MoM Pipeline</div>
+      <div class="kpi-value">$591.1K</div>
+      <div class="kpi-delta neg">▼ 8.2% MoM</div>
+      <div class="kpi-sub">vs $643.7K Mar 1–26</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Closed gain</div>
-      <div class="kpi-value">+$6,463</div>
-      <div class="kpi-delta positive">WoW delta</div>
+    <div class="kpi-card green">
+      <div class="kpi-label">April Closed (MTD)</div>
+      <div class="kpi-value">$23.7K</div>
+      <div class="kpi-delta pos">▲ 78.0% YoY</div>
+      <div class="kpi-sub">vs $13.3K Apr 2025</div>
     </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- MoM -->
-  <div class="section-label">Month over Month · March 1–19 vs April 1–19, 2026</div>
-  <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-label">Pipeline (curr)</div>
-      <div class="kpi-value">$447,623</div>
-      <div class="kpi-delta positive">▲ 35.98% MoM</div>
-      <div class="kpi-sub">Prev: $329,192</div>
+    <div class="kpi-card red">
+      <div class="kpi-label">MoM Closed</div>
+      <div class="kpi-value">$23.7K</div>
+      <div class="kpi-delta neg">▼ 28.6% MoM</div>
+      <div class="kpi-sub">vs $33.2K Mar 1–26</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Closed (curr)</div>
-      <div class="kpi-value">$17,940</div>
-      <div class="kpi-delta negative">▼ 38.40% MoM</div>
-      <div class="kpi-sub">Prev: $29,121</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Pipeline gain</div>
-      <div class="kpi-value">+$118,431</div>
-      <div class="kpi-delta positive">MoM delta</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Closed drop</div>
-      <div class="kpi-value">-$11,181</div>
-      <div class="kpi-delta negative">MoM delta</div>
+    <div class="kpi-card red">
+      <div class="kpi-label">WoW Closed</div>
+      <div class="kpi-value">$3.2K</div>
+      <div class="kpi-delta neg">▼ 67.9% WoW</div>
+      <div class="kpi-sub">Apr 20 vs Apr 13 week</div>
     </div>
   </div>
 
-  <div class="divider"></div>
+  <div class="section-label">Weekly Pipeline Pace — April 2026</div>
+  <div class="chart-card full" style="margin-bottom:20px;">
+    <div class="chart-title">Weekly Pipeline Generated (ARR) — All Markets</div>
+    <div class="chart-sub">Week ending 3/30 · 4/6 · 4/13 · 4/20 · by country</div>
+    <canvas id="chartWeekly" style="max-height:280px;"></canvas>
+  </div>
 
-  <!-- YoY -->
-  <div class="section-label">Year over Year · April 1–19, 2025 vs April 1–19, 2026</div>
-  <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-label">Pipeline (curr)</div>
-      <div class="kpi-value">$447,623</div>
-      <div class="kpi-delta positive">▲ 290.80% YoY</div>
-      <div class="kpi-sub">Prev: $114,540</div>
+  <div class="section-label">Quota Coverage — April 1–26, 2026</div>
+
+  <!-- Coverage summary cards -->
+  <div class="kpi-grid" style="margin-bottom:20px;">
+    <div class="kpi-card green">
+      <div class="kpi-label">UK Coverage</div>
+      <div class="kpi-value">105.9%</div>
+      <div class="kpi-delta pos">▲ $7.7K above quota</div>
+      <div class="kpi-sub">$139.2K / $131.5K</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Closed (curr)</div>
-      <div class="kpi-value">$17,940</div>
-      <div class="kpi-delta positive">▲ 78.75% YoY</div>
-      <div class="kpi-sub">Prev: $10,036</div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Romania Coverage</div>
+      <div class="kpi-value">249.0%</div>
+      <div class="kpi-delta pos">▲ $122.9K above quota</div>
+      <div class="kpi-sub">$205.4K / $82.5K</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Pipeline gain</div>
-      <div class="kpi-value">+$333,082</div>
-      <div class="kpi-delta positive">YoY delta</div>
+    <div class="kpi-card green">
+      <div class="kpi-label">ANZ Coverage</div>
+      <div class="kpi-value">277.3%</div>
+      <div class="kpi-delta pos">▲ $114.9K above quota</div>
+      <div class="kpi-sub">$179.8K / $64.8K</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Closed gain</div>
-      <div class="kpi-value">+$7,904</div>
-      <div class="kpi-delta positive">YoY delta</div>
+    <div class="kpi-card red">
+      <div class="kpi-label">DACH Coverage</div>
+      <div class="kpi-value">5.7%</div>
+      <div class="kpi-delta neg">▼ $133.5K below quota</div>
+      <div class="kpi-sub">$8.1K / $141.7K</div>
     </div>
   </div>
 
-  <div class="divider"></div>
-
-  <!-- Charts -->
-  <div class="chart-grid">
+  <!-- Coverage bar chart -->
+  <div class="chart-grid" style="margin-bottom:20px;">
     <div class="chart-card">
-      <div class="chart-title">Pipeline — MoM</div>
-      <div class="chart-period">March 1–19 vs April 1–19, 2026</div>
-      <div class="legend">
-        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>March</span>
-        <span class="legend-item"><span class="legend-dot" style="background:#4B9CD3;"></span>April</span>
-      </div>
-      <div style="position:relative;height:200px;"><canvas id="allMoMChart" role="img" aria-label="Bar chart pipeline and closed MoM March vs April 2026">March: Pipeline $329,192, Closed $29,121. April: Pipeline $447,623, Closed $17,940.</canvas></div>
+      <div class="chart-title">Pipeline vs Quota — by Region</div>
+      <div class="chart-sub">April 1–26 · ARR in USD</div>
+      <canvas id="chartCoverage"></canvas>
     </div>
     <div class="chart-card">
-      <div class="chart-title">Pipeline — YoY</div>
-      <div class="chart-period">April 1–19, 2025 vs April 1–19, 2026</div>
-      <div class="legend">
-        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 2025</span>
-        <span class="legend-item"><span class="legend-dot" style="background:#2ECC71;"></span>Apr 2026</span>
-      </div>
-      <div style="position:relative;height:200px;"><canvas id="allYoYChart" role="img" aria-label="Bar chart pipeline and closed YoY 2025 vs 2026">2025: Pipeline $114,540, Closed $10,036. 2026: Pipeline $447,623, Closed $17,940.</canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">Pipeline — WoW</div>
-      <div class="chart-period">Apr 6–12 vs Apr 13–19, 2026</div>
-      <div class="legend">
-        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 6–12</span>
-        <span class="legend-item"><span class="legend-dot" style="background:#F39C12;"></span>Apr 13–19</span>
-      </div>
-      <div style="position:relative;height:200px;"><canvas id="allWoWChart" role="img" aria-label="Bar chart pipeline and closed WoW April 6-12 vs April 13-19 2026">Apr 6-12: Pipeline $252,800, Closed $3,477. Apr 13-19: Pipeline $88,000, Closed $9,940.</canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">Pipeline growth — all time frames</div>
-      <div class="chart-period">% change vs prior period</div>
-      <div class="legend">
-        <span class="legend-item"><span class="legend-dot" style="background:#4B9CD3;"></span>Pipeline %</span>
-        <span class="legend-item"><span class="legend-dot" style="background:#2ECC71;"></span>Closed %</span>
-      </div>
-      <div style="position:relative;height:200px;"><canvas id="allDeltaChart" role="img" aria-label="Bar chart percentage change pipeline and closed across WoW MoM YoY">WoW Pipeline -65.19%, Closed +185.87%. MoM Pipeline +35.98%, Closed -38.40%. YoY Pipeline +290.80%, Closed +78.75%.</canvas></div>
+      <div class="chart-title">Coverage % by Region</div>
+      <div class="chart-sub">April 1–26 · % of quota achieved</div>
+      <canvas id="chartCoveragePct"></canvas>
     </div>
   </div>
+
+  <!-- Coverage progress bars -->
+  <div class="chart-card full" style="margin-bottom:0;">
+    <div class="chart-title">Quota Coverage — Visual Pace</div>
+    <div class="chart-sub">April 1–26, 2026 · Pipeline Generated vs April Target</div>
+    <div style="padding: 12px 0;">
+
+      <div class="cov-row">
+        <div class="cov-region">🇬🇧 UK</div>
+        <div class="cov-bar-wrap">
+          <div class="cov-bar" style="width:100%; background: var(--green);"></div>
+        </div>
+        <div class="cov-pct" style="color:var(--green);">105.9%</div>
+        <div class="cov-meta">$139,210 / $131,513</div>
+      </div>
+
+      <div class="cov-row">
+        <div class="cov-region">🇷🇴 Romania</div>
+        <div class="cov-bar-wrap">
+          <div class="cov-bar" style="width:100%; background: var(--green);"></div>
+        </div>
+        <div class="cov-pct" style="color:var(--green);">249.0%</div>
+        <div class="cov-meta">$205,415 / $82,509</div>
+      </div>
+
+      <div class="cov-row">
+        <div class="cov-region">🇦🇺 ANZ</div>
+        <div class="cov-bar-wrap">
+          <div class="cov-bar" style="width:100%; background: var(--green);"></div>
+        </div>
+        <div class="cov-pct" style="color:var(--green);">277.3%</div>
+        <div class="cov-meta">$179,794 / $64,833</div>
+      </div>
+
+      <div class="cov-row">
+        <div class="cov-region">🔴 DACH</div>
+        <div class="cov-bar-wrap">
+          <div class="cov-bar" style="width:5.7%; background: var(--red);"></div>
+        </div>
+        <div class="cov-pct" style="color:var(--red);">5.7%</div>
+        <div class="cov-meta">$8,130 / $141,667</div>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
-<!-- ═══════════════════════════════════ KEY MARKETS -->
-<div id="tab-markets" class="section">
-  <div class="section-title">Key Markets</div>
-  <div class="section-desc">WoW pipeline and closed data by region</div>
+<!-- ===================== TAB 2: KEY MARKETS ===================== -->
+<div id="tab-markets" class="tab-content">
 
-  <div class="market-tabs">
-    <div class="market-tab active" onclick="switchMarket('dach', event)">🇩🇪 DACH</div>
-    <div class="market-tab" onclick="switchMarket('ro', event)">🇷🇴 Romania</div>
-    <div class="market-tab" onclick="switchMarket('uk', event)">🇬🇧 UK</div>
-    <div class="market-tab" onclick="switchMarket('anz', event)">🇦🇺 ANZ</div>
-  </div>
-
-  <!-- DACH -->
-  <div id="market-dach" class="market-panel active">
-    <div class="section-label">DACH — Week over Week · Apr 6–12 vs Apr 13–19, 2026</div>
-    <div class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-label">Pipeline (prev)</div>
-        <div class="kpi-value">$6,400</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Pipeline (curr)</div>
-        <div class="kpi-value">$6,400</div>
-        <div class="kpi-delta neutral-grey">0.00% WoW</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Closed (prev)</div>
-        <div class="kpi-value">—</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Closed (curr)</div>
-        <div class="kpi-value">—</div>
-        <div class="kpi-delta na">n/a</div>
-      </div>
-    </div>
-    <div class="divider"></div>
-    <div class="chart-card" style="margin-bottom:0;">
-      <div class="chart-title">DACH — Pipeline WoW</div>
-      <div class="chart-period">Apr 6–12 vs Apr 13–19, 2026</div>
-      <div class="legend">
-        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 6–12</span>
-        <span class="legend-item"><span class="legend-dot" style="background:#4B9CD3;"></span>Apr 13–19</span>
-      </div>
-      <div style="position:relative;height:180px;"><canvas id="dachChart" role="img" aria-label="DACH pipeline WoW comparison">Apr 6-12: $6,400. Apr 13-19: $6,400. Closed: no data both weeks.</canvas></div>
-    </div>
-  </div>
-
-  <!-- Romania -->
-  <div id="market-ro" class="market-panel">
-    <div class="section-label">Romania — Week over Week · Apr 6–12 vs Apr 13–19, 2026</div>
-    <div class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-label">Pipeline (prev)</div>
-        <div class="kpi-value">$136,000</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Pipeline (curr)</div>
-        <div class="kpi-value">$800</div>
-        <div class="kpi-delta negative">▼ 99.41% WoW</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Closed (prev)</div>
-        <div class="kpi-value">$1,866</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Closed (curr)</div>
-        <div class="kpi-value">$3,771</div>
-        <div class="kpi-delta positive">▲ 102.08% WoW</div>
-      </div>
-    </div>
-    <div class="divider"></div>
-    <div class="chart-card" style="margin-bottom:0;">
-      <div class="chart-title">Romania — Pipeline & Closed WoW</div>
-      <div class="chart-period">Apr 6–12 vs Apr 13–19, 2026</div>
-      <div class="legend">
-        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 6–12</span>
-        <span class="legend-item"><span class="legend-dot" style="background:#4B9CD3;"></span>Apr 13–19</span>
-      </div>
-      <div style="position:relative;height:180px;"><canvas id="roChart" role="img" aria-label="Romania pipeline and closed WoW comparison">Apr 6-12: Pipeline $136,000, Closed $1,866. Apr 13-19: Pipeline $800, Closed $3,771.</canvas></div>
-    </div>
+  <div class="region-tabs">
+    <button class="region-btn active" onclick="switchRegion('uk', this)">🇬🇧 United Kingdom</button>
+    <button class="region-btn" onclick="switchRegion('romania', this)">🇷🇴 Romania</button>
+    <button class="region-btn" onclick="switchRegion('anz', this)">🇦🇺 ANZ</button>
+    <button class="region-btn" onclick="switchRegion('dach', this)">🇩🇪 DACH</button>
   </div>
 
   <!-- UK -->
-  <div id="market-uk" class="market-panel">
-    <div class="section-label">UK — Week over Week · Apr 6–12 vs Apr 13–19, 2026</div>
-    <div class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-label">Pipeline (prev)</div>
-        <div class="kpi-value">$64,000</div>
+  <div id="region-uk" class="region-panel active">
+    <div class="pace-card">
+      <div class="pace-circle">
+        <div class="pace-pct">100%</div>
+        <div class="pace-lbl">Coverage</div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Pipeline (curr)</div>
-        <div class="kpi-value">$2,400</div>
-        <div class="kpi-delta negative">▼ 96.25% WoW</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Closed (prev)</div>
-        <div class="kpi-value">$1,611</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Closed (curr)</div>
-        <div class="kpi-value">—</div>
-        <div class="kpi-delta na">n/a</div>
+      <div class="pace-info">
+        <h3>United Kingdom — On Quota 🎯</h3>
+        <p>April MTD: $131,513 · Quota: $131,513<br>
+        WoW Pipeline: <strong>+1900%</strong> ($2,400 → $48,000) | Apr 13 vs 20</p>
       </div>
     </div>
-    <div class="divider"></div>
-    <div class="chart-card" style="margin-bottom:0;">
-      <div class="chart-title">UK — Pipeline & Closed WoW</div>
-      <div class="chart-period">Apr 6–12 vs Apr 13–19, 2026</div>
-      <div class="legend">
-        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 6–12</span>
-        <span class="legend-item"><span class="legend-dot" style="background:#4B9CD3;"></span>Apr 13–19</span>
+
+    <div class="section-label">WoW Performance — Apr 13 vs Apr 20</div>
+    <div class="kpi-grid">
+      <div class="kpi-card green">
+        <div class="kpi-label">WoW Pipeline</div>
+        <div class="kpi-value">$48K</div>
+        <div class="kpi-delta pos">▲ 1900% WoW</div>
+        <div class="kpi-sub">Apr 13: $2,400</div>
       </div>
-      <div style="position:relative;height:180px;"><canvas id="ukChart" role="img" aria-label="UK pipeline and closed WoW comparison">Apr 6-12: Pipeline $64,000, Closed $1,611. Apr 13-19: Pipeline $2,400, Closed no data.</canvas></div>
+      <div class="kpi-card">
+        <div class="kpi-label">Apr 20 Closed</div>
+        <div class="kpi-value">$1.6K</div>
+        <div class="kpi-delta neu">New this week</div>
+        <div class="kpi-sub">Apr 13: $0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Apr Quota</div>
+        <div class="kpi-value">$131K</div>
+        <div class="kpi-delta pos">✓ 100% covered</div>
+        <div class="kpi-sub">MTD: $131,513</div>
+      </div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">UK — WoW Pipeline by Cohort</div>
+        <div class="chart-sub">Apr 13 vs Apr 20 · ARR by company size</div>
+        <canvas id="chartUK"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">UK — Cohort Breakdown Detail</div>
+        <div class="chart-sub">Apr 20 week distribution</div>
+        <canvas id="chartUKDonut"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card full" style="margin-bottom:0;">
+      <div class="chart-title">UK — Cohort Table</div>
+      <div class="chart-sub">WoW detail · Apr 13 vs Apr 20</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>Cohort</th><th>Apr 13 ARR</th><th>Apr 20 ARR</th><th>WoW Δ</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ch1 | 1 user</td><td class="num">$0</td><td class="num">$800</td><td><span class="tag pos">New</span></td></tr>
+          <tr><td>ch2 | 2–4 users</td><td class="num">$2,400</td><td class="num">$6,400</td><td><span class="tag pos">+167%</span></td></tr>
+          <tr><td>ch3 | 5–9 users</td><td class="num">$0</td><td class="num">$12,000</td><td><span class="tag pos">New</span></td></tr>
+          <tr><td>ch4 | 10–24 users</td><td class="num">$0</td><td class="num">$12,000</td><td><span class="tag pos">New</span></td></tr>
+          <tr><td>ch5 | 25–49 users</td><td class="num">$0</td><td class="num">$13,600</td><td><span class="tag pos">New</span></td></tr>
+          <tr><td>No value</td><td class="num">$0</td><td class="num">$3,200</td><td><span class="tag pos">New</span></td></tr>
+          <tr class="total-row"><td>Total</td><td class="num">$2,400</td><td class="num">$48,000</td><td><span class="tag pos">+1900%</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ROMANIA -->
+  <div id="region-romania" class="region-panel">
+    <div class="pace-card">
+      <div class="pace-circle">
+        <div class="pace-pct">100%</div>
+        <div class="pace-lbl">Coverage</div>
+      </div>
+      <div class="pace-info">
+        <h3>Romania — On Quota 🎯</h3>
+        <p>April MTD: $82,509 · Quota: $82,509<br>
+        WoW Pipeline: <strong>+9250%</strong> ($800 → $74,800) | Apr 13 vs 20</p>
+      </div>
+    </div>
+
+    <div class="section-label">WoW Performance — Apr 13 vs Apr 20</div>
+    <div class="kpi-grid">
+      <div class="kpi-card green">
+        <div class="kpi-label">WoW Pipeline</div>
+        <div class="kpi-value">$74.8K</div>
+        <div class="kpi-delta pos">▲ 9250% WoW</div>
+        <div class="kpi-sub">Apr 13: $800</div>
+      </div>
+      <div class="kpi-card red">
+        <div class="kpi-label">Apr 20 Closed</div>
+        <div class="kpi-value">$0</div>
+        <div class="kpi-delta neg">n/a this week</div>
+        <div class="kpi-sub">Apr 13: $3,770</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Apr Quota</div>
+        <div class="kpi-value">$82.5K</div>
+        <div class="kpi-delta pos">✓ 100% covered</div>
+        <div class="kpi-sub">MTD: $82,509</div>
+      </div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">Romania — WoW Pipeline by Cohort</div>
+        <div class="chart-sub">Apr 13 vs Apr 20 · ARR by company size</div>
+        <canvas id="chartRO"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Romania — Cohort Breakdown Detail</div>
+        <div class="chart-sub">Apr 20 week distribution</div>
+        <canvas id="chartRODonut"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card full" style="margin-bottom:0;">
+      <div class="chart-title">Romania — Cohort Table</div>
+      <div class="chart-sub">WoW detail · Apr 13 vs Apr 20</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>Cohort</th><th>Apr 13 ARR</th><th>Apr 20 ARR</th><th>WoW Δ</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ch1 | 1 user</td><td class="num">$800</td><td class="num">$47,200</td><td><span class="tag pos">+5800%</span></td></tr>
+          <tr><td>ch2 | 2–4 users</td><td class="num">$0</td><td class="num">$2,800</td><td><span class="tag pos">New</span></td></tr>
+          <tr><td>ch3 | 5–9 users</td><td class="num">$4,000</td><td class="num">$6,400</td><td><span class="tag pos">+60%</span></td></tr>
+          <tr><td>ch4 | 10–24 users</td><td class="num">$0</td><td class="num">$8,000</td><td><span class="tag pos">New</span></td></tr>
+          <tr><td>No value</td><td class="num">$0</td><td class="num">$10,400</td><td><span class="tag pos">New</span></td></tr>
+          <tr class="total-row"><td>Total</td><td class="num">$800</td><td class="num">$74,800</td><td><span class="tag pos">+9250%</span></td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
   <!-- ANZ -->
-  <div id="market-anz" class="market-panel">
-    <div class="section-label">ANZ — Week over Week · Apr 6–12 vs Apr 13–19, 2026</div>
+  <div id="region-anz" class="region-panel">
+    <div class="pace-card" style="background: linear-gradient(135deg, #1A4A6E 0%, #1A3A8A 100%);">
+      <div class="pace-circle">
+        <div class="pace-pct">277%</div>
+        <div class="pace-lbl">Coverage</div>
+      </div>
+      <div class="pace-info">
+        <h3>ANZ — Above Quota 🚀</h3>
+        <p>April MTD: $179,794 · Quota: $64,833 · Coverage: <strong>277.3%</strong><br>
+        WoW Pipeline: <strong>-40.3%</strong> ($64,264 → $38,400) | Apr 13 vs 20 · Australia + New Zealand</p>
+      </div>
+    </div>
+
+    <div class="section-label">WoW Performance — Apr 13 vs Apr 20</div>
     <div class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-label">Pipeline (prev)</div>
-        <div class="kpi-value">$36,000</div>
+      <div class="kpi-card red">
+        <div class="kpi-label">WoW Pipeline</div>
+        <div class="kpi-value">$38.4K</div>
+        <div class="kpi-delta neg">▼ 40.3% WoW</div>
+        <div class="kpi-sub">Apr 13: $64,264</div>
+      </div>
+      <div class="kpi-card red">
+        <div class="kpi-label">Apr 20 Closed</div>
+        <div class="kpi-value">$2.2K</div>
+        <div class="kpi-delta neg">▼ 65.1% WoW</div>
+        <div class="kpi-sub">Apr 13: $6,169</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">Apr Quota Coverage</div>
+        <div class="kpi-value">277.3%</div>
+        <div class="kpi-delta pos">▲ $114.9K above quota</div>
+        <div class="kpi-sub">$179,794 / $64,833</div>
+      </div>
+    </div>
+
+    <div class="section-label">Weekly Pace — ANZ (Australia + New Zealand)</div>
+    <div class="chart-card full" style="margin-bottom:16px;">
+      <div class="chart-title">ANZ — Weekly Pipeline (All 4 Weeks)</div>
+      <div class="chart-sub">3/30 · 4/6 · 4/13 · 4/20 · Australia vs New Zealand</div>
+      <canvas id="chartANZWeekly" style="max-height:200px;"></canvas>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">ANZ — WoW Cohort Comparison</div>
+        <div class="chart-sub">Apr 13 vs Apr 20 · ARR by cohort</div>
+        <canvas id="chartANZ"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">ANZ — Apr 20 Cohort Mix</div>
+        <div class="chart-sub">Distribution this week · Australia only</div>
+        <canvas id="chartANZDonut"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card full" style="margin-bottom:0;">
+      <div class="chart-title">ANZ — Cohort Table</div>
+      <div class="chart-sub">WoW detail · Apr 13 vs Apr 20 · Australia + New Zealand</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>Country / Cohort</th><th>Apr 13 ARR</th><th>Apr 20 ARR</th><th>WoW Δ</th></tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding-left:8px;font-size:11px;color:var(--muted);font-weight:700;background:#F8FAFC;" colspan="4">🇦🇺 AUSTRALIA</td></tr>
+          <tr><td>ch1 | 1 user</td><td class="num">$932</td><td class="num">$0</td><td><span class="tag neg">↓ Gone</span></td></tr>
+          <tr><td>ch2 | 2–4 users</td><td class="num">$28,132</td><td class="num">$15,200</td><td><span class="tag neg">-46.0%</span></td></tr>
+          <tr><td>ch4 | 10–24 users</td><td class="num">$0</td><td class="num">$23,200</td><td><span class="tag pos">New</span></td></tr>
+          <tr><td>No value</td><td class="num">$29,600</td><td class="num">$0</td><td><span class="tag neg">↓ Gone</span></td></tr>
+          <tr><td style="padding-left:8px;font-size:11px;color:var(--muted);font-weight:700;background:#F8FAFC;" colspan="4">🇳🇿 NEW ZEALAND</td></tr>
+          <tr><td>ch3 | 5–9 users</td><td class="num">$5,600</td><td class="num">$0</td><td><span class="tag neg">↓ Gone</span></td></tr>
+          <tr class="total-row"><td>Total ANZ</td><td class="num">$64,264</td><td class="num">$38,400</td><td><span class="tag neg">-40.3%</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DACH -->
+  <div id="region-dach" class="region-panel">
+    <div class="pace-card" style="background: linear-gradient(135deg, #6B1A1A 0%, #8B2020 100%);">
+      <div class="pace-circle" style="border-color:rgba(255,255,255,0.3);">
+        <div class="pace-pct">5.7%</div>
+        <div class="pace-lbl">Coverage</div>
+      </div>
+      <div class="pace-info">
+        <h3>DACH — Significantly Behind Quota ⚠️</h3>
+        <p>April MTD: $8,130 · Quota: $141,667 · Gap: <strong>-$133,537</strong><br>
+        WoW Pipeline: <strong>+39.5%</strong> ($6,400 → $8,930) | Apr 13 vs 20 · Germany + Austria + Switzerland</p>
+      </div>
+    </div>
+
+    <div class="section-label">WoW Performance — Apr 13 vs Apr 20</div>
+    <div class="kpi-grid">
+      <div class="kpi-card green">
+        <div class="kpi-label">WoW Pipeline</div>
+        <div class="kpi-value">$8.9K</div>
+        <div class="kpi-delta pos">▲ 39.5% WoW</div>
+        <div class="kpi-sub">Apr 13: $6,400</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Pipeline (curr)</div>
-        <div class="kpi-value">$64,800</div>
-        <div class="kpi-delta positive">▲ 80.00% WoW</div>
+        <div class="kpi-label">Apr 20 Closed</div>
+        <div class="kpi-value">n/a</div>
+        <div class="kpi-delta neu">No data this week</div>
+        <div class="kpi-sub">Apr 13: —</div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Closed (prev)</div>
-        <div class="kpi-value">—</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Closed (curr)</div>
-        <div class="kpi-value">$6,169</div>
-        <div class="kpi-delta positive">n/a → $6,169</div>
+      <div class="kpi-card red">
+        <div class="kpi-label">Apr Quota Coverage</div>
+        <div class="kpi-value">5.7%</div>
+        <div class="kpi-delta neg">▼ $133.5K below quota</div>
+        <div class="kpi-sub">$8,130 / $141,667</div>
       </div>
     </div>
-    <div class="divider"></div>
-    <div class="chart-card" style="margin-bottom:0;">
-      <div class="chart-title">ANZ — Pipeline & Closed WoW</div>
-      <div class="chart-period">Apr 6–12 vs Apr 13–19, 2026</div>
-      <div class="legend">
-        <span class="legend-item"><span class="legend-dot" style="background:#1F2D5C;"></span>Apr 6–12</span>
-        <span class="legend-item"><span class="legend-dot" style="background:#4B9CD3;"></span>Apr 13–19</span>
+
+    <div class="section-label">Weekly Pace — DACH (Germany + Austria + Switzerland)</div>
+    <div class="chart-card full" style="margin-bottom:16px;">
+      <div class="chart-title">DACH — Weekly Pipeline (All 4 Weeks)</div>
+      <div class="chart-sub">3/30 · 4/6 · 4/13 · 4/20 · by country</div>
+      <canvas id="chartDACHWeekly" style="max-height:200px;"></canvas>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">DACH — WoW Cohort Comparison</div>
+        <div class="chart-sub">Apr 13 vs Apr 20 · ARR by cohort</div>
+        <canvas id="chartDACH"></canvas>
       </div>
-      <div style="position:relative;height:180px;"><canvas id="anzChart" role="img" aria-label="ANZ pipeline and closed WoW comparison">Apr 6-12: Pipeline $36,000, Closed no data. Apr 13-19: Pipeline $64,800, Closed $6,169.</canvas></div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════ COHORTS -->
-<div id="tab-cohorts" class="section">
-  <div class="section-title">Cohort breakdown</div>
-  <div class="section-desc">Companies by employee size band · Snapshot: April 13, 2026</div>
-
-  <div class="cohort-note">
-    <strong>ICP definition:</strong> CH3 (5–9 employees) and above. These cohorts represent your target customer profile. Companies in CH1 and CH2 are below ICP threshold.
-  </div>
-
-  <div class="cohort-grid">
-    <div class="cohort-card">
-      <div class="cohort-name">CH2</div>
-      <div class="cohort-range">2–4 employees</div>
-      <div class="cohort-count">5</div>
-      <div class="cohort-pct">56% of total</div>
-    </div>
-    <div class="cohort-card">
-      <div class="cohort-name">CH1</div>
-      <div class="cohort-range">1 employee</div>
-      <div class="cohort-count">2</div>
-      <div class="cohort-pct">22% of total</div>
-    </div>
-    <div class="cohort-card icp">
-      <span class="icp-tag">ICP</span>
-      <div class="cohort-name">CH4</div>
-      <div class="cohort-range">10–24 employees</div>
-      <div class="cohort-count">1</div>
-      <div class="cohort-pct">11% of total</div>
-    </div>
-    <div class="cohort-card icp">
-      <span class="icp-tag">ICP</span>
-      <div class="cohort-name">CH5</div>
-      <div class="cohort-range">25–49 employees</div>
-      <div class="cohort-count">1</div>
-      <div class="cohort-pct">11% of total</div>
-    </div>
-    <div class="cohort-card icp">
-      <span class="icp-tag">ICP</span>
-      <div class="cohort-name">CH3</div>
-      <div class="cohort-range">5–9 employees</div>
-      <div class="cohort-count">0</div>
-      <div class="cohort-pct">0% of total</div>
-    </div>
-    <div class="cohort-card icp">
-      <span class="icp-tag">ICP</span>
-      <div class="cohort-name">CH6</div>
-      <div class="cohort-range">50+ employees</div>
-      <div class="cohort-count">0</div>
-      <div class="cohort-pct">0% of total</div>
-    </div>
-  </div>
-
-  <div class="chart-grid">
-    <div class="chart-card">
-      <div class="chart-title">Companies by cohort</div>
-      <div class="chart-period">All cohorts · Apr 13, 2026 · Total: 9</div>
-      <div class="legend">
-        <span class="legend-item"><span class="legend-dot" style="background:#4B9CD3;"></span>Below ICP</span>
-        <span class="legend-item"><span class="legend-dot" style="background:#2ECC71;"></span>ICP (CH3+)</span>
+      <div class="chart-card">
+        <div class="chart-title">DACH — Apr 20 Cohort Mix</div>
+        <div class="chart-sub">Distribution this week · Switzerland dominant</div>
+        <canvas id="chartDACHDonut"></canvas>
       </div>
-      <div style="position:relative;height:220px;"><canvas id="cohortBar" role="img" aria-label="Bar chart of companies by cohort">CH2: 5, CH1: 2, CH4: 1, CH5: 1, CH3: 0, CH6: 0.</canvas></div>
     </div>
-    <div class="chart-card">
-      <div class="chart-title">ICP vs below-ICP split</div>
-      <div class="chart-period">Share of total pipeline companies</div>
-      <div class="legend">
-        <span class="legend-item"><span class="legend-dot" style="background:#4B9CD3;"></span>Below ICP (CH1+CH2)</span>
-        <span class="legend-item"><span class="legend-dot" style="background:#2ECC71;"></span>ICP (CH3–CH6)</span>
-      </div>
-      <div style="position:relative;height:220px;"><canvas id="cohortDonut" role="img" aria-label="Donut chart ICP vs below ICP split">Below ICP: 7 companies (78%), ICP: 2 companies (22%).</canvas></div>
+
+    <div class="chart-card full" style="margin-bottom:0;">
+      <div class="chart-title">DACH — Cohort Table</div>
+      <div class="chart-sub">WoW detail · Apr 13 vs Apr 20 · Germany + Austria + Switzerland</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>Country / Cohort</th><th>Apr 13 ARR</th><th>Apr 20 ARR</th><th>WoW Δ</th></tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding-left:8px;font-size:11px;color:var(--muted);font-weight:700;background:#F8FAFC;" colspan="4">🇦🇹 AUSTRIA</td></tr>
+          <tr><td>ch1 | 1 user</td><td class="num">$0</td><td class="num">$930</td><td><span class="tag pos">New</span></td></tr>
+          <tr><td>ch2 | 2–4 users</td><td class="num">$2,400</td><td class="num">$0</td><td><span class="tag neg">↓ Gone</span></td></tr>
+          <tr><td style="padding-left:8px;font-size:11px;color:var(--muted);font-weight:700;background:#F8FAFC;" colspan="4">🇩🇪 GERMANY</td></tr>
+          <tr><td>ch6 | 50+ users</td><td class="num">$0</td><td class="num">$0</td><td><span class="tag neu">—</span></td></tr>
+          <tr><td>No value</td><td class="num">$3,200</td><td class="num">$0</td><td><span class="tag neg">↓ Gone</span></td></tr>
+          <tr><td style="padding-left:8px;font-size:11px;color:var(--muted);font-weight:700;background:#F8FAFC;" colspan="4">🇨🇭 SWITZERLAND</td></tr>
+          <tr><td>ch2 | 2–4 users</td><td class="num">$800</td><td class="num">$800</td><td><span class="tag neu">0%</span></td></tr>
+          <tr><td>ch3 | 5–9 users</td><td class="num">$0</td><td class="num">$7,200</td><td><span class="tag pos">New</span></td></tr>
+          <tr class="total-row"><td>Total DACH</td><td class="num">$6,400</td><td class="num">$8,930</td><td><span class="tag pos">+39.5%</span></td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
-  <div class="divider"></div>
-  <div style="font-size:13px;color:#888;line-height:1.6;">
-    <strong style="color:#1F2D5C;">Key insight:</strong> Of the 9 companies in pipeline on April 13, only <strong style="color:#2ECC71;">2 (22%)</strong> are ICP-qualified (CH4 and CH5). The majority — <strong style="color:#E74C3C;">7 companies (78%)</strong> — fall below the ICP threshold. CH3, the entry point of ICP, has 0 companies currently. Focus should be on improving ICP-fit lead quality upstream.
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════ FULL TABLE -->
-<div id="tab-table" class="section">
-  <div class="section-title">Full data table</div>
-  <div class="section-desc">All markets and time frames — pipeline and closed</div>
-
-  <div class="section-label" style="margin-bottom:8px;">All International — WoW</div>
-  <div class="table-wrap">
-    <table class="data-table">
-      <thead><tr><th>Metric</th><th>Apr 6–12</th><th>Apr 13–19</th><th>WoW % change</th></tr></thead>
-      <tbody>
-        <tr><td>Pipeline</td><td>$252,800</td><td>$88,000</td><td class="tag-negative">-65.19%</td></tr>
-        <tr><td>Closed</td><td>$3,477</td><td>$9,940</td><td class="tag-positive">+185.87%</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="section-label" style="margin-bottom:8px;margin-top:20px;">All International — MoM</div>
-  <div class="table-wrap">
-    <table class="data-table">
-      <thead><tr><th>Metric</th><th>Mar 1–19, 2026</th><th>Apr 1–19, 2026</th><th>MoM % change</th></tr></thead>
-      <tbody>
-        <tr><td>Pipeline</td><td>$329,192</td><td>$447,623</td><td class="tag-positive">+35.98%</td></tr>
-        <tr><td>Closed</td><td>$29,121</td><td>$17,940</td><td class="tag-negative">-38.40%</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="section-label" style="margin-bottom:8px;margin-top:20px;">All International — YoY</div>
-  <div class="table-wrap">
-    <table class="data-table">
-      <thead><tr><th>Metric</th><th>Apr 1–19, 2025</th><th>Apr 1–19, 2026</th><th>YoY % change</th></tr></thead>
-      <tbody>
-        <tr><td>Pipeline</td><td>$114,540</td><td>$447,623</td><td class="tag-positive">+290.80%</td></tr>
-        <tr><td>Closed</td><td>$10,036</td><td>$17,940</td><td class="tag-positive">+78.75%</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="section-label" style="margin-bottom:8px;margin-top:20px;">Key Markets — WoW Pipeline</div>
-  <div class="table-wrap">
-    <table class="data-table">
-      <thead><tr><th>Market</th><th>Apr 6–12 Pipeline</th><th>Apr 13–19 Pipeline</th><th>WoW %</th><th>Apr 6–12 Closed</th><th>Apr 13–19 Closed</th><th>WoW %</th></tr></thead>
-      <tbody>
-        <tr><td>DACH</td><td>$6,400</td><td>$6,400</td><td class="tag-neutral">0.00%</td><td>—</td><td>—</td><td class="tag-neutral">n/a</td></tr>
-        <tr><td>Romania</td><td>$136,000</td><td>$800</td><td class="tag-negative">-99.41%</td><td>$1,866</td><td>$3,771</td><td class="tag-positive">+102.08%</td></tr>
-        <tr><td>UK</td><td>$64,000</td><td>$2,400</td><td class="tag-negative">-96.25%</td><td>$1,611</td><td>—</td><td class="tag-neutral">n/a</td></tr>
-        <tr><td>ANZ</td><td>$36,000</td><td>$64,800</td><td class="tag-positive">+80.00%</td><td>—</td><td>$6,169</td><td class="tag-neutral">n/a</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="section-label" style="margin-bottom:8px;margin-top:20px;">Cohort snapshot — Apr 13, 2026</div>
-  <div class="table-wrap">
-    <table class="data-table">
-      <thead><tr><th>Cohort</th><th>Employee range</th><th>ICP?</th><th># Companies</th><th>% of total</th></tr></thead>
-      <tbody>
-        <tr><td>CH1</td><td>1</td><td class="tag-neutral">No</td><td>2</td><td>22%</td></tr>
-        <tr><td>CH2</td><td>2–4</td><td class="tag-neutral">No</td><td>5</td><td>56%</td></tr>
-        <tr><td>CH3</td><td>5–9</td><td class="tag-positive">Yes (entry)</td><td>0</td><td>0%</td></tr>
-        <tr><td>CH4</td><td>10–24</td><td class="tag-positive">Yes</td><td>1</td><td>11%</td></tr>
-        <tr><td>CH5</td><td>25–49</td><td class="tag-positive">Yes</td><td>1</td><td>11%</td></tr>
-        <tr><td>CH6</td><td>50+</td><td class="tag-positive">Yes</td><td>0</td><td>0%</td></tr>
-        <tr style="background:#f3f5fb;"><td><strong>Total</strong></td><td></td><td></td><td><strong>9</strong></td><td><strong>100%</strong></td></tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="footnote">* WoW data uses Apr 6–12 vs Apr 13–19, 2026. MoM uses Mar 1–19 vs Apr 1–19. YoY uses Apr 1–19 2025 vs 2026.</div>
 </div>
 
 <script>
-function switchTab(name) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  const map = { all: 0, markets: 1, cohorts: 2, table: 3 };
-  document.querySelectorAll('.nav-tab')[map[name]].classList.add('active');
+// ─── TAB NAVIGATION ───────────────────────────────────
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
 }
 
-function switchMarket(name, e) {
-  document.querySelectorAll('.market-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.market-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('market-' + name).classList.add('active');
-  e.target.classList.add('active');
+function switchRegion(id, btn) {
+  document.querySelectorAll('.region-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.region-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('region-' + id).classList.add('active');
+  btn.classList.add('active');
 }
 
-const navy = '#1F2D5C';
-const blue = '#4B9CD3';
-const green = '#2ECC71';
-const amber = '#F39C12';
-const red = '#E74C3C';
-
-const baseOpts = {
-  responsive: true, maintainAspectRatio: false,
-  plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' $' + ctx.parsed.y.toLocaleString() } } },
-  scales: {
-    x: { ticks: { font: { size: 11 }, color: '#888' }, grid: { display: false } },
-    y: { ticks: { font: { size: 11 }, color: '#888', callback: v => '$' + (v >= 1000 ? (v/1000).toFixed(0) + 'k' : v) }, grid: { color: 'rgba(0,0,0,0.05)' } }
-  }
+// ─── COLOR PALETTE ────────────────────────────────────
+const C = {
+  navy:   '#1F2D5C',
+  blue:   '#4B9CD3',
+  green:  '#2ECC71',
+  amber:  '#F39C12',
+  red:    '#E74C3C',
+  purple: '#9B59B6',
+  teal:   '#1ABC9C',
+  gray:   '#BDC3C7',
 };
+const REGIONS = ['UK','Romania','ANZ','DACH'];
+const REG_COLORS = [C.blue, C.amber, C.teal, C.green];
 
-new Chart(document.getElementById('allMoMChart'), {
-  type: 'bar',
-  data: { labels: ['Pipeline', 'Closed'], datasets: [
-    { label: 'March', data: [329192, 29121], backgroundColor: navy, borderRadius: 4 },
-    { label: 'April', data: [447623, 17940], backgroundColor: blue, borderRadius: 4 }
-  ]},
-  options: baseOpts
-});
+// ─── CHART DEFAULTS ───────────────────────────────────
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.color = '#6B7A99';
+const gridOpts = { color: 'rgba(0,0,0,0.05)', drawBorder: false };
+const tickOpts = { maxTicksLimit: 5 };
+const fmt$ = v => '$' + (v >= 1000 ? (v/1000).toFixed(0)+'K' : v.toLocaleString());
 
-new Chart(document.getElementById('allYoYChart'), {
-  type: 'bar',
-  data: { labels: ['Pipeline', 'Closed'], datasets: [
-    { label: 'Apr 2025', data: [114540, 10036], backgroundColor: navy, borderRadius: 4 },
-    { label: 'Apr 2026', data: [447623, 17940], backgroundColor: green, borderRadius: 4 }
-  ]},
-  options: baseOpts
-});
-
-new Chart(document.getElementById('allWoWChart'), {
-  type: 'bar',
-  data: { labels: ['Pipeline', 'Closed'], datasets: [
-    { label: 'Apr 6–12', data: [252800, 3477], backgroundColor: navy, borderRadius: 4 },
-    { label: 'Apr 13–19', data: [88000, 9940], backgroundColor: amber, borderRadius: 4 }
-  ]},
-  options: baseOpts
-});
-
-new Chart(document.getElementById('allDeltaChart'), {
+// ─── TAB 1: WEEKLY PACE ───────────────────────────────
+new Chart(document.getElementById('chartWeekly'), {
   type: 'bar',
   data: {
-    labels: ['WoW Pipeline', 'WoW Closed', 'MoM Pipeline', 'MoM Closed', 'YoY Pipeline', 'YoY Closed'],
-    datasets: [{
-      data: [-65.19, 185.87, 35.98, -38.40, 290.80, 78.75],
-      backgroundColor: [-65.19, 185.87, 35.98, -38.40, 290.80, 78.75].map(v => v >= 0 ? green : red),
-      borderRadius: 4
-    }]
+    labels: ['3/30/2026','4/6/2026','4/13/2026','4/20/2026'],
+    datasets: [
+      { label: 'Australia',    data: [12829, 80052, 58665, 38400], backgroundColor: C.teal },
+      { label: 'Romania',      data: [43065, 136350, 4800, 74800], backgroundColor: C.amber },
+      { label: 'UK',           data: [28800, 63210, 2400, 48000],  backgroundColor: C.blue },
+      { label: 'Switzerland',  data: [800,   6400,  800,  8000],   backgroundColor: C.purple },
+      { label: 'Germany',      data: [0,     0,     5600, 0],      backgroundColor: C.green },
+      { label: 'New Zealand',  data: [0,     0,     5600, 0],      backgroundColor: '#1ABC9C' },
+      { label: 'Austria',      data: [0,     0,     0,    930],    backgroundColor: C.red },
+    ]
   },
   options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.parsed.y.toFixed(2) + '%' } } },
+    responsive: true, maintainAspectRatio: true,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 10 } } },
     scales: {
-      x: { ticks: { font: { size: 10 }, color: '#888', maxRotation: 30 }, grid: { display: false } },
-      y: { ticks: { font: { size: 11 }, color: '#888', callback: v => v + '%' }, grid: { color: 'rgba(0,0,0,0.05)' } }
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, grid: gridOpts, ticks: { ...tickOpts, callback: fmt$ } }
     }
   }
 });
 
-new Chart(document.getElementById('dachChart'), {
-  type: 'bar',
-  data: { labels: ['Pipeline'], datasets: [
-    { label: 'Apr 6–12', data: [6400], backgroundColor: navy, borderRadius: 4 },
-    { label: 'Apr 13–19', data: [6400], backgroundColor: blue, borderRadius: 4 }
-  ]},
-  options: baseOpts
-});
-
-new Chart(document.getElementById('roChart'), {
-  type: 'bar',
-  data: { labels: ['Pipeline', 'Closed'], datasets: [
-    { label: 'Apr 6–12', data: [136000, 1866], backgroundColor: navy, borderRadius: 4 },
-    { label: 'Apr 13–19', data: [800, 3771], backgroundColor: blue, borderRadius: 4 }
-  ]},
-  options: baseOpts
-});
-
-new Chart(document.getElementById('ukChart'), {
-  type: 'bar',
-  data: { labels: ['Pipeline', 'Closed'], datasets: [
-    { label: 'Apr 6–12', data: [64000, 1611], backgroundColor: navy, borderRadius: 4 },
-    { label: 'Apr 13–19', data: [2400, 0], backgroundColor: blue, borderRadius: 4 }
-  ]},
-  options: baseOpts
-});
-
-new Chart(document.getElementById('anzChart'), {
-  type: 'bar',
-  data: { labels: ['Pipeline', 'Closed'], datasets: [
-    { label: 'Apr 6–12', data: [36000, 0], backgroundColor: navy, borderRadius: 4 },
-    { label: 'Apr 13–19', data: [64800, 6169], backgroundColor: blue, borderRadius: 4 }
-  ]},
-  options: baseOpts
-});
-
-new Chart(document.getElementById('cohortBar'), {
+// ─── TAB 1: PIPELINE VS QUOTA ─────────────────────────
+new Chart(document.getElementById('chartCoverage'), {
   type: 'bar',
   data: {
-    labels: ['CH1 (1)', 'CH2 (2–4)', 'CH3 (5–9)', 'CH4 (10–24)', 'CH5 (25–49)', 'CH6 (50+)'],
-    datasets: [{
-      data: [2, 5, 0, 1, 1, 0],
-      backgroundColor: [blue, blue, green, green, green, green],
-      borderRadius: 4
-    }]
+    labels: ['UK','Romania','ANZ','DACH'],
+    datasets: [
+      {
+        label: 'April Quota',
+        data: [131513, 82509, 64833, 141667],
+        backgroundColor: 'rgba(107,122,153,0.25)',
+        borderColor: 'rgba(107,122,153,0.6)',
+        borderWidth: 1.5,
+      },
+      {
+        label: 'Pipeline MTD',
+        data: [139210, 205415, 179794, 8130],
+        backgroundColor: [C.green, C.green, C.green, C.red],
+      }
+    ]
   },
   options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.parsed.y + ' companies' } } },
+    responsive: true, maintainAspectRatio: true,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } },
     scales: {
-      x: { ticks: { font: { size: 10 }, color: '#888' }, grid: { display: false } },
-      y: { ticks: { font: { size: 11 }, color: '#888', stepSize: 1 }, grid: { color: 'rgba(0,0,0,0.05)' }, max: 6 }
+      x: { grid: { display: false } },
+      y: { grid: gridOpts, ticks: { ...tickOpts, callback: fmt$ } }
     }
   }
 });
 
-new Chart(document.getElementById('cohortDonut'), {
-  type: 'doughnut',
+// ─── TAB 1: COVERAGE % ────────────────────────────────
+new Chart(document.getElementById('chartCoveragePct'), {
+  type: 'bar',
   data: {
-    labels: ['Below ICP (CH1+CH2)', 'ICP (CH3–CH6)'],
+    labels: ['UK','Romania','ANZ','DACH'],
     datasets: [{
-      data: [7, 2],
-      backgroundColor: [blue, green],
-      borderWidth: 0,
-      hoverOffset: 6
+      label: 'Coverage %',
+      data: [105.9, 249.0, 277.3, 5.7],
+      backgroundColor: [C.green, C.green, C.green, C.red],
+      borderRadius: 6,
     }]
   },
   options: {
-    responsive: true, maintainAspectRatio: false,
+    responsive: true, maintainAspectRatio: true,
     plugins: {
       legend: { display: false },
-      tooltip: { callbacks: { label: ctx => ' ' + ctx.label + ': ' + ctx.parsed + ' companies (' + Math.round(ctx.parsed / 9 * 100) + '%)' } }
+      tooltip: { callbacks: { label: ctx => ctx.parsed.y + '%' } }
     },
-    cutout: '65%'
+    scales: {
+      x: { grid: { display: false } },
+      y: {
+        grid: gridOpts,
+        ticks: { callback: v => v + '%' },
+        min: 0,
+        suggestedMax: 300
+      }
+    }
+  }
+});
+
+// ─── ANZ WEEKLY PACE ──────────────────────────────────
+new Chart(document.getElementById('chartANZWeekly'), {
+  type: 'bar',
+  data: {
+    labels: ['3/30/2026','4/6/2026','4/13/2026','4/20/2026'],
+    datasets: [
+      { label: 'Australia', data: [12829, 80052, 58665, 38400], backgroundColor: C.teal },
+      { label: 'New Zealand', data: [0, 0, 5600, 0], backgroundColor: C.blue },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: true,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } },
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, grid: gridOpts, ticks: { ...tickOpts, callback: fmt$ } }
+    }
+  }
+});
+
+// ─── DACH WEEKLY PACE ─────────────────────────────────
+new Chart(document.getElementById('chartDACHWeekly'), {
+  type: 'bar',
+  data: {
+    labels: ['3/30/2026','4/6/2026','4/13/2026','4/20/2026'],
+    datasets: [
+      { label: 'Germany',     data: [0, 0, 5600, 0],    backgroundColor: C.navy },
+      { label: 'Austria',     data: [0, 0, 0,    930],  backgroundColor: C.amber },
+      { label: 'Switzerland', data: [800, 6400, 800, 8000], backgroundColor: C.green },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: true,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } },
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, grid: gridOpts, ticks: { ...tickOpts, callback: fmt$ } }
+    }
+  }
+});
+const ukCohorts = ['ch1|1','ch2|2-4','ch3|5-9','ch4|10-24','ch5|25-49','No value'];
+const ukApr13  = [0, 2400, 0, 0, 0, 0];
+const ukApr20  = [800, 6400, 12000, 12000, 13600, 3200];
+
+new Chart(document.getElementById('chartUK'), {
+  type: 'bar',
+  data: {
+    labels: ukCohorts,
+    datasets: [
+      { label: 'Apr 13', data: ukApr13, backgroundColor: '#BDC3C7' },
+      { label: 'Apr 20', data: ukApr20, backgroundColor: C.blue },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: true,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } },
+    scales: { x: { grid: { display: false } }, y: { grid: gridOpts, ticks: { callback: fmt$ } } }
+  }
+});
+
+new Chart(document.getElementById('chartUKDonut'), {
+  type: 'doughnut',
+  data: {
+    labels: ukCohorts.filter((_, i) => ukApr20[i] > 0),
+    datasets: [{ data: ukApr20.filter(v => v > 0), backgroundColor: [C.navy, C.blue, C.teal, C.green, C.purple, C.amber] }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: true,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 8 } } },
+    cutout: '60%'
+  }
+});
+
+// ─── ROMANIA CHARTS ───────────────────────────────────
+const roCohorts = ['ch1|1','ch2|2-4','ch3|5-9','ch4|10-24','No value'];
+const roApr13   = [800, 0, 4000, 0, 0];
+const roApr20   = [47200, 2800, 6400, 8000, 10400];
+
+new Chart(document.getElementById('chartRO'), {
+  type: 'bar',
+  data: {
+    labels: roCohorts,
+    datasets: [
+      { label: 'Apr 13', data: roApr13, backgroundColor: '#BDC3C7' },
+      { label: 'Apr 20', data: roApr20, backgroundColor: C.amber },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: true,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } },
+    scales: { x: { grid: { display: false } }, y: { grid: gridOpts, ticks: { callback: fmt$ } } }
+  }
+});
+
+new Chart(document.getElementById('chartRODonut'), {
+  type: 'doughnut',
+  data: {
+    labels: roCohorts,
+    datasets: [{ data: roApr20, backgroundColor: [C.navy, C.blue, C.teal, C.green, C.amber] }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: true,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 8 } } },
+    cutout: '60%'
+  }
+});
+
+// ─── ANZ CHARTS ───────────────────────────────────────
+const anzCohorts = ['AU ch1|1','AU ch2|2-4','AU ch4|10-24','AU No value','NZ ch3|5-9'];
+const anzApr13   = [932, 28132, 0, 29600, 5600];
+const anzApr20   = [0, 15200, 23200, 0, 0];
+
+new Chart(document.getElementById('chartANZ'), {
+  type: 'bar',
+  data: {
+    labels: anzCohorts,
+    datasets: [
+      { label: 'Apr 13', data: anzApr13, backgroundColor: '#BDC3C7' },
+      { label: 'Apr 20', data: anzApr20, backgroundColor: C.teal },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: true,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } },
+    scales: { x: { grid: { display: false } }, y: { grid: gridOpts, ticks: { callback: fmt$ } } }
+  }
+});
+
+new Chart(document.getElementById('chartANZDonut'), {
+  type: 'doughnut',
+  data: {
+    labels: ['AU ch2|2-4','AU ch4|10-24'],
+    datasets: [{ data: [15200, 23200], backgroundColor: [C.teal, C.navy] }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: true,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 8 } } },
+    cutout: '60%'
+  }
+});
+
+// ─── DACH CHARTS ──────────────────────────────────────
+const dachCohorts = ['AT ch1|1','AT ch2|2-4','DE ch6|50+','DE No value','CH ch2|2-4','CH ch3|5-9'];
+const dachApr13   = [0, 2400, 0, 3200, 800, 0];
+const dachApr20   = [930, 0, 0, 0, 800, 7200];
+
+new Chart(document.getElementById('chartDACH'), {
+  type: 'bar',
+  data: {
+    labels: dachCohorts,
+    datasets: [
+      { label: 'Apr 13', data: dachApr13, backgroundColor: '#BDC3C7' },
+      { label: 'Apr 20', data: dachApr20, backgroundColor: C.green },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: true,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } },
+    scales: { x: { grid: { display: false } }, y: { grid: gridOpts, ticks: { callback: fmt$ } } }
+  }
+});
+
+new Chart(document.getElementById('chartDACHDonut'), {
+  type: 'doughnut',
+  data: {
+    labels: ['AT ch1|1','CH ch2|2-4','CH ch3|5-9'],
+    datasets: [{ data: [930, 800, 7200], backgroundColor: [C.green, C.teal, C.navy] }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: true,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 8 } } },
+    cutout: '60%'
   }
 });
 </script>
