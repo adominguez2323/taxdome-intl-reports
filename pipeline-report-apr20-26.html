@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pipeline Report — Apr 20–26</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy: #1F2D5C; --blue: #4B9CD3; --green: #2ECC71;
+    --amber: #F39C12; --red: #E74C3C;
+    --bg: #0f1623; --surface: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1); --muted: rgba(255,255,255,0.45);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* ── Header ── */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 32px; border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02); flex-shrink: 0;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .badge { background: var(--navy); border: 1px solid rgba(75,156,211,0.3); color: #7ec8f0; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; padding: 4px 12px; border-radius: 20px; }
+  .header-title { font-size: 14px; font-weight: 600; color: var(--muted); }
+
+  /* ── Tabs ── */
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); padding: 0 32px; background: rgba(255,255,255,0.02); flex-shrink: 0; }
+  .tab { padding: 12px 22px 10px; font-size: 13px; font-weight: 600; color: var(--muted); background: none; border: none; border-bottom: 3px solid transparent; margin-bottom: -1px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: color 0.2s, border-color 0.2s; }
+  .tab:hover { color: #fff; }
+  .tab.active { color: #fff; border-bottom-color: var(--blue); }
+
+  /* ── Pages ── */
+  .page { display: none; flex: 1; overflow-y: auto; padding: 24px 32px 16px; }
+  .page.active { display: block; }
+
+  /* ── Section label ── */
+  .section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── KPI grid ── */
+  .kpi-row { display: grid; gap: 12px; margin-bottom: 20px; }
+  .kpi-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .kpi-row.cols-5 { grid-template-columns: repeat(5, 1fr); }
+
+  .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 14px 12px; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; }
+  .kpi.accent-top::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 12px 12px 0 0; }
+  .kpi.lead::before { background: #2d4080; }
+  .kpi.mql::before  { background: var(--blue); }
+  .kpi.sql::before  { background: var(--green); }
+  .kpi-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.09em; font-weight: 600; margin-bottom: 7px; }
+  .kpi-val { font-size: 40px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; margin-bottom: 4px; }
+  .kpi-val.sm { font-size: 26px; }
+  .kpi-delta { font-size: 12px; font-weight: 600; font-family: 'DM Mono', monospace; margin-bottom: 10px; }
+  .kpi-prev { width: 100%; border-top: 1px solid var(--border); padding-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+  .kpi-prev-row { display: flex; justify-content: space-between; font-size: 11px; }
+  .kpi-prev-label { color: var(--muted); }
+  .kpi-prev-val { font-family: 'DM Mono', monospace; font-weight: 500; font-size: 11px; }
+
+  /* ── Conv cards ── */
+  .conv-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .conv { background: linear-gradient(135deg, #1a2a50, #243460); border: 1px solid rgba(75,156,211,0.2); border-radius: 12px; padding: 16px 18px 12px; display: flex; align-items: flex-start; gap: 14px; }
+  .conv-icon { font-size: 24px; opacity: 0.6; flex-shrink: 0; }
+  .conv-body { flex: 1; }
+  .conv-label { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.09em; font-weight: 600; margin-bottom: 4px; }
+  .conv-val { font-size: 36px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; color: var(--green); margin-bottom: 3px; }
+  .conv-delta { font-size: 12px; font-family: 'DM Mono', monospace; color: rgba(255,255,255,0.5); margin-bottom: 10px; }
+  .conv-prev { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+  .conv-prev-row { display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,0.5); }
+  .conv-prev-val { font-family: 'DM Mono', monospace; }
+
+  /* ── Two-col layout ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .chart-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .chart-box-title { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.8); margin-bottom: 12px; }
+  .chart-box-title span { font-weight: 400; color: var(--muted); font-size: 11px; margin-left: 5px; }
+  .chart-container { position: relative; height: 160px; }
+
+  /* ── Funnel visual ── */
+  .funnel-wrap { display: flex; align-items: flex-end; gap: 0; height: 130px; margin-bottom: 10px; }
+  .fv-step { flex: 1; display: flex; flex-direction: column; align-items: center; }
+  .fv-bar-outer { width: 100%; display: flex; justify-content: center; align-items: flex-end; height: 90px; }
+  .fv-bar { width: 65%; border-radius: 6px 6px 0 0; }
+  .fv-num { font-size: 20px; font-weight: 700; margin-top: 7px; letter-spacing: -0.02em; }
+  .fv-lbl { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+  .fv-arrow { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 36px; flex-shrink: 0; padding-bottom: 38px; gap: 2px; }
+  .fv-rate { font-size: 10px; font-weight: 700; color: var(--blue); font-family: 'DM Mono', monospace; }
+
+  /* ── Callout ── */
+  .callout { background: rgba(243,156,18,0.08); border: 1px solid rgba(243,156,18,0.25); border-left: 4px solid var(--amber); border-radius: 10px; padding: 11px 16px; font-size: 12px; color: rgba(255,255,255,0.75); margin-bottom: 16px; line-height: 1.6; }
+  .callout strong { color: #fff; }
+
+  /* ── Market blocks ── */
+  .market-block { margin-bottom: 20px; }
+  .market-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .market-flag { font-size: 18px; }
+  .market-name { font-size: 15px; font-weight: 700; }
+  .market-kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+
+  /* ── Positive / negative ── */
+  .positive { color: var(--green); }
+  .negative { color: #ff6b6b; }
+  .neutral  { color: var(--amber); }
+  .dimmed   { color: var(--muted); }
+
+  /* ── Talking points ── */
+  .talking-bar { flex-shrink: 0; background: rgba(75,156,211,0.07); border-top: 1px solid rgba(75,156,211,0.18); padding: 10px 32px; display: flex; align-items: flex-start; gap: 10px; }
+  .tp-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); white-space: nowrap; margin-top: 2px; }
+  .tp-text { font-size: 12px; color: rgba(255,255,255,0.65); line-height: 1.5; }
+  .tp-text strong { color: #fff; }
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<div class="header">
+  <div class="header-left">
+    <span class="badge">Apr 20–26, 2025</span>
+    <span class="header-title">International Pipeline Report</span>
+  </div>
+</div>
+
+<!-- ── Tabs ── -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('all', this)">🌍 All Markets</button>
+  <button class="tab" onclick="switchTab('key', this)">📍 Key Markets</button>
+</div>
+
+
+<!-- ════════════════════════════════
+     PAGE 1 — ALL MARKETS
+════════════════════════════════ -->
+<div class="page active" id="page-all">
+
+  <!-- Last week KPIs -->
+  <div class="section-label">Last week · Apr 20–26</div>
+  <div class="kpi-row cols-3">
+    <div class="kpi accent-top lead">
+      <div class="kpi-label">Leads</div>
+      <div class="kpi-val">17</div>
+      <div class="kpi-delta negative">▼ 55.3% WoW</div>
+      <div class="kpi-prev">
+        <div class="kpi-prev-row"><span class="kpi-prev-label">Week before</span><span class="kpi-prev-val">38</span></div>
+        <div class="kpi-prev-row"><span class="kpi-prev-label">MoM (Apr 1–26)</span><span class="kpi-prev-val">114</span></div>
+        <div class="kpi-prev-row"><span class="kpi-prev-label">vs prev month</span><span class="kpi-prev-val negative">−298 (−72.3%)</span></div>
+        <div class="kpi-prev-row"><span class="kpi-prev-label">YoY comp (Apr 1–26, 2025)</span><span class="kpi-prev-val">82</span></div>
+        <div class="kpi-prev-row"><span class="kpi-prev-label">vs YoY</span><span class="kpi-prev-val positive">+32 (+39.0%)</span></div>
+      </div>
+    </div>
+    <div class="kpi accent-top mql">
+      <div class="kpi-label">MQL</div>
+      <div class="kpi-val">19</div>
+      <div class="kpi-delta negative">▼ 36.7% WoW</div>
+      <div class="kpi-prev">
+        <div class="kpi-prev-row"><span class="kpi-prev-label">Week before</span><span class="kpi-prev-val">30</span></div>
+        <div class="kpi-prev-row"><span class="kpi-prev-label">MoM (Apr 1–26)</span><span class="kpi-prev-val">105</span></div>
+        <div class="kpi-prev-row"><span class="kpi-prev-label">vs prev month</span><span class="kpi-prev-val negative">−103 (−49.5%)</span></div>
+        <div class="kpi-prev-row"><span class="kpi-prev-label">YoY comp (Apr 1–26, 2025)</span><span class="kpi-prev-val">57</span></div>
+        <div class="kpi-prev-row"><span class="kpi-prev-label">vs YoY</span><span class="kpi-prev-val positive">+48 (+84.2%)</span></div>
+      </div>
+    </div>
+    <div class="kpi accent-top sql">
+      <div class="kpi-label">SQL</div>
+      <div class="kpi-val">11</div>
+      <div class="kpi-delta negative">▼ 15.4% WoW</div>
+      <div class="kpi-prev">
+        <div class="kpi-prev-row"><span class="kpi-prev-label">Week before</span><span class="kpi-prev-val">13</span></div>
+        <div class="kpi-prev-row"><span class="kpi-prev-label">MoM (Apr 1–26)</span><span class="kpi-prev-val">58</span></div>
+        <div class="kpi-prev-row"><span class="kpi-prev-label">vs prev month</span><span class="kpi-prev-val negative">−36 (−38.3%)</span></div>
+        <div class="kpi-prev-row"><span class="kpi-prev-label">YoY comp (Apr 1–26, 2025)</span><span class="kpi-prev-val">38</span></div>
+        <div class="kpi-prev-row"><span class="kpi-prev-label">vs YoY</span><span class="kpi-prev-val positive">+20 (+52.6%)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conversion rates -->
+  <div class="section-label">Conversion rates · Last week</div>
+  <div class="conv-row" style="grid-template-columns:1fr 1fr 1fr;">
+    <div class="conv">
+      <div class="conv-icon">⚡</div>
+      <div class="conv-body">
+        <div class="conv-label">Lead → MQL</div>
+        <div class="conv-val">111.8%</div>
+        <div class="conv-delta">▲ +32.8 pts WoW</div>
+        <div class="conv-prev">
+          <div class="conv-prev-row"><span>Week before</span><span class="conv-prev-val">79.0%</span></div>
+          <div class="conv-prev-row"><span>MoM Apr 1–26, 2026</span><span class="conv-prev-val">92.1%</span></div>
+          <div class="conv-prev-row"><span>Mar 1–26, 2026 (comp)</span><span class="conv-prev-val">50.5%</span></div>
+          <div class="conv-prev-row"><span>Apr 1–26, 2025 (YoY)</span><span class="conv-prev-val">69.5%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="conv">
+      <div class="conv-icon">🎯</div>
+      <div class="conv-body">
+        <div class="conv-label">MQL → SQL</div>
+        <div class="conv-val">57.9%</div>
+        <div class="conv-delta">▲ +14.6 pts WoW</div>
+        <div class="conv-prev">
+          <div class="conv-prev-row"><span>Week before</span><span class="conv-prev-val">43.3%</span></div>
+          <div class="conv-prev-row"><span>MoM Apr 1–26, 2026</span><span class="conv-prev-val">55.2%</span></div>
+          <div class="conv-prev-row"><span>Mar 1–26, 2026 (comp)</span><span class="conv-prev-val">45.2%</span></div>
+          <div class="conv-prev-row"><span>Apr 1–26, 2025 (YoY)</span><span class="conv-prev-val">66.7%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="conv">
+      <div class="conv-icon">🏁</div>
+      <div class="conv-body">
+        <div class="conv-label">Lead → SQL</div>
+        <div class="conv-val">64.7%</div>
+        <div class="conv-delta" style="color:rgba(255,255,255,0.5);">End-to-end rate</div>
+        <div class="conv-prev">
+          <div class="conv-prev-row"><span>Week before</span><span class="conv-prev-val">34.2%</span></div>
+          <div class="conv-prev-row"><span>MoM Apr 1–26, 2026</span><span class="conv-prev-val">50.9%</span></div>
+          <div class="conv-prev-row"><span>Mar 1–26, 2026 (comp)</span><span class="conv-prev-val">22.8%</span></div>
+          <div class="conv-prev-row"><span>Apr 1–26, 2025 (YoY)</span><span class="conv-prev-val">46.3%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts row -->
+  <div class="section-label">Trend comparisons</div>
+  <div class="two-col">
+    <!-- Funnel -->
+    <div class="chart-box">
+      <div class="chart-box-title">Bowtie Funnel <span>Last week</span></div>
+      <div class="funnel-wrap">
+        <div class="fv-step">
+          <div class="fv-bar-outer"><div class="fv-bar" id="fv-lead" style="background:linear-gradient(180deg,#2d4080,#1F2D5C);"></div></div>
+          <div class="fv-num">17</div><div class="fv-lbl">Leads</div>
+        </div>
+        <div class="fv-arrow">
+          <div class="fv-rate">111.8%</div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4B9CD3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+        <div class="fv-step">
+          <div class="fv-bar-outer"><div class="fv-bar" id="fv-mql" style="background:linear-gradient(180deg,#5aaee0,#4B9CD3);"></div></div>
+          <div class="fv-num">19</div><div class="fv-lbl">MQL</div>
+        </div>
+        <div class="fv-arrow">
+          <div class="fv-rate">57.9%</div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4B9CD3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+        <div class="fv-step">
+          <div class="fv-bar-outer"><div class="fv-bar" id="fv-sql" style="background:linear-gradient(180deg,#3ddaa0,#2ECC71);"></div></div>
+          <div class="fv-num">11</div><div class="fv-lbl">SQL</div>
+        </div>
+      </div>
+    </div>
+    <!-- MoM chart -->
+    <div class="chart-box">
+      <div class="chart-box-title">MoM Comparison <span>Apr 1–26 vs Mar 1–26</span></div>
+      <div class="chart-container"><canvas id="momChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- YoY highlight -->
+  <div class="section-label">YoY · Apr 1–26, 2026 vs Apr 1–26, 2025</div>
+  <div class="kpi-row cols-5">
+    <div class="kpi" style="border-color:rgba(46,204,113,0.35);">
+      <div class="kpi-label">Lead YoY ▲</div>
+      <div class="kpi-val sm" style="color:var(--green);">114</div>
+      <div class="kpi-delta positive">▲ +39.0% (+32)</div>
+      <div class="kpi-prev">
+        <div class="kpi-prev-row"><span class="kpi-prev-label">Apr 1–26, 2025</span><span class="kpi-prev-val">82</span></div>
+      </div>
+    </div>
+    <div class="kpi" style="border-color:rgba(46,204,113,0.35);">
+      <div class="kpi-label">MQL YoY ▲</div>
+      <div class="kpi-val sm" style="color:var(--green);">105</div>
+      <div class="kpi-delta positive">▲ +84.2% (+48)</div>
+      <div class="kpi-prev">
+        <div class="kpi-prev-row"><span class="kpi-prev-label">Apr 1–26, 2025</span><span class="kpi-prev-val">57</span></div>
+      </div>
+    </div>
+    <div class="kpi" style="border-color:rgba(46,204,113,0.35);">
+      <div class="kpi-label">SQL YoY ▲</div>
+      <div class="kpi-val sm" style="color:var(--green);">58</div>
+      <div class="kpi-delta positive">▲ +52.6% (+20)</div>
+      <div class="kpi-prev">
+        <div class="kpi-prev-row"><span class="kpi-prev-label">Apr 1–26, 2025</span><span class="kpi-prev-val">38</span></div>
+      </div>
+    </div>
+    <div class="kpi" style="border-color:rgba(46,204,113,0.35);">
+      <div class="kpi-label">Lead→MQL YoY</div>
+      <div class="kpi-val sm" style="color:var(--green);">92.1%</div>
+      <div class="kpi-delta positive">▲ +22.6 pts</div>
+      <div class="kpi-prev">
+        <div class="kpi-prev-row"><span class="kpi-prev-label">Apr 1–26, 2025</span><span class="kpi-prev-val">69.5%</span></div>
+      </div>
+    </div>
+    <div class="kpi" style="border-color:rgba(46,204,113,0.35);">
+      <div class="kpi-label">MQL→SQL YoY</div>
+      <div class="kpi-val sm" style="color:var(--green);">55.2%</div>
+      <div class="kpi-delta negative">▼ −11.5 pts</div>
+      <div class="kpi-prev">
+        <div class="kpi-prev-row"><span class="kpi-prev-label">Apr 1–26, 2025</span><span class="kpi-prev-val">66.7%</span></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page-all -->
+
+
+<!-- ════════════════════════════════
+     PAGE 2 — KEY MARKETS
+════════════════════════════════ -->
+<div class="page" id="page-key">
+
+  <div class="callout">
+    <strong>Weekly snapshot (Apr 20–26):</strong> No activity across any key market last week. Week prior, only <strong>ANZ</strong> had entries — Lead 1 / MQL 1 / SQL 1.
+  </div>
+
+  <!-- ANZ -->
+  <div class="market-block">
+    <div class="market-header"><span class="market-flag">🇦🇺</span><span class="market-name">ANZ</span></div>
+    <div class="market-kpi-row">
+      <div class="kpi accent-top lead">
+        <div class="kpi-label">Lead</div>
+        <div class="kpi-val sm">4</div>
+        <div class="kpi-delta positive">▲ +33.3% MoM</div>
+        <div class="kpi-prev">
+          <div class="kpi-prev-row"><span class="kpi-prev-label">Prev period</span><span class="kpi-prev-val">3</span></div>
+        </div>
+      </div>
+      <div class="kpi accent-top mql">
+        <div class="kpi-label">MQL</div>
+        <div class="kpi-val sm">4</div>
+        <div class="kpi-delta positive">▲ +33.3% MoM</div>
+        <div class="kpi-prev">
+          <div class="kpi-prev-row"><span class="kpi-prev-label">Prev period</span><span class="kpi-prev-val">3</span></div>
+        </div>
+      </div>
+      <div class="kpi accent-top sql">
+        <div class="kpi-label">SQL</div>
+        <div class="kpi-val sm">4</div>
+        <div class="kpi-delta positive">▲ +33.3% MoM</div>
+        <div class="kpi-prev">
+          <div class="kpi-prev-row"><span class="kpi-prev-label">Prev period</span><span class="kpi-prev-val">3</span></div>
+        </div>
+      </div>
+      <div class="kpi" style="border-color:rgba(46,204,113,0.35);">
+        <div class="kpi-label">Lead→MQL</div>
+        <div class="kpi-val sm" style="color:var(--green);">100%</div>
+        <div class="kpi-delta positive">Perfect</div>
+        <div class="kpi-prev"><div class="kpi-prev-row"><span class="kpi-prev-label">Prev period</span><span class="kpi-prev-val">100%</span></div></div>
+      </div>
+      <div class="kpi" style="border-color:rgba(46,204,113,0.35);">
+        <div class="kpi-label">MQL→SQL</div>
+        <div class="kpi-val sm" style="color:var(--green);">100%</div>
+        <div class="kpi-delta positive">Perfect</div>
+        <div class="kpi-prev"><div class="kpi-prev-row"><span class="kpi-prev-label">Prev period</span><span class="kpi-prev-val">100%</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UK -->
+  <div class="market-block">
+    <div class="market-header"><span class="market-flag">🇬🇧</span><span class="market-name">UK</span></div>
+    <div class="market-kpi-row">
+      <div class="kpi accent-top lead">
+        <div class="kpi-label">Lead</div>
+        <div class="kpi-val sm">1</div>
+        <div class="kpi-delta neutral">0% MoM</div>
+        <div class="kpi-prev"><div class="kpi-prev-row"><span class="kpi-prev-label">Prev period</span><span class="kpi-prev-val">1</span></div></div>
+      </div>
+      <div class="kpi accent-top mql">
+        <div class="kpi-label">MQL</div>
+        <div class="kpi-val sm">1</div>
+        <div class="kpi-delta negative">▼ 50.0% MoM</div>
+        <div class="kpi-prev"><div class="kpi-prev-row"><span class="kpi-prev-label">Prev period</span><span class="kpi-prev-val">2</span></div></div>
+      </div>
+      <div class="kpi accent-top sql">
+        <div class="kpi-label">SQL</div>
+        <div class="kpi-val sm">1</div>
+        <div class="kpi-delta neutral">0% MoM</div>
+        <div class="kpi-prev"><div class="kpi-prev-row"><span class="kpi-prev-label">Prev period</span><span class="kpi-prev-val">1</span></div></div>
+      </div>
+      <div class="kpi" style="border-color:rgba(46,204,113,0.35);">
+        <div class="kpi-label">Lead→MQL</div>
+        <div class="kpi-val sm" style="color:var(--green);">100%</div>
+        <div class="kpi-delta positive">Strong</div>
+        <div class="kpi-prev"><div class="kpi-prev-row"><span class="kpi-prev-label">Prev period</span><span class="kpi-prev-val">200%</span></div></div>
+      </div>
+      <div class="kpi" style="border-color:rgba(46,204,113,0.35);">
+        <div class="kpi-label">MQL→SQL</div>
+        <div class="kpi-val sm" style="color:var(--green);">100%</div>
+        <div class="kpi-delta positive">Strong</div>
+        <div class="kpi-prev"><div class="kpi-prev-row"><span class="kpi-prev-label">Prev period</span><span class="kpi-prev-val">50%</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DACH -->
+  <div class="market-block">
+    <div class="market-header"><span class="market-flag">🇩🇪</span><span class="market-name">DACH</span></div>
+    <div class="market-kpi-row">
+      <div class="kpi accent-top lead">
+        <div class="kpi-label">Lead</div>
+        <div class="kpi-val sm" style="color:#ff6b6b;">0</div>
+        <div class="kpi-delta negative">▼ 100% MoM</div>
+        <div class="kpi-prev"><div class="kpi-prev-row"><span class="kpi-prev-label">Prev period</span><span class="kpi-prev-val">3</span></div></div>
+      </div>
+      <div class="kpi accent-top mql">
+        <div class="kpi-label">MQL</div>
+        <div class="kpi-val sm" style="color:#ff6b6b;">0</div>
+        <div class="kpi-delta negative">▼ 100% MoM</div>
+        <div class="kpi-prev"><div class="kpi-prev-row"><span class="kpi-prev-label">Prev period</span><span class="kpi-prev-val">3</span></div></div>
+      </div>
+      <div class="kpi accent-top sql">
+        <div class="kpi-label">SQL</div>
+        <div class="kpi-val sm" style="color:#ff6b6b;">0</div>
+        <div class="kpi-delta negative">▼ 100% MoM</div>
+        <div class="kpi-prev"><div class="kpi-prev-row"><span class="kpi-prev-label">Prev period</span><span class="kpi-prev-val">2</span></div></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Lead→MQL</div>
+        <div class="kpi-val sm dimmed">—</div>
+        <div class="kpi-delta neutral">No data</div>
+        <div class="kpi-prev"><div class="kpi-prev-row"><span class="kpi-prev-label">Prev period</span><span class="kpi-prev-val">100%</span></div></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">MQL→SQL</div>
+        <div class="kpi-val sm dimmed">—</div>
+        <div class="kpi-delta neutral">No data</div>
+        <div class="kpi-prev"><div class="kpi-prev-row"><span class="kpi-prev-label">Prev period</span><span class="kpi-prev-val">66.7%</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Romania -->
+  <div class="market-block">
+    <div class="market-header"><span class="market-flag">🇷🇴</span><span class="market-name">Romania</span></div>
+    <div class="market-kpi-row">
+      <div class="kpi accent-top lead">
+        <div class="kpi-label">Lead</div>
+        <div class="kpi-val sm" style="color:#ff6b6b;">0</div>
+        <div class="kpi-delta neutral">n/a MoM</div>
+        <div class="kpi-prev"><div class="kpi-prev-row"><span class="kpi-prev-label">Prev period</span><span class="kpi-prev-val">0</span></div></div>
+      </div>
+      <div class="kpi accent-top mql">
+        <div class="kpi-label">MQL</div>
+        <div class="kpi-val sm" style="color:#ff6b6b;">0</div>
+        <div class="kpi-delta negative">▼ 100% MoM</div>
+        <div class="kpi-prev"><div class="kpi-prev-row"><span class="kpi-prev-label">Prev period</span><span class="kpi-prev-val">1</span></div></div>
+      </div>
+      <div class="kpi accent-top sql">
+        <div class="kpi-label">SQL</div>
+        <div class="kpi-val sm" style="color:var(--amber);">1</div>
+        <div class="kpi-delta negative">▼ 50.0% MoM</div>
+        <div class="kpi-prev"><div class="kpi-prev-row"><span class="kpi-prev-label">Prev period</span><span class="kpi-prev-val">2</span></div></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Lead→MQL</div>
+        <div class="kpi-val sm dimmed">—</div>
+        <div class="kpi-delta neutral">No data</div>
+        <div class="kpi-prev"><div class="kpi-prev-row"><span class="kpi-prev-label">Prev period</span><span class="kpi-prev-val">—</span></div></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">MQL→SQL</div>
+        <div class="kpi-val sm dimmed">—</div>
+        <div class="kpi-delta neutral">No data</div>
+        <div class="kpi-prev"><div class="kpi-prev-row"><span class="kpi-prev-label">Prev period</span><span class="kpi-prev-val">—</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Market chart -->
+  <div class="section-label">Market comparison · MoM current</div>
+  <div class="chart-box" style="margin-bottom:16px;">
+    <div class="chart-box-title">Lead / MQL / SQL by Market <span>Apr 1–26</span></div>
+    <div class="chart-container" style="height:140px;"><canvas id="marketChart"></canvas></div>
+  </div>
+
+</div><!-- /page-key -->
+
+
+<!-- ── Talking points ── -->
+<div class="talking-bar">
+  <span class="tp-label">🎙️ Say</span>
+  <div class="tp-text" id="tpText">Last week: 17 Leads, 19 MQLs, 11 SQLs. Volume is down WoW, but conversion rates are strong — Lead-to-MQL at 111.8%, MQL-to-SQL at 57.9%. YoY all three stages are up: <strong>Lead +39%, MQL +84%, SQL +53%</strong> vs Apr 1–26, 2025.</div>
+</div>
+
+<script>
+const tpText = document.getElementById('tpText');
+const talkingPoints = {
+  all: 'Last week: 17 Leads, 19 MQLs, 11 SQLs. Volume is down WoW, but conversion rates are strong — Lead-to-MQL at 111.8%, MQL-to-SQL at 57.9%. YoY all three stages are up: <strong>Lead +39%, MQL +84%, SQL +53%</strong> vs Apr 1–26, 2025.',
+  key: 'No activity across key markets last week. Month-to-date: <strong>ANZ is the top performer</strong> — 4/4/4 with 100% conversion at both stages. UK is steady at 1/1/1. <strong>DACH and Romania had zero top-of-funnel entries</strong> this period — both need attention.'
+};
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('page-' + tab).classList.add('active');
+  tpText.innerHTML = talkingPoints[tab];
+  if (tab === 'key' && !window.marketChartBuilt) buildMarketChart();
+}
+
+// Funnel bar heights
+(function() {
+  const max = 19, minH = 22, maxH = 85;
+  const h = v => minH + (v / max) * (maxH - minH);
+  document.getElementById('fv-lead').style.height = h(17) + 'px';
+  document.getElementById('fv-mql').style.height  = h(19) + 'px';
+  document.getElementById('fv-sql').style.height  = h(11) + 'px';
+})();
+
+// MoM chart
+new Chart(document.getElementById('momChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Lead', 'MQL', 'SQL'],
+    datasets: [
+      { label: 'Apr 1–26, 2026', data: [114,105,58], backgroundColor: ['rgba(31,45,92,0.9)','rgba(75,156,211,0.9)','rgba(46,204,113,0.9)'], borderRadius: 6, borderSkipped: false },
+      { label: 'Mar 1–26, 2026', data: [412,208,94], backgroundColor: ['rgba(31,45,92,0.25)','rgba(75,156,211,0.25)','rgba(46,204,113,0.25)'], borderRadius: 6, borderSkipped: false }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position:'top', labels:{ color:'rgba(255,255,255,0.45)', font:{family:'DM Sans',size:11}, boxWidth:10, boxHeight:10 } }, tooltip:{ backgroundColor:'#1F2D5C', cornerRadius:8 } },
+    scales: {
+      y: { beginAtZero:true, grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'rgba(255,255,255,0.4)',font:{family:'DM Mono',size:10}} },
+      x: { grid:{display:false}, ticks:{color:'rgba(255,255,255,0.7)',font:{family:'DM Sans',size:12,weight:'700'}} }
+    }
+  }
+});
+
+function buildMarketChart() {
+  window.marketChartBuilt = true;
+  new Chart(document.getElementById('marketChart'), {
+    type: 'bar',
+    data: {
+      labels: ['ANZ 🇦🇺','UK 🇬🇧','DACH 🇩🇪','Romania 🇷🇴'],
+      datasets: [
+        { label:'Lead', data:[4,1,0,0], backgroundColor:'rgba(31,45,92,0.9)', borderRadius:5 },
+        { label:'MQL',  data:[4,1,0,0], backgroundColor:'rgba(75,156,211,0.9)', borderRadius:5 },
+        { label:'SQL',  data:[4,1,0,1], backgroundColor:'rgba(46,204,113,0.9)', borderRadius:5 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend:{ position:'top', labels:{ color:'rgba(255,255,255,0.45)', font:{family:'DM Sans',size:11}, boxWidth:10,boxHeight:10 } }, tooltip:{ backgroundColor:'#1F2D5C', cornerRadius:8 } },
+      scales: {
+        y: { beginAtZero:true, max:6, ticks:{stepSize:1,color:'rgba(255,255,255,0.4)',font:{family:'DM Mono',size:10}}, grid:{color:'rgba(255,255,255,0.05)'} },
+        x: { grid:{display:false}, ticks:{color:'rgba(255,255,255,0.7)',font:{family:'DM Sans',size:12,weight:'700'}} }
+      }
+    }
+  });
+}
+</script>
+</body>
+</html>
