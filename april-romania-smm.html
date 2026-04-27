@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Romania SMM Performance — April 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy: #1F2D5C;
+    --blue: #4B9CD3;
+    --green: #2ECC71;
+    --amber: #F39C12;
+    --red: #E74C3C;
+    --bg: #F4F6FB;
+    --card: #ffffff;
+    --border: #E2E8F4;
+    --text: #1a2340;
+    --muted: #7a89aa;
+    --fb-blue: #1877F2;
+    --li-blue: #0A66C2;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 28px 24px 48px;
+    min-width: 640px;
+  }
+
+  /* ── HEADER ── */
+  .report-header {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .report-header .left { display: flex; flex-direction: column; gap: 6px; }
+  .report-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: -0.3px;
+  }
+  .report-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .report-badge {
+    background: var(--navy);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    align-self: flex-start;
+  }
+
+  /* ── HEADLINE INSIGHT BANNER ── */
+  .insight-banner {
+    background: linear-gradient(135deg, #1F2D5C 0%, #2d4a8a 100%);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    box-shadow: 0 4px 20px rgba(31,45,92,0.15);
+  }
+  .insight-icon { font-size: 26px; flex-shrink: 0; margin-top: 2px; }
+  .insight-text h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 5px;
+    letter-spacing: 0.01em;
+  }
+  .insight-text p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.72);
+    line-height: 1.55;
+  }
+  .insight-text strong { color: #fff; }
+
+  /* ── SECTION TOGGLE ── */
+  details {
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--card);
+    box-shadow: 0 2px 10px rgba(31,45,92,0.05);
+    overflow: hidden;
+  }
+  summary.section-toggle {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    padding: 16px 22px;
+    cursor: pointer;
+    list-style: none;
+    background: #f0f4ff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 14px;
+    user-select: none;
+  }
+  details[open] summary.section-toggle { border-radius: 14px 14px 0 0; }
+  summary.section-toggle::-webkit-details-marker { display: none; }
+  summary.section-toggle::after {
+    content: '›';
+    margin-left: auto;
+    font-size: 18px;
+    color: var(--muted);
+    transition: transform 0.2s;
+  }
+  details[open] summary.section-toggle::after { transform: rotate(90deg); }
+  .section-content { padding: 22px; }
+
+  /* ── KPI GRID ── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .kpi-card {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 18px 16px;
+    text-align: center;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .kpi-card.fb::before { background: var(--fb-blue); }
+  .kpi-card.li::before { background: var(--li-blue); }
+  .kpi-card.organic::before { background: var(--green); }
+  .kpi-card.neutral::before { background: var(--navy); }
+
+  .kpi-channel {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+    color: var(--muted);
+  }
+  .kpi-channel.fb-tag { color: var(--fb-blue); }
+  .kpi-channel.li-tag { color: var(--li-blue); }
+  .kpi-label { font-size: 11px; color: var(--muted); margin-bottom: 8px; font-weight: 500; line-height: 1.3; }
+  .kpi-value { font-size: 26px; font-weight: 700; color: var(--navy); line-height: 1; }
+  .kpi-delta { font-size: 12px; margin-top: 7px; font-weight: 600; }
+  .kpi-delta.positive { color: var(--green); }
+  .kpi-delta.negative { color: var(--red); }
+  .kpi-delta.neutral-d { color: var(--amber); }
+
+  /* ── CHART WRAPPER ── */
+  .chart-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 22px;
+  }
+  @media (max-width: 720px) { .chart-row { grid-template-columns: 1fr; } }
+
+  .chart-card {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 18px;
+    border: 1px solid var(--border);
+  }
+  .chart-card.full { grid-column: 1 / -1; }
+  .chart-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .chart-container { position: relative; height: 210px; }
+
+  /* ── WOW TABLE ── */
+  .wow-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .wow-table thead tr {
+    background: #f0f4ff;
+  }
+  .wow-table th {
+    padding: 11px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--navy);
+    border-bottom: 2px solid var(--border);
+  }
+  .wow-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+  }
+  .wow-table tr:last-child td { border-bottom: none; }
+  .wow-table .channel-cell {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .wow-table .metric-cell {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .badge-fb {
+    display: inline-block;
+    background: rgba(24,119,242,0.1);
+    color: var(--fb-blue);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .badge-li {
+    display: inline-block;
+    background: rgba(10,102,194,0.1);
+    color: var(--li-blue);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .pill-pos {
+    display: inline-block;
+    background: rgba(46,204,113,0.12);
+    color: #1a9e55;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .pill-neg {
+    display: inline-block;
+    background: rgba(231,76,60,0.1);
+    color: var(--red);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .pill-neu {
+    display: inline-block;
+    background: rgba(243,156,18,0.1);
+    color: #c87a00;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 12px;
+  }
+
+  /* ── SECTION LABEL ── */
+  .sub-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 14px;
+    margin-top: 6px;
+  }
+
+  /* ── FOOTER ── */
+  .report-footer {
+    margin-top: 28px;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    font-weight: 400;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="report-header">
+  <div class="left">
+    <div class="report-title">🇷🇴 Romania — SMM Performance</div>
+    <div class="report-subtitle">LinkedIn & Facebook · Jan–Dec 2026 · Updated Apr 27, 2026</div>
+  </div>
+  <div class="report-badge">April MTD</div>
+</div>
+
+<!-- HEADLINE INSIGHT -->
+<div class="insight-banner">
+  <div class="insight-icon">📣</div>
+  <div class="insight-text">
+    <h3>Key Insight — Facebook is Leading Romania Growth</h3>
+    <p>Facebook Organic Reach <strong>surged +203% MoM</strong> (2,430 → 7,365) and Organic Views grew <strong>+21% MoM</strong>. As the primary channel for the Romania market, this is a strong positive signal. LinkedIn performance is secondary for this market and not a concern.</p>
+  </div>
+</div>
+
+<!-- ── SECTION 1: MONTHLY OVERVIEW ── -->
+<details open>
+  <summary class="section-toggle">📅 Monthly Overview — March vs April MTD</summary>
+  <div class="section-content">
+
+    <div class="sub-label">Facebook — Key Metrics</div>
+    <div class="kpi-grid">
+      <div class="kpi-card fb">
+        <div class="kpi-channel fb-tag">Facebook</div>
+        <div class="kpi-label">Organic Reach</div>
+        <div class="kpi-value">7,365</div>
+        <div class="kpi-delta positive">▲ +203% vs Mar (2,430)</div>
+      </div>
+      <div class="kpi-card fb">
+        <div class="kpi-channel fb-tag">Facebook</div>
+        <div class="kpi-label">Organic Views</div>
+        <div class="kpi-value">8,212</div>
+        <div class="kpi-delta positive">▲ +21% vs Mar (6,791)</div>
+      </div>
+      <div class="kpi-card fb">
+        <div class="kpi-channel fb-tag">Facebook</div>
+        <div class="kpi-label">Engagement Rate</div>
+        <div class="kpi-value">1.66%</div>
+        <div class="kpi-delta negative">▼ vs Mar (7.20%)</div>
+      </div>
+      <div class="kpi-card fb">
+        <div class="kpi-channel fb-tag">Facebook</div>
+        <div class="kpi-label">LP Clicks from FB</div>
+        <div class="kpi-value">121</div>
+        <div class="kpi-delta negative">▼ vs Mar (180)</div>
+      </div>
+    </div>
+
+    <div class="sub-label">LinkedIn — Key Metrics</div>
+    <div class="kpi-grid">
+      <div class="kpi-card li">
+        <div class="kpi-channel li-tag">LinkedIn</div>
+        <div class="kpi-label">Organic Impressions</div>
+        <div class="kpi-value">1,095</div>
+        <div class="kpi-delta negative">▼ vs Mar (3,814)</div>
+      </div>
+      <div class="kpi-card li">
+        <div class="kpi-channel li-tag">LinkedIn</div>
+        <div class="kpi-label">Engagement Rate</div>
+        <div class="kpi-value">4.66%</div>
+        <div class="kpi-delta positive">▲ vs Mar (4.64%)</div>
+      </div>
+      <div class="kpi-card li">
+        <div class="kpi-channel li-tag">LinkedIn</div>
+        <div class="kpi-label">LP Clicks from LI</div>
+        <div class="kpi-value">13</div>
+        <div class="kpi-delta negative">▼ vs Mar (39)</div>
+      </div>
+    </div>
+
+    <div class="sub-label">Combined — Organic Traffic & Engagement</div>
+    <div class="kpi-grid">
+      <div class="kpi-card organic">
+        <div class="kpi-channel">Total SM</div>
+        <div class="kpi-label">Organic Traffic to LP</div>
+        <div class="kpi-value">135</div>
+        <div class="kpi-delta negative">▼ vs Mar (225)</div>
+      </div>
+      <div class="kpi-card organic">
+        <div class="kpi-channel">Total SM</div>
+        <div class="kpi-label">WIA (Walk-ins Attributed)</div>
+        <div class="kpi-value">77</div>
+        <div class="kpi-delta negative">▼ vs Mar (149)</div>
+      </div>
+      <div class="kpi-card neutral">
+        <div class="kpi-channel">Organic</div>
+        <div class="kpi-label">Total Post Shares / Reposts</div>
+        <div class="kpi-value">26</div>
+        <div class="kpi-delta positive">▲ +117% vs Mar (12)</div>
+      </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="chart-row">
+      <div class="chart-card">
+        <div class="chart-title">Facebook Reach & Views — Mar vs Apr</div>
+        <div class="chart-container">
+          <canvas id="fbReachChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Engagement Rate — Mar vs Apr (%)</div>
+        <div class="chart-container">
+          <canvas id="erChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-row">
+      <div class="chart-card full">
+        <div class="chart-title">Organic Traffic to Landing Page — Mar vs Apr (by Source)</div>
+        <div class="chart-container">
+          <canvas id="trafficChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</details>
+
+<!-- ── SECTION 2: WEEKLY SNAPSHOT ── -->
+<details open>
+  <summary class="section-toggle">📊 Weekly Snapshot — Apr 13–19 vs Apr 20–27 (WoW)</summary>
+  <div class="section-content">
+
+    <div class="kpi-grid">
+      <div class="kpi-card li">
+        <div class="kpi-channel li-tag">LinkedIn</div>
+        <div class="kpi-label">Impressions WoW</div>
+        <div class="kpi-value">456</div>
+        <div class="kpi-delta positive">▲ +125.74% (was 202)</div>
+      </div>
+      <div class="kpi-card li">
+        <div class="kpi-channel li-tag">LinkedIn</div>
+        <div class="kpi-label">Engagement Rate WoW</div>
+        <div class="kpi-value">5.04%</div>
+        <div class="kpi-delta neutral-d">▼ −2.39pp (was 7.43%)</div>
+      </div>
+      <div class="kpi-card fb">
+        <div class="kpi-channel fb-tag">Facebook</div>
+        <div class="kpi-label">Views WoW</div>
+        <div class="kpi-value">553</div>
+        <div class="kpi-delta negative">▼ −72.14% (was 1,985)</div>
+      </div>
+      <div class="kpi-card fb">
+        <div class="kpi-channel fb-tag">Facebook</div>
+        <div class="kpi-label">Engagement Rate WoW</div>
+        <div class="kpi-value">3.91%</div>
+        <div class="kpi-delta positive">▲ +2.59pp (was 1.32%)</div>
+      </div>
+    </div>
+
+    <table class="wow-table">
+      <thead>
+        <tr>
+          <th>Channel</th>
+          <th>Metric</th>
+          <th>Apr 13–19</th>
+          <th>Apr 20–27</th>
+          <th>WoW Change</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="channel-cell"><span class="badge-li">LI</span></td>
+          <td class="metric-cell">Impressions</td>
+          <td>202</td>
+          <td>456</td>
+          <td><span class="pill-pos">▲ +125.74%</span></td>
+        </tr>
+        <tr>
+          <td class="channel-cell"></td>
+          <td class="metric-cell">Engagement Rate</td>
+          <td>7.43%</td>
+          <td>5.04%</td>
+          <td><span class="pill-neu">▼ −2.39pp</span></td>
+        </tr>
+        <tr>
+          <td class="channel-cell"><span class="badge-fb">FB</span></td>
+          <td class="metric-cell">Views</td>
+          <td>1,985</td>
+          <td>553</td>
+          <td><span class="pill-neg">▼ −72.14%</span></td>
+        </tr>
+        <tr>
+          <td class="channel-cell"></td>
+          <td class="metric-cell">Engagement Rate</td>
+          <td>1.32%</td>
+          <td>3.91%</td>
+          <td><span class="pill-pos">▲ +2.59pp</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top:22px;">
+      <div class="chart-card">
+        <div class="chart-title">WoW Comparison — LinkedIn Impressions & Facebook Views</div>
+        <div class="chart-container">
+          <canvas id="wowChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</details>
+
+<div class="report-footer">TaxDome · Romania Market · SMM Report · Data: LinkedIn & Facebook Organic · Generated Apr 27, 2026</div>
+
+<script>
+  const navyColor = '#1F2D5C';
+  const fbColor = '#1877F2';
+  const liColor = '#0A66C2';
+  const green = '#2ECC71';
+  const red = '#E74C3C';
+  const amber = '#F39C12';
+
+  Chart.defaults.font.family = "'DM Sans', sans-serif";
+  Chart.defaults.color = '#7a89aa';
+
+  // 1. FB Reach & Views — Mar vs Apr
+  new Chart(document.getElementById('fbReachChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Organic Reach', 'Organic Views'],
+      datasets: [
+        {
+          label: 'March',
+          data: [2430, 6791],
+          backgroundColor: 'rgba(24,119,242,0.25)',
+          borderColor: fbColor,
+          borderWidth: 2,
+          borderRadius: 6,
+        },
+        {
+          label: 'April MTD',
+          data: [7365, 8212],
+          backgroundColor: 'rgba(24,119,242,0.75)',
+          borderColor: fbColor,
+          borderWidth: 2,
+          borderRadius: 6,
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14, font: { size: 11 } } } },
+      scales: {
+        y: { grid: { color: '#eef0f6' }, ticks: { font: { size: 11 } } },
+        x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+      }
+    }
+  });
+
+  // 2. ER Bar — Mar vs Apr
+  new Chart(document.getElementById('erChart'), {
+    type: 'bar',
+    data: {
+      labels: ['LinkedIn ER', 'Facebook ER'],
+      datasets: [
+        {
+          label: 'March',
+          data: [4.64, 7.20],
+          backgroundColor: 'rgba(31,45,92,0.25)',
+          borderColor: navyColor,
+          borderWidth: 2,
+          borderRadius: 6,
+        },
+        {
+          label: 'April MTD',
+          data: [4.66, 1.66],
+          backgroundColor: 'rgba(31,45,92,0.75)',
+          borderColor: navyColor,
+          borderWidth: 2,
+          borderRadius: 6,
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14, font: { size: 11 } } } },
+      scales: {
+        y: { grid: { color: '#eef0f6' }, ticks: { font: { size: 11 }, callback: v => v + '%' } },
+        x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+      }
+    }
+  });
+
+  // 3. Organic Traffic to LP
+  new Chart(document.getElementById('trafficChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Total LP (SM)', 'LP from Facebook', 'LP from LinkedIn'],
+      datasets: [
+        {
+          label: 'March',
+          data: [225, 180, 39],
+          backgroundColor: 'rgba(46,204,113,0.3)',
+          borderColor: green,
+          borderWidth: 2,
+          borderRadius: 6,
+        },
+        {
+          label: 'April MTD',
+          data: [135, 121, 13],
+          backgroundColor: 'rgba(46,204,113,0.75)',
+          borderColor: green,
+          borderWidth: 2,
+          borderRadius: 6,
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      indexAxis: 'y',
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14, font: { size: 11 } } } },
+      scales: {
+        x: { grid: { color: '#eef0f6' }, ticks: { font: { size: 11 } } },
+        y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+      }
+    }
+  });
+
+  // 4. WoW Chart
+  new Chart(document.getElementById('wowChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Apr 13–19', 'Apr 20–27'],
+      datasets: [
+        {
+          label: 'LI Impressions',
+          data: [202, 456],
+          backgroundColor: 'rgba(10,102,194,0.65)',
+          borderColor: liColor,
+          borderWidth: 2,
+          borderRadius: 6,
+          yAxisID: 'y',
+        },
+        {
+          label: 'FB Views',
+          data: [1985, 553],
+          backgroundColor: 'rgba(24,119,242,0.65)',
+          borderColor: fbColor,
+          borderWidth: 2,
+          borderRadius: 6,
+          yAxisID: 'y',
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14, font: { size: 11 } } } },
+      scales: {
+        y: { grid: { color: '#eef0f6' }, ticks: { font: { size: 11 } } },
+        x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+      }
+    }
+  });
+</script>
+</body>
+</html>
