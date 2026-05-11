@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UK — Key Driver Ad Creatives (May 2026)</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#F4F5F7;padding:2rem 1.5rem}
+.page-header{margin-bottom:2rem}
+.page-header h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#1F2D5C;margin-bottom:.3rem}
+.page-header p{font-size:13px;color:#888}
+.ads-grid{display:flex;flex-direction:column;gap:2rem}
+.ad-wrap{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.ad-label-row{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;border-bottom:1px solid #eee}
+.ad-num{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#888}
+.ad-channel{font-size:11px;background:#EEF3FA;color:#185FA5;padding:3px 10px;border-radius:20px;font-weight:600}
+.ad{display:flex;align-items:stretch;width:100%;min-height:260px;border-radius:0}
+
+/* ── AD 1 ── MTD Deadline Pressure */
+.ad1-bg{background:#0A0F1E;color:#fff;width:100%}
+.ad1-left{flex:0 0 50%;padding:2rem 1.75rem 1.75rem 2rem;display:flex;flex-direction:column;justify-content:space-between}
+.ad1-eyebrow{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#F5A623;font-weight:600;margin-bottom:.6rem}
+.ad1-headline{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;line-height:1.15;color:#fff}
+.ad1-headline span{color:#F5A623}
+.ad1-sub{font-size:12px;color:rgba(255,255,255,.6);margin-top:.6rem;line-height:1.6}
+.ad1-cta{display:inline-block;background:#F5A623;color:#0A0F1E;font-weight:700;font-size:12px;padding:.5rem 1.1rem;border-radius:7px;margin-top:1rem;width:fit-content}
+.ad1-right{flex:1;background:#111829;display:flex;align-items:center;justify-content:center;padding:1.5rem}
+.deadline-stack{display:flex;flex-direction:column;gap:.5rem;width:100%}
+.dl-item{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:.6rem .85rem;display:flex;align-items:center;gap:.6rem}
+.dl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dl-dot.red{background:#E24B4A}.dl-dot.amber{background:#F5A623}.dl-dot.green{background:#5DCAA5}
+.dl-title{font-size:11px;font-weight:500;color:#fff;flex:1}
+.dl-date{font-size:10px;color:rgba(255,255,255,.4);white-space:nowrap}
+.dl-badge{font-size:9px;padding:2px 6px;border-radius:4px;margin-left:.4rem;white-space:nowrap}
+.dl-badge.bad{background:rgba(226,75,74,.18);color:#F09595}
+.dl-badge.ok{background:rgba(93,202,165,.15);color:#5DCAA5}
+.divider-v{width:1px;background:rgba(255,255,255,.07);flex-shrink:0}
+
+/* ── AD 2 ── Tool Fragmentation */
+.ad2-bg{background:#F7F5F0;width:100%}
+.ad2-left{flex:0 0 50%;padding:2rem 1.75rem 1.75rem 2rem;display:flex;flex-direction:column;justify-content:space-between}
+.ad2-headline{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;line-height:1.15;color:#111}
+.ad2-headline em{font-style:normal;color:#533AB7}
+.ad2-sub{font-size:12px;color:#555;margin-top:.6rem;line-height:1.55}
+.ad2-cta{display:inline-block;background:#533AB7;color:#fff;font-weight:700;font-size:12px;padding:.5rem 1.1rem;border-radius:7px;margin-top:1rem;width:fit-content}
+.ad2-right{flex:1;background:#EEEDFE;display:flex;align-items:center;justify-content:center;padding:1.5rem}
+.tools-chaos{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;width:100%}
+.tool-pill{background:#fff;border:1px solid rgba(83,58,183,.12);border-radius:7px;padding:.4rem .65rem;font-size:11px;font-weight:500;color:#333;display:flex;align-items:center;gap:.35rem}
+.tool-pill.struck{text-decoration:line-through;color:#bbb;border-color:rgba(0,0,0,.05)}
+.tool-pill.winner{background:#533AB7;color:#fff;border-color:#533AB7;grid-column:1/-1;justify-content:center;font-size:11px;font-weight:700}
+.arrow-down{text-align:center;color:#533AB7;font-size:16px;grid-column:1/-1;margin:.1rem 0}
+
+/* ── AD 3 ── Client Chasing */
+.ad3-bg{background:#0B1F1A;width:100%}
+.ad3-left{flex:0 0 50%;padding:2rem 1.75rem 1.75rem 2rem;display:flex;flex-direction:column;justify-content:space-between}
+.ad3-eyebrow{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#5DCAA5;font-weight:600;margin-bottom:.6rem}
+.ad3-headline{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;line-height:1.2;color:#fff}
+.ad3-sub{font-size:12px;color:rgba(255,255,255,.58);margin-top:.6rem;line-height:1.6}
+.ad3-quote{font-size:11px;color:#5DCAA5;font-style:italic;margin-top:.65rem;border-left:2px solid #5DCAA5;padding-left:.65rem;line-height:1.5}
+.ad3-cta{display:inline-block;background:#5DCAA5;color:#0B1F1A;font-weight:700;font-size:12px;padding:.5rem 1.1rem;border-radius:7px;margin-top:1rem;width:fit-content}
+.ad3-right{flex:1;background:#0E271F;display:flex;flex-direction:column;justify-content:center;padding:1.5rem;gap:.45rem}
+.chat-msg{max-width:88%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:.45rem .7rem;font-size:11px;color:rgba(255,255,255,.72);line-height:1.4}
+.chat-msg.client{align-self:flex-start}
+.chat-msg.firm{align-self:flex-end;background:rgba(93,202,165,.15);border-color:rgba(93,202,165,.2);color:#5DCAA5}
+.chat-sender{font-size:9px;color:rgba(255,255,255,.28);margin-bottom:2px}
+.chat-app-sep{text-align:center;font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.18);margin:.2rem 0}
+
+/* ── AD 4 ── QuickBooks */
+.ad4-bg{background:#fff;width:100%}
+.ad4-left{flex:0 0 50%;padding:2rem 1.75rem 1.75rem 2rem;display:flex;flex-direction:column;justify-content:space-between;border-right:1px solid #eef0f4}
+.ad4-eyebrow{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#185FA5;font-weight:600;margin-bottom:.6rem}
+.ad4-headline{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;line-height:1.15;color:#111}
+.ad4-headline span{color:#185FA5}
+.ad4-sub{font-size:12px;color:#555;margin-top:.6rem;line-height:1.55}
+.ad4-cta{display:inline-block;background:#185FA5;color:#fff;font-weight:700;font-size:12px;padding:.5rem 1.1rem;border-radius:7px;margin-top:1rem;width:fit-content}
+.ad4-right{flex:1;background:#F0F6FD;display:flex;align-items:center;justify-content:center;padding:1.5rem}
+.flow-card{background:#fff;border:1px solid rgba(24,95,165,.14);border-radius:11px;padding:1.1rem;width:100%}
+.flow-title{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#185FA5;margin-bottom:.65rem}
+.flow-row{display:flex;align-items:center;gap:.45rem;font-size:11px;color:#333;padding:.2rem 0}
+.flow-row .icon-ok{color:#1D9E75;font-size:13px;flex-shrink:0}
+.flow-row .icon-no{color:#E24B4A;font-size:13px;flex-shrink:0}
+.flow-hr{border:none;border-top:1px solid #eef0f4;margin:.6rem 0}
+.flow-badge{background:#E1F5EE;color:#0F6E56;font-size:11px;font-weight:600;padding:.3rem .7rem;border-radius:6px;text-align:center}
+
+/* ── AD 5 ── Scale Without Chaos */
+.ad5-bg{background:#13111C;width:100%}
+.ad5-left{flex:0 0 50%;padding:2rem 1.75rem 1.75rem 2rem;display:flex;flex-direction:column;justify-content:space-between}
+.ad5-eyebrow{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#AFA9EC;font-weight:600;margin-bottom:.6rem}
+.ad5-headline{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;line-height:1.15;color:#fff}
+.ad5-quote{font-size:11px;color:#AFA9EC;font-style:italic;border-left:2px solid #7F77DD;padding-left:.65rem;margin-top:.65rem;line-height:1.55}
+.ad5-attr{font-size:10px;color:rgba(255,255,255,.35);margin-top:.3rem}
+.ad5-cta{display:inline-block;background:#7F77DD;color:#fff;font-weight:700;font-size:12px;padding:.5rem 1.1rem;border-radius:7px;margin-top:1rem;width:fit-content}
+.ad5-right{flex:1;background:#1B1829;display:flex;align-items:center;justify-content:center;padding:1.5rem}
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;width:100%}
+.metric-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:.75rem .9rem;text-align:center}
+.metric-num{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#AFA9EC}
+.metric-label{font-size:10px;color:rgba(255,255,255,.38);margin-top:3px;line-height:1.35}
+
+/* ── Responsive ── */
+@media(max-width:600px){
+  .ad{flex-direction:column}
+  .ad1-left,.ad2-left,.ad3-left,.ad4-left,.ad5-left{flex:none;border-right:none;border-bottom:1px solid rgba(255,255,255,.08)}
+  .ad1-right,.ad2-right,.ad3-right,.ad4-right,.ad5-right{padding:1.25rem}
+  .divider-v{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>🇬🇧 UK Key Driver Ad Creatives — May 2026</h1>
+  <p>5 bold, UK-specific ad concepts for lead generation. Problem-led. No "all-in-one" language. Built from ICP research, demo notes and UK client quotes.</p>
+</div>
+
+<div class="ads-grid">
+
+  <!-- AD 1 -->
+  <div class="ad-wrap">
+    <div class="ad-label-row">
+      <span class="ad-num">Ad 1 — MTD Deadline Pressure</span>
+      <span class="ad-channel">Google Search &amp; Display</span>
+    </div>
+    <div class="ad ad1-bg">
+      <div class="ad1-left">
+        <div>
+          <div class="ad1-eyebrow">MTD is changing everything</div>
+          <div class="ad1-headline">Your deadlines <span>never stop.</span><br>Neither should your visibility.</div>
+          <div class="ad1-sub">31 Jan. VAT 7th. SA returns. MTD check-ins. UK accountants face more deadlines than ever — yet most track them across three different tools.</div>
+        </div>
+        <div class="ad1-cta">See how firms stay ahead →</div>
+      </div>
+      <div class="divider-v"></div>
+      <div class="ad1-right">
+        <div class="deadline-stack">
+          <div class="dl-item">
+            <div class="dl-dot red"></div>
+            <div class="dl-title">SA Tax Return — J. Morrison</div>
+            <div class="dl-date">31 Jan</div>
+            <span class="dl-badge bad">Overdue</span>
+          </div>
+          <div class="dl-item">
+            <div class="dl-dot amber"></div>
+            <div class="dl-title">VAT Return — Oakfield Ltd</div>
+            <div class="dl-date">7 Feb</div>
+            <span class="dl-badge bad">Docs missing</span>
+          </div>
+          <div class="dl-item">
+            <div class="dl-dot amber"></div>
+            <div class="dl-title">MTD Submission — Hartley &amp; Co</div>
+            <div class="dl-date">12 Feb</div>
+            <span class="dl-badge bad">Awaiting client</span>
+          </div>
+          <div class="dl-item">
+            <div class="dl-dot green"></div>
+            <div class="dl-title">Corp Tax — Bluebell Co.</div>
+            <div class="dl-date">28 Feb</div>
+            <span class="dl-badge ok">On track</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AD 2 -->
+  <div class="ad-wrap">
+    <div class="ad-label-row">
+      <span class="ad-num">Ad 2 — Tool Fragmentation / Consolidation</span>
+      <span class="ad-channel">LinkedIn &amp; META Retargeting</span>
+    </div>
+    <div class="ad ad2-bg">
+      <div class="ad2-left">
+        <div>
+          <div class="ad2-headline">Still running your firm across <em>six different tools?</em></div>
+          <div class="ad2-sub">Karbon. Pixie. Docusign. Dropbox. WhatsApp. Spreadsheets. TaxDome doesn't replace Xero — it brings everything else into one place so you can finally see what's actually happening.</div>
+        </div>
+        <div class="ad2-cta">Bring order to the chaos →</div>
+      </div>
+      <div class="ad2-right">
+        <div class="tools-chaos">
+          <div class="tool-pill struck">📁 Dropbox</div>
+          <div class="tool-pill struck">✍️ Docusign</div>
+          <div class="tool-pill struck">💬 WhatsApp</div>
+          <div class="tool-pill struck">📊 Spreadsheets</div>
+          <div class="tool-pill struck">📧 Karbon</div>
+          <div class="tool-pill struck">🗂 Pixie</div>
+          <div class="arrow-down">↓</div>
+          <div class="tool-pill winner">✦ TaxDome — one operational hub</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AD 3 -->
+  <div class="ad-wrap">
+    <div class="ad-label-row">
+      <span class="ad-num">Ad 3 — Client Chasing / Communication Chaos</span>
+      <span class="ad-channel">META &amp; LinkedIn</span>
+    </div>
+    <div class="ad ad3-bg">
+      <div class="ad3-left">
+        <div>
+          <div class="ad3-eyebrow">Stop chasing. Start scaling.</div>
+          <div class="ad3-headline">Your clients are in WhatsApp. Their documents are in email. Their signatures are in Docusign.</div>
+          <div class="ad3-sub">UK firms waste hours each week chasing clients across different channels. TaxDome gives your clients a dedicated portal — and your team a single inbox for everything.</div>
+          <div class="ad3-quote">"It's like using WhatsApp, but dedicated for accounting and tax."<br><span style="font-style:normal;color:rgba(255,255,255,.35);font-size:10px;display:block;margin-top:3px">— Suyesh Sharma, Metta Accountants</span></div>
+        </div>
+        <div class="ad3-cta">See the client portal →</div>
+      </div>
+      <div class="ad3-right">
+        <div class="chat-app-sep">WhatsApp · Email · SMS · …</div>
+        <div class="chat-msg client"><div class="chat-sender">WhatsApp — James T.</div>When will our return be ready?</div>
+        <div class="chat-msg client"><div class="chat-sender">Email — Sarah M.</div>Where do I upload the docs again?</div>
+        <div class="chat-msg client"><div class="chat-sender">SMS — R. Patel</div>Can you resend the organiser?</div>
+        <div style="text-align:center;color:rgba(255,255,255,.15);font-size:14px;margin:.15rem 0">↓</div>
+        <div class="chat-msg firm"><div class="chat-sender">TaxDome portal — all in one place</div>Automated reminder sent. Document request live. ✓</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AD 4 -->
+  <div class="ad-wrap">
+    <div class="ad-label-row">
+      <span class="ad-num">Ad 4 — QuickBooks / Xero Users</span>
+      <span class="ad-channel">Google — QuickBooks &amp; Xero Keywords</span>
+    </div>
+    <div class="ad ad4-bg">
+      <div class="ad4-left">
+        <div>
+          <div class="ad4-eyebrow">Already using QuickBooks or Xero?</div>
+          <div class="ad4-headline">Great. Now <span>run the rest of your firm</span> properly.</div>
+          <div class="ad4-sub">QuickBooks handles your numbers. TaxDome handles everything else — client communication, document requests, workflow automation, e-signatures and deadline tracking. No switching required.</div>
+        </div>
+        <div class="ad4-cta">See how they work together →</div>
+      </div>
+      <div class="ad4-right">
+        <div class="flow-card">
+          <div class="flow-title">What TaxDome adds to your stack</div>
+          <div class="flow-row"><span class="icon-ok">✓</span> Automated client onboarding</div>
+          <div class="flow-row"><span class="icon-ok">✓</span> Deadline &amp; task tracking</div>
+          <div class="flow-row"><span class="icon-ok">✓</span> Secure document portal</div>
+          <div class="flow-row"><span class="icon-ok">✓</span> E-signatures built in</div>
+          <div class="flow-row"><span class="icon-ok">✓</span> Team workflow automation</div>
+          <div class="flow-row"><span class="icon-no">✗</span> Replaces your accounting software</div>
+          <hr class="flow-hr">
+          <div class="flow-badge">Works alongside QuickBooks &amp; Xero</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AD 5 -->
+  <div class="ad-wrap">
+    <div class="ad-label-row">
+      <span class="ad-num">Ad 5 — Workflow Visibility / Scale Without Chaos</span>
+      <span class="ad-channel">LinkedIn Awareness &amp; Retargeting</span>
+    </div>
+    <div class="ad ad5-bg">
+      <div class="ad5-left">
+        <div>
+          <div class="ad5-eyebrow">Built for growing UK firms</div>
+          <div class="ad5-headline">Know exactly where every client job stands. Every single day.</div>
+          <div class="ad5-quote">"Having TaxDome's workflow and knowing where each job is really gives me the feeling that we can go for it — scale our practice."</div>
+          <div class="ad5-attr">— Suyesh Sharma, Managing Director, Metta Accountants</div>
+        </div>
+        <div class="ad5-cta">See it in action →</div>
+      </div>
+      <div class="ad5-right">
+        <div class="metrics-grid">
+          <div class="metric-card"><div class="metric-num">100%</div><div class="metric-label">Job visibility<br>across your team</div></div>
+          <div class="metric-card"><div class="metric-num">1</div><div class="metric-label">Operational hub<br>not another tool</div></div>
+          <div class="metric-card"><div class="metric-num">3–15</div><div class="metric-label">Person firms<br>ideal sweet spot</div></div>
+          <div class="metric-card"><div class="metric-num">4.9★</div><div class="metric-label">Rated by 30k+<br>firm users</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
