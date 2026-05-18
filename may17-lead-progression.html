@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lead Progression Report · May 17, 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy: #1F2D5C;
+    --blue: #4B9CD3;
+    --green: #2ECC71;
+    --amber: #F39C12;
+    --red: #E74C3C;
+    --bg: #F4F6FB;
+    --card: #ffffff;
+    --border: #E8ECF4;
+    --text: #1F2D5C;
+    --muted: #8892A4;
+    --label: #5A6682;
+    --dach: #7C5CBF;
+    --uk:   #E8704A;
+    --ro:   #2ECC71;
+    --anz:  #1DA8A0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 28px 28px 56px;
+    min-width: 720px;
+  }
+
+  /* ── HEADER ── */
+  .report-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 28px; padding-bottom: 22px; border-bottom: 2px solid var(--border);
+  }
+  .report-title  { font-size: 21px; font-weight: 700; color: var(--navy); letter-spacing: -0.3px; }
+  .report-sub    { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .report-badge  {
+    background: var(--navy); color: #fff; font-size: 11px; font-weight: 600;
+    padding: 4px 13px; border-radius: 20px; letter-spacing: 0.05em;
+    text-transform: uppercase; white-space: nowrap; margin-top: 4px;
+  }
+
+  /* ── TOP-LEVEL TABS ── */
+  .main-tabs { display: flex; gap: 6px; margin-bottom: 28px; }
+  .main-tab {
+    padding: 9px 22px; border-radius: 9px; font-size: 14px; font-weight: 600;
+    cursor: pointer; border: 1.5px solid var(--border); background: var(--card);
+    color: var(--muted); transition: all .15s; user-select: none;
+  }
+  .main-tab.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .main-tab:hover:not(.active) { border-color: var(--blue); color: var(--navy); }
+
+  .main-view { display: none; }
+  .main-view.active { display: block; }
+
+  /* ── SUB TABS (timeframe) ── */
+  .sub-tabs { display: flex; gap: 4px; margin-bottom: 22px; flex-wrap: wrap; }
+  .sub-tab {
+    padding: 6px 16px; border-radius: 7px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: 1.5px solid var(--border); background: var(--card);
+    color: var(--muted); transition: all .15s; user-select: none;
+  }
+  .sub-tab.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .sub-tab:hover:not(.active) { border-color: var(--blue); color: var(--navy); }
+
+  .sub-view { display: none; }
+  .sub-view.active { display: block; }
+
+  /* ── SECTION HEADER ── */
+  .sec-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .sec-title {
+    font-size: 12px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .08em; color: var(--navy);
+  }
+  .sec-period {
+    font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace;
+    background: var(--border); padding: 2px 8px; border-radius: 4px;
+  }
+  .sec-line { flex: 1; height: 1px; background: var(--border); }
+
+  /* ── KPI GRID ── */
+  .kpi-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 11px; margin-bottom: 18px; }
+  .kpi-card {
+    background: var(--card); border-radius: 11px; padding: 16px 13px 13px;
+    border: 1px solid var(--border); position: relative; overflow: hidden;
+  }
+  .kpi-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 3px; border-radius: 11px 11px 0 0; background: var(--blue);
+  }
+  .kpi-card.pos::before { background: var(--green); }
+  .kpi-card.neg::before { background: var(--red); }
+  .kpi-card.neu::before { background: var(--amber); }
+
+  .kpi-lbl  { font-size: 10px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 9px; }
+  .kpi-row  { display: flex; justify-content: space-between; align-items: flex-end; gap: 4px; }
+  .kpi-val  { font-size: 22px; font-weight: 700; color: var(--navy); line-height: 1; }
+  .kpi-val.sm { font-size: 17px; }
+  .kpi-delta {
+    font-size: 11px; font-weight: 600; font-family: 'DM Mono', monospace;
+    padding: 2px 5px; border-radius: 4px; white-space: nowrap;
+  }
+  .kpi-delta.up   { color: #1a9e56; background: rgba(46,204,113,.1); }
+  .kpi-delta.dn   { color: #c0392b; background: rgba(231,76,60,.1); }
+  .kpi-delta.na   { color: var(--muted); background: var(--border); }
+  .kpi-cmp {
+    display: flex; justify-content: space-between;
+    margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--border);
+  }
+  .kpi-cmp-item { text-align: center; }
+  .kpi-cmp-lbl  { font-size: 9px; color: var(--muted); display: block; }
+  .kpi-cmp-val  { font-size: 12px; font-weight: 600; color: var(--label); }
+
+  /* ── CHART ── */
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .chart-card { background: var(--card); border-radius: 11px; padding: 18px; border: 1px solid var(--border); }
+  .chart-ttl  { font-size: 11px; font-weight: 600; color: var(--label); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
+  .chart-wrap { position: relative; height: 175px; }
+
+  /* ── KEY MARKETS: sub-tabs for market selector ── */
+  .mkt-tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .mkt-tab {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 16px; border-radius: 9px; font-size: 13px; font-weight: 600;
+    cursor: pointer; border: 1.5px solid var(--border); background: var(--card);
+    color: var(--muted); transition: all .15s; user-select: none;
+  }
+  .mkt-tab .flag { font-size: 18px; line-height: 1; }
+  .mkt-tab.active { color: #fff; border-color: transparent; }
+  .mkt-tab:hover:not(.active) { border-color: var(--blue); color: var(--navy); }
+  .mkt-tab[data-mkt="all"].active  { background: var(--navy); }
+  .mkt-tab[data-mkt="dach"].active { background: var(--dach); }
+  .mkt-tab[data-mkt="uk"].active   { background: var(--uk); }
+  .mkt-tab[data-mkt="ro"].active   { background: var(--ro); }
+  .mkt-tab[data-mkt="anz"].active  { background: var(--anz); }
+
+  .mkt-view { display: none; }
+  .mkt-view.active { display: block; }
+
+  /* ── DIVIDER ── */
+  .divider { height: 1px; background: var(--border); margin: 28px 0; }
+</style>
+</head>
+<body>
+
+<div class="report-header">
+  <div>
+    <div class="report-title">Lead Progression Report</div>
+    <div class="report-sub">All Markets · Key Markets · MoM · YoY · WoW</div>
+  </div>
+  <div class="report-badge">As of May 17, 2026</div>
+</div>
+
+<!-- ═══ MAIN TABS ═══ -->
+<div class="main-tabs">
+  <div class="main-tab active" onclick="switchMain('all',this)">🌍 All Markets</div>
+  <div class="main-tab" onclick="switchMain('key',this)">📍 Key Markets</div>
+</div>
+
+<!-- ════════════════════════════════════════
+     TAB 1 · ALL MARKETS
+════════════════════════════════════════ -->
+<div class="main-view active" id="main-all">
+
+  <div class="sub-tabs">
+    <div class="sub-tab active" onclick="switchSub('all','mom',this)">MoM</div>
+    <div class="sub-tab" onclick="switchSub('all','yoy',this)">YoY</div>
+    <div class="sub-tab" onclick="switchSub('all','wow',this)">WoW</div>
+  </div>
+
+  <!-- ALL · MOM -->
+  <div class="sub-view active" id="all-mom">
+    <div class="sec-hdr">
+      <div class="sec-title">Month-over-Month</div>
+      <div class="sec-period">Apr 01–17 vs May 01–17, 2026</div>
+      <div class="sec-line"></div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card neg">
+        <div class="kpi-lbl">Leads</div>
+        <div class="kpi-row"><div class="kpi-val">61</div><div class="kpi-delta dn">▼ 27.38%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Apr</span><span class="kpi-cmp-val">84</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">May</span><span class="kpi-cmp-val">61</span></div>
+        </div>
+      </div>
+      <div class="kpi-card neg">
+        <div class="kpi-lbl">MQL</div>
+        <div class="kpi-row"><div class="kpi-val">52</div><div class="kpi-delta dn">▼ 13.33%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Apr</span><span class="kpi-cmp-val">60</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">May</span><span class="kpi-cmp-val">52</span></div>
+        </div>
+      </div>
+      <div class="kpi-card neg">
+        <div class="kpi-lbl">SQL</div>
+        <div class="kpi-row"><div class="kpi-val">23</div><div class="kpi-delta dn">▼ 30.30%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Apr</span><span class="kpi-cmp-val">33</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">May</span><span class="kpi-cmp-val">23</span></div>
+        </div>
+      </div>
+      <div class="kpi-card pos">
+        <div class="kpi-lbl">Lead / MQL</div>
+        <div class="kpi-row"><div class="kpi-val sm">85.25%</div><div class="kpi-delta up">▲ 13.82%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Apr</span><span class="kpi-cmp-val">71.43%</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">May</span><span class="kpi-cmp-val">85.25%</span></div>
+        </div>
+      </div>
+      <div class="kpi-card neg">
+        <div class="kpi-lbl">MQL / SQL</div>
+        <div class="kpi-row"><div class="kpi-val sm">44.23%</div><div class="kpi-delta dn">▼ 10.77%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Apr</span><span class="kpi-cmp-val">55.00%</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">May</span><span class="kpi-cmp-val">44.23%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card"><div class="chart-ttl">Volume — Apr vs May</div><div class="chart-wrap"><canvas id="c-mom-vol"></canvas></div></div>
+      <div class="chart-card"><div class="chart-ttl">Conversion Rates — Apr vs May</div><div class="chart-wrap"><canvas id="c-mom-rate"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- ALL · YOY -->
+  <div class="sub-view" id="all-yoy">
+    <div class="sec-hdr">
+      <div class="sec-title">Year-over-Year</div>
+      <div class="sec-period">May 01–17, 2025 vs May 01–17, 2026</div>
+      <div class="sec-line"></div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card pos">
+        <div class="kpi-lbl">Leads</div>
+        <div class="kpi-row"><div class="kpi-val">61</div><div class="kpi-delta up">▲ 24.49%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">2025</span><span class="kpi-cmp-val">49</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">2026</span><span class="kpi-cmp-val">61</span></div>
+        </div>
+      </div>
+      <div class="kpi-card pos">
+        <div class="kpi-lbl">MQL</div>
+        <div class="kpi-row"><div class="kpi-val">52</div><div class="kpi-delta up">▲ 79.31%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">2025</span><span class="kpi-cmp-val">29</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">2026</span><span class="kpi-cmp-val">52</span></div>
+        </div>
+      </div>
+      <div class="kpi-card pos">
+        <div class="kpi-lbl">SQL</div>
+        <div class="kpi-row"><div class="kpi-val">23</div><div class="kpi-delta up">▲ 15.00%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">2025</span><span class="kpi-cmp-val">20</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">2026</span><span class="kpi-cmp-val">23</span></div>
+        </div>
+      </div>
+      <div class="kpi-card pos">
+        <div class="kpi-lbl">Lead / MQL</div>
+        <div class="kpi-row"><div class="kpi-val sm">85.25%</div><div class="kpi-delta up">▲ 26.06%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">2025</span><span class="kpi-cmp-val">59.18%</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">2026</span><span class="kpi-cmp-val">85.25%</span></div>
+        </div>
+      </div>
+      <div class="kpi-card neg">
+        <div class="kpi-lbl">MQL / SQL</div>
+        <div class="kpi-row"><div class="kpi-val sm">44.23%</div><div class="kpi-delta dn">▼ 24.73%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">2025</span><span class="kpi-cmp-val">68.97%</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">2026</span><span class="kpi-cmp-val">44.23%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card"><div class="chart-ttl">Volume — 2025 vs 2026</div><div class="chart-wrap"><canvas id="c-yoy-vol"></canvas></div></div>
+      <div class="chart-card"><div class="chart-ttl">Conversion Rates — 2025 vs 2026</div><div class="chart-wrap"><canvas id="c-yoy-rate"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- ALL · WOW -->
+  <div class="sub-view" id="all-wow">
+    <div class="sec-hdr">
+      <div class="sec-title">Week-over-Week</div>
+      <div class="sec-period">May 04–10 vs May 11–17, 2026</div>
+      <div class="sec-line"></div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card neg">
+        <div class="kpi-lbl">Leads</div>
+        <div class="kpi-row"><div class="kpi-val">24</div><div class="kpi-delta dn">▼ 27.27%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">33</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">24</span></div>
+        </div>
+      </div>
+      <div class="kpi-card neg">
+        <div class="kpi-lbl">MQL</div>
+        <div class="kpi-row"><div class="kpi-val">21</div><div class="kpi-delta dn">▼ 22.22%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">27</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">21</span></div>
+        </div>
+      </div>
+      <div class="kpi-card neg">
+        <div class="kpi-lbl">SQL</div>
+        <div class="kpi-row"><div class="kpi-val">9</div><div class="kpi-delta dn">▼ 25.00%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">12</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">9</span></div>
+        </div>
+      </div>
+      <div class="kpi-card pos">
+        <div class="kpi-lbl">Lead / MQL</div>
+        <div class="kpi-row"><div class="kpi-val sm">87.50%</div><div class="kpi-delta up">▲ 5.68%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">81.82%</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">87.50%</span></div>
+        </div>
+      </div>
+      <div class="kpi-card neg">
+        <div class="kpi-lbl">MQL / SQL</div>
+        <div class="kpi-row"><div class="kpi-val sm">42.86%</div><div class="kpi-delta dn">▼ 1.59%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">44.44%</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">42.86%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card"><div class="chart-ttl">Volume — Wk 04–10 vs 11–17</div><div class="chart-wrap"><canvas id="c-wow-vol"></canvas></div></div>
+      <div class="chart-card"><div class="chart-ttl">Conversion Rates — Wk 04–10 vs 11–17</div><div class="chart-wrap"><canvas id="c-wow-rate"></canvas></div></div>
+    </div>
+  </div>
+
+</div><!-- end main-all -->
+
+
+<!-- ════════════════════════════════════════
+     TAB 2 · KEY MARKETS
+════════════════════════════════════════ -->
+<div class="main-view" id="main-key">
+
+  <div class="sec-hdr" style="margin-bottom:18px">
+    <div class="sec-title">Week-over-Week</div>
+    <div class="sec-period">May 04–10 vs May 11–17, 2026</div>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="mkt-tabs">
+    <div class="mkt-tab active" data-mkt="all"  onclick="switchMkt('all',this)"><span class="flag">🌍</span> Overall</div>
+    <div class="mkt-tab"        data-mkt="dach" onclick="switchMkt('dach',this)"><span class="flag">🇩🇪</span> DACH</div>
+    <div class="mkt-tab"        data-mkt="uk"   onclick="switchMkt('uk',this)"><span class="flag">🇬🇧</span> UK</div>
+    <div class="mkt-tab"        data-mkt="ro"   onclick="switchMkt('ro',this)"><span class="flag">🇷🇴</span> RO</div>
+    <div class="mkt-tab"        data-mkt="anz"  onclick="switchMkt('anz',this)"><span class="flag">🇦🇺</span> ANZ</div>
+  </div>
+
+  <!-- KEY · OVERALL -->
+  <div class="mkt-view active" id="mkt-all">
+    <div class="kpi-grid">
+      <div class="kpi-card neg">
+        <div class="kpi-lbl">Leads</div>
+        <div class="kpi-row"><div class="kpi-val">13</div><div class="kpi-delta dn">▼ 43.48%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">23</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">13</span></div>
+        </div>
+      </div>
+      <div class="kpi-card neg">
+        <div class="kpi-lbl">MQL</div>
+        <div class="kpi-row"><div class="kpi-val">11</div><div class="kpi-delta dn">▼ 26.67%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">15</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">11</span></div>
+        </div>
+      </div>
+      <div class="kpi-card neu">
+        <div class="kpi-lbl">SQL</div>
+        <div class="kpi-row"><div class="kpi-val">7</div><div class="kpi-delta na">0.00%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">7</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">7</span></div>
+        </div>
+      </div>
+      <div class="kpi-card pos">
+        <div class="kpi-lbl">Lead / MQL</div>
+        <div class="kpi-row"><div class="kpi-val sm">84.62%</div><div class="kpi-delta up">▲ 19.40%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">65.22%</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">84.62%</span></div>
+        </div>
+      </div>
+      <div class="kpi-card pos">
+        <div class="kpi-lbl">MQL / SQL</div>
+        <div class="kpi-row"><div class="kpi-val sm">63.64%</div><div class="kpi-delta up">▲ 16.97%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">46.67%</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">63.64%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card"><div class="chart-ttl">Volume — Key Markets Overall</div><div class="chart-wrap"><canvas id="c-km-vol"></canvas></div></div>
+      <div class="chart-card"><div class="chart-ttl">Conversion Rates</div><div class="chart-wrap"><canvas id="c-km-rate"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- KEY · DACH -->
+  <div class="mkt-view" id="mkt-dach">
+    <div class="kpi-grid">
+      <div class="kpi-card pos" style="--blue:var(--dach)">
+        <div class="kpi-lbl">Leads</div>
+        <div class="kpi-row"><div class="kpi-val">4</div><div class="kpi-delta up">▲ 300%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">1</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">4</span></div>
+        </div>
+      </div>
+      <div class="kpi-card" style="--blue:var(--dach)">
+        <div class="kpi-lbl">MQL</div>
+        <div class="kpi-row"><div class="kpi-val">3</div><div class="kpi-delta na">n/a</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">0</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">3</span></div>
+        </div>
+      </div>
+      <div class="kpi-card" style="--blue:var(--dach)">
+        <div class="kpi-lbl">SQL</div>
+        <div class="kpi-row"><div class="kpi-val">1</div><div class="kpi-delta na">n/a</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">0</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">1</span></div>
+        </div>
+      </div>
+      <div class="kpi-card pos" style="--blue:var(--dach)">
+        <div class="kpi-lbl">Lead / MQL</div>
+        <div class="kpi-row"><div class="kpi-val sm">75.00%</div><div class="kpi-delta up">▲ 75.00%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">0.00%</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">75.00%</span></div>
+        </div>
+      </div>
+      <div class="kpi-card" style="--blue:var(--dach)">
+        <div class="kpi-lbl">MQL / SQL</div>
+        <div class="kpi-row"><div class="kpi-val sm">33.33%</div><div class="kpi-delta na">n/a</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">n/a</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">33.33%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card"><div class="chart-ttl">🇩🇪 DACH — Volume</div><div class="chart-wrap"><canvas id="c-dach-vol"></canvas></div></div>
+      <div class="chart-card"><div class="chart-ttl">🇩🇪 DACH — Conversion Rates</div><div class="chart-wrap"><canvas id="c-dach-rate"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- KEY · UK -->
+  <div class="mkt-view" id="mkt-uk">
+    <div class="kpi-grid">
+      <div class="kpi-card neg">
+        <div class="kpi-lbl">Leads</div>
+        <div class="kpi-row"><div class="kpi-val">6</div><div class="kpi-delta dn">▼ 33.33%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">9</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">6</span></div>
+        </div>
+      </div>
+      <div class="kpi-card neg">
+        <div class="kpi-lbl">MQL</div>
+        <div class="kpi-row"><div class="kpi-val">5</div><div class="kpi-delta dn">▼ 37.50%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">8</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">5</span></div>
+        </div>
+      </div>
+      <div class="kpi-card neg">
+        <div class="kpi-lbl">SQL</div>
+        <div class="kpi-row"><div class="kpi-val">3</div><div class="kpi-delta dn">▼ 25.00%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">4</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">3</span></div>
+        </div>
+      </div>
+      <div class="kpi-card neg">
+        <div class="kpi-lbl">Lead / MQL</div>
+        <div class="kpi-row"><div class="kpi-val sm">83.33%</div><div class="kpi-delta dn">▼ 5.56%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">88.89%</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">83.33%</span></div>
+        </div>
+      </div>
+      <div class="kpi-card pos">
+        <div class="kpi-lbl">MQL / SQL</div>
+        <div class="kpi-row"><div class="kpi-val sm">60.00%</div><div class="kpi-delta up">▲ 10.00%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">50.00%</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">60.00%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card"><div class="chart-ttl">🇬🇧 UK — Volume</div><div class="chart-wrap"><canvas id="c-uk-vol"></canvas></div></div>
+      <div class="chart-card"><div class="chart-ttl">🇬🇧 UK — Conversion Rates</div><div class="chart-wrap"><canvas id="c-uk-rate"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- KEY · RO -->
+  <div class="mkt-view" id="mkt-ro">
+    <div class="kpi-grid">
+      <div class="kpi-card neg">
+        <div class="kpi-lbl">Leads</div>
+        <div class="kpi-row"><div class="kpi-val">1</div><div class="kpi-delta dn">▼ 83.33%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">6</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">1</span></div>
+        </div>
+      </div>
+      <div class="kpi-card neg">
+        <div class="kpi-lbl">MQL</div>
+        <div class="kpi-row"><div class="kpi-val">1</div><div class="kpi-delta dn">▼ 50.00%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">2</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">1</span></div>
+        </div>
+      </div>
+      <div class="kpi-card" style="--blue:var(--ro)">
+        <div class="kpi-lbl">SQL</div>
+        <div class="kpi-row"><div class="kpi-val">1</div><div class="kpi-delta na">n/a</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">0</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">1</span></div>
+        </div>
+      </div>
+      <div class="kpi-card pos">
+        <div class="kpi-lbl">Lead / MQL</div>
+        <div class="kpi-row"><div class="kpi-val sm">100%</div><div class="kpi-delta up">▲ 66.67%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">33.33%</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">100%</span></div>
+        </div>
+      </div>
+      <div class="kpi-card pos">
+        <div class="kpi-lbl">MQL / SQL</div>
+        <div class="kpi-row"><div class="kpi-val sm">100%</div><div class="kpi-delta up">▲ 100%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">0.00%</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">100%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card"><div class="chart-ttl">🇷🇴 RO — Volume</div><div class="chart-wrap"><canvas id="c-ro-vol"></canvas></div></div>
+      <div class="chart-card"><div class="chart-ttl">🇷🇴 RO — Conversion Rates</div><div class="chart-wrap"><canvas id="c-ro-rate"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- KEY · ANZ -->
+  <div class="mkt-view" id="mkt-anz">
+    <div class="kpi-grid">
+      <div class="kpi-card neg">
+        <div class="kpi-lbl">Leads</div>
+        <div class="kpi-row"><div class="kpi-val">2</div><div class="kpi-delta dn">▼ 71.43%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">7</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">2</span></div>
+        </div>
+      </div>
+      <div class="kpi-card neg">
+        <div class="kpi-lbl">MQL</div>
+        <div class="kpi-row"><div class="kpi-val">2</div><div class="kpi-delta dn">▼ 60.00%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">5</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">2</span></div>
+        </div>
+      </div>
+      <div class="kpi-card neg">
+        <div class="kpi-lbl">SQL</div>
+        <div class="kpi-row"><div class="kpi-val">2</div><div class="kpi-delta dn">▼ 33.33%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">3</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">2</span></div>
+        </div>
+      </div>
+      <div class="kpi-card pos">
+        <div class="kpi-lbl">Lead / MQL</div>
+        <div class="kpi-row"><div class="kpi-val sm">100%</div><div class="kpi-delta up">▲ 28.57%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">71.43%</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">100%</span></div>
+        </div>
+      </div>
+      <div class="kpi-card pos">
+        <div class="kpi-lbl">MQL / SQL</div>
+        <div class="kpi-row"><div class="kpi-val sm">100%</div><div class="kpi-delta up">▲ 40.00%</div></div>
+        <div class="kpi-cmp">
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 04–10</span><span class="kpi-cmp-val">60.00%</span></div>
+          <div class="kpi-cmp-item"><span class="kpi-cmp-lbl">Wk 11–17</span><span class="kpi-cmp-val">100%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card"><div class="chart-ttl">🇦🇺 ANZ — Volume</div><div class="chart-wrap"><canvas id="c-anz-vol"></canvas></div></div>
+      <div class="chart-card"><div class="chart-ttl">🇦🇺 ANZ — Conversion Rates</div><div class="chart-wrap"><canvas id="c-anz-rate"></canvas></div></div>
+    </div>
+  </div>
+
+</div><!-- end main-key -->
+
+<script>
+// ── Helpers ──────────────────────────────────────────────────
+const NAVY='#1F2D5C', BLUE='#4B9CD3';
+const BT = c => c+'28'; // transparent fill
+
+const base = {
+  responsive:true, maintainAspectRatio:false,
+  plugins:{ legend:{ position:'bottom', labels:{ font:{family:'DM Sans',size:11}, padding:10, boxWidth:9 } } },
+  scales:{
+    x:{ grid:{display:false}, ticks:{font:{family:'DM Sans',size:11}} },
+    y:{ grid:{color:'#eef0f5'}, border:{display:false}, ticks:{font:{family:'DM Sans',size:11}} }
+  }
+};
+const rateOpts = JSON.parse(JSON.stringify(base));
+rateOpts.scales.y.max = 110;
+rateOpts.scales.y.ticks.callback = v => v+'%';
+
+function bar(id, prev, curr, labels, c1, c2) {
+  new Chart(document.getElementById(id), {
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        { label:prev[0], data:prev[1], backgroundColor:BT(c1), borderColor:c1, borderWidth:2, borderRadius:5 },
+        { label:curr[0], data:curr[1], backgroundColor:BT(c2), borderColor:c2, borderWidth:2, borderRadius:5 }
+      ]
+    },
+    options: base
+  });
+}
+function rateBar(id, prev, curr, labels, c1, c2) {
+  new Chart(document.getElementById(id), {
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        { label:prev[0], data:prev[1], backgroundColor:BT(c1), borderColor:c1, borderWidth:2, borderRadius:5 },
+        { label:curr[0], data:curr[1], backgroundColor:BT(c2), borderColor:c2, borderWidth:2, borderRadius:5 }
+      ]
+    },
+    options: rateOpts
+  });
+}
+
+const VOL = ['Leads','MQL','SQL'];
+const RATE = ['Lead/MQL','MQL/SQL'];
+
+// ALL MARKETS
+bar      ('c-mom-vol',  ['Apr 01–17',[84,60,33]], ['May 01–17',[61,52,23]], VOL,  BLUE, NAVY);
+rateBar  ('c-mom-rate', ['Apr 01–17',[71.43,55]], ['May 01–17',[85.25,44.23]], RATE, BLUE, NAVY);
+bar      ('c-yoy-vol',  ['May 2025',[49,29,20]],  ['May 2026',[61,52,23]],  VOL,  BLUE, NAVY);
+rateBar  ('c-yoy-rate', ['May 2025',[59.18,68.97]],['May 2026',[85.25,44.23]],RATE,BLUE, NAVY);
+bar      ('c-wow-vol',  ['May 04–10',[33,27,12]], ['May 11–17',[24,21,9]],  VOL,  BLUE, NAVY);
+rateBar  ('c-wow-rate', ['May 04–10',[81.82,44.44]],['May 11–17',[87.5,42.86]],RATE,BLUE,NAVY);
+
+// KEY MARKETS OVERALL
+bar      ('c-km-vol',   ['May 04–10',[23,15,7]],  ['May 11–17',[13,11,7]], VOL,  BLUE, NAVY);
+rateBar  ('c-km-rate',  ['May 04–10',[65.22,46.67]],['May 11–17',[84.62,63.64]],RATE,BLUE,NAVY);
+
+// DACH
+const DACH='#7C5CBF';
+bar      ('c-dach-vol', ['May 04–10',[1,0,0]],    ['May 11–17',[4,3,1]],   VOL,  DACH, NAVY);
+rateBar  ('c-dach-rate',['May 04–10',[0,0]],       ['May 11–17',[75,33.33]],RATE, DACH, NAVY);
+
+// UK
+const UK='#E8704A';
+bar      ('c-uk-vol',   ['May 04–10',[9,8,4]],    ['May 11–17',[6,5,3]],   VOL,  UK, NAVY);
+rateBar  ('c-uk-rate',  ['May 04–10',[88.89,50]],  ['May 11–17',[83.33,60]],RATE, UK, NAVY);
+
+// RO
+const RO='#2ECC71';
+bar      ('c-ro-vol',   ['May 04–10',[6,2,0]],    ['May 11–17',[1,1,1]],   VOL,  RO, NAVY);
+rateBar  ('c-ro-rate',  ['May 04–10',[33.33,0]],   ['May 11–17',[100,100]], RATE, RO, NAVY);
+
+// ANZ
+const ANZ='#1DA8A0';
+bar      ('c-anz-vol',  ['May 04–10',[7,5,3]],    ['May 11–17',[2,2,2]],   VOL,  ANZ, NAVY);
+rateBar  ('c-anz-rate', ['May 04–10',[71.43,60]],  ['May 11–17',[100,100]], RATE, ANZ, NAVY);
+
+// ── Tab logic ────────────────────────────────────────────────
+function switchMain(id, el) {
+  document.querySelectorAll('.main-view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('main-'+id).classList.add('active');
+  el.classList.add('active');
+}
+function switchSub(scope, id, el) {
+  const parent = document.getElementById('main-'+scope);
+  parent.querySelectorAll('.sub-view').forEach(v => v.classList.remove('active'));
+  parent.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(scope+'-'+id).classList.add('active');
+  el.classList.add('active');
+}
+function switchMkt(id, el) {
+  document.querySelectorAll('.mkt-view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.mkt-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('mkt-'+id).classList.add('active');
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>
