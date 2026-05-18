@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pipeline Report — Week of May 11–17, 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy: #1F2D5C;
+    --blue: #4B9CD3;
+    --green: #2ECC71;
+    --green-bg: #EAFAF1;
+    --amber: #F39C12;
+    --amber-bg: #FEF9EC;
+    --red: #E74C3C;
+    --red-bg: #FDEDEC;
+    --bg: #F4F6FB;
+    --card: #FFFFFF;
+    --border: #E2E8F0;
+    --text: #1A1F36;
+    --muted: #6B7A99;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+
+  .report-header {
+    background: linear-gradient(135deg, #1F2D5C 0%, #2d4080 50%, #1a3a6e 100%);
+    padding: 28px 32px 24px; position: relative; overflow: hidden;
+  }
+  .report-header::before { content:''; position:absolute; top:-40px; right:-40px; width:220px; height:220px; border-radius:50%; background:rgba(75,156,211,0.15); }
+  .report-header::after  { content:''; position:absolute; bottom:-60px; left:30%; width:160px; height:160px; border-radius:50%; background:rgba(75,156,211,0.08); }
+  .header-inner { position:relative; z-index:1; }
+  .report-title    { font-size:22px; font-weight:700; color:#fff; letter-spacing:-0.3px; }
+  .report-subtitle { font-size:13px; color:rgba(255,255,255,0.65); margin-top:4px; }
+  .report-badge    { display:inline-block; margin-top:10px; background:rgba(75,156,211,0.3); color:#a8d4f0; font-size:11px; font-weight:600; padding:3px 10px; border-radius:20px; letter-spacing:0.05em; text-transform:uppercase; font-family:'DM Mono',monospace; }
+
+  .tab-bar { background:#fff; border-bottom:1px solid var(--border); display:flex; padding:0 32px; position:sticky; top:0; z-index:100; box-shadow:0 1px 4px rgba(0,0,0,0.05); }
+  .tab-btn { font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; color:var(--muted); background:none; border:none; border-bottom:3px solid transparent; padding:14px 18px 11px; cursor:pointer; transition:all 0.2s; }
+  .tab-btn.active { color:var(--navy); border-bottom-color:var(--blue); }
+  .tab-btn:hover:not(.active) { color:var(--navy); }
+
+  .tab-panel { display:none; padding:28px 32px 48px; }
+  .tab-panel.active { display:block; }
+
+  .section-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .section-title::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  .kpi-grid { display:grid; gap:12px; margin-bottom:24px; }
+  .g2 { grid-template-columns:repeat(2,1fr); }
+  .g4 { grid-template-columns:repeat(4,1fr); }
+
+  .kpi-card { background:var(--card); border-radius:12px; padding:18px 16px 16px; border:1px solid var(--border); position:relative; overflow:hidden; }
+  .kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--blue); border-radius:12px 12px 0 0; }
+  .kpi-card.green::before { background:var(--green); }
+  .kpi-card.red::before   { background:var(--red); }
+  .kpi-card.amber::before { background:var(--amber); }
+  .kpi-card.flat::before  { background:var(--muted); }
+
+  .kpi-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em; font-weight:600; margin-bottom:8px; }
+  .kpi-value { font-size:24px; font-weight:700; color:var(--navy); line-height:1; font-family:'DM Mono',monospace; }
+  .kpi-value.sm { font-size:20px; }
+  .kpi-sub  { font-size:11px; color:var(--muted); margin-top:4px; }
+  .kpi-prev { font-size:11px; color:var(--muted); margin-top:6px; font-family:'DM Mono',monospace; }
+  .kpi-prev span { color:var(--text); font-weight:600; }
+  .kpi-delta { display:inline-flex; align-items:center; gap:3px; font-size:12px; font-weight:700; margin-top:8px; padding:2px 8px; border-radius:6px; font-family:'DM Mono',monospace; }
+  .kpi-delta.pos { color:#1a8a4a; background:var(--green-bg); }
+  .kpi-delta.neg { color:#b83229; background:var(--red-bg); }
+  .kpi-delta.neu { color:#9a6c00; background:var(--amber-bg); }
+  .kpi-delta.na  { color:var(--muted); background:#F0F2F7; }
+
+  .chart-card { background:var(--card); border-radius:12px; padding:20px 20px 16px; border:1px solid var(--border); margin-bottom:12px; }
+  .chart-title { font-size:13px; font-weight:700; color:var(--navy); margin-bottom:3px; }
+  .chart-sub   { font-size:11px; color:var(--muted); margin-bottom:16px; }
+  .chart-wrap  { position:relative; height:230px; }
+  .chart-wrap.tall { height:270px; }
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+
+  .table-card { background:var(--card); border-radius:12px; border:1px solid var(--border); overflow:hidden; margin-bottom:28px; }
+  .table-card-header { padding:14px 18px 12px; border-bottom:1px solid var(--border); display:flex; align-items:baseline; gap:8px; }
+  .table-card-title  { font-size:13px; font-weight:700; color:var(--navy); }
+  .table-card-sub    { font-size:11px; color:var(--muted); }
+
+  table { width:100%; border-collapse:collapse; }
+  thead th { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); padding:10px 18px; text-align:left; background:#F8F9FC; border-bottom:1px solid var(--border); }
+  thead th:not(:first-child) { text-align:right; }
+  tbody td { font-size:13px; padding:10px 18px; border-bottom:1px solid #F0F2F7; color:var(--text); }
+  tbody td:not(:first-child) { text-align:right; font-family:'DM Mono',monospace; font-size:12px; }
+  tbody tr:last-child td { border-bottom:none; }
+  tbody tr.total-row td { font-weight:700; background:#F8F9FC; color:var(--navy); border-top:1px solid var(--border); }
+  .cp { color:#1a8a4a; font-weight:700; }
+  .cn { color:#b83229; font-weight:700; }
+
+  .market-header { display:flex; align-items:center; gap:10px; margin:28px 0 14px; }
+  .market-badge  { font-size:11px; font-weight:700; padding:3px 10px; border-radius:6px; text-transform:uppercase; letter-spacing:0.06em; font-family:'DM Mono',monospace; }
+  .badge-dach { background:#EDE9FE; color:#5B21B6; }
+  .badge-uk   { background:#DBEAFE; color:#1D4ED8; }
+  .badge-ro   { background:#FEE2E2; color:#991B1B; }
+  .badge-anz  { background:#D1FAE5; color:#065F46; }
+  .market-name { font-size:14px; font-weight:700; color:var(--navy); }
+
+  .quota-bar-wrap  { padding:10px 0 6px; }
+  .quota-bar-track { height:10px; background:#E8ECF5; border-radius:99px; overflow:hidden; }
+  .quota-bar-fill  { height:100%; border-radius:99px; }
+  .qb-low  { background:linear-gradient(90deg,var(--red),#c0392b); }
+  .qb-mid  { background:linear-gradient(90deg,var(--amber),#e67e22); }
+  .qb-high { background:linear-gradient(90deg,var(--green),#27ae60); }
+  .quota-bar-labels { display:flex; justify-content:space-between; margin-top:5px; font-size:10px; color:var(--muted); font-family:'DM Mono',monospace; }
+
+  @media (max-width:700px) {
+    .two-col,.g4 { grid-template-columns:repeat(2,1fr); }
+    .tab-bar,.tab-panel { padding-left:16px; padding-right:16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="report-header">
+  <div class="header-inner">
+    <div class="report-title">Pipeline &amp; Closed ARR Report</div>
+    <div class="report-subtitle">All Markets &amp; Key Markets breakdown — Generated May 18, 2026</div>
+    <div class="report-badge">Week of May 11–17, 2026</div>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('all',this)">🌍 All Markets</button>
+  <button class="tab-btn" onclick="switchTab('key',this)">🎯 Key Markets</button>
+</div>
+
+
+<!-- ══════════════════ TAB 1 — ALL MARKETS ══════════════════ -->
+<div id="tab-all" class="tab-panel active">
+
+  <div class="section-title">Week-over-Week (WoW) — May 4–10 vs May 11–17</div>
+  <div class="kpi-grid g2">
+    <div class="kpi-card red">
+      <div class="kpi-label">Pipeline ARR</div>
+      <div class="kpi-value sm">$64,935</div>
+      <div class="kpi-sub">May 11–17, 2026</div>
+      <div class="kpi-prev">Previous week: <span>$192,452</span></div>
+      <div class="kpi-delta neg">▼ 66.26%</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Closed ARR</div>
+      <div class="kpi-value sm">$3,472</div>
+      <div class="kpi-sub">May 11–17, 2026</div>
+      <div class="kpi-prev">Previous week: <span>$2,524</span></div>
+      <div class="kpi-delta pos">▲ 37.59%</div>
+    </div>
+  </div>
+
+  <div class="section-title">Month-over-Month (MoM) — Apr 1–17 vs May 1–17</div>
+  <div class="kpi-grid g2">
+    <div class="kpi-card flat">
+      <div class="kpi-label">Pipeline ARR</div>
+      <div class="kpi-value sm">$283,652</div>
+      <div class="kpi-sub">May 1–17, 2026</div>
+      <div class="kpi-prev">April 1–17: <span>$284,040</span></div>
+      <div class="kpi-delta neg">▼ 0.14%</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Closed ARR</div>
+      <div class="kpi-value sm">$5,996</div>
+      <div class="kpi-sub">May 1–17, 2026</div>
+      <div class="kpi-prev">April 1–17: <span>$17,948</span></div>
+      <div class="kpi-delta neg">▼ 66.59%</div>
+    </div>
+  </div>
+
+  <div class="section-title">Year-over-Year (YoY) — May 1–17, 2025 vs 2026</div>
+  <div class="kpi-grid g2">
+    <div class="kpi-card green">
+      <div class="kpi-label">Pipeline ARR</div>
+      <div class="kpi-value sm">$283,652</div>
+      <div class="kpi-sub">May 1–17, 2026</div>
+      <div class="kpi-prev">May 1–17, 2025: <span>$75,574</span></div>
+      <div class="kpi-delta pos">▲ 275.33%</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Closed ARR</div>
+      <div class="kpi-value sm">$5,996</div>
+      <div class="kpi-sub">May 1–17, 2026</div>
+      <div class="kpi-prev">May 1–17, 2025: <span>$33,245</span></div>
+      <div class="kpi-delta neg">▼ 81.97%</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="chart-card">
+      <div class="chart-title">Pipeline ARR — All Timeframes</div>
+      <div class="chart-sub">WoW · MoM · YoY comparison</div>
+      <div class="chart-wrap"><canvas id="cAllPipe"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Closed ARR — All Timeframes</div>
+      <div class="chart-sub">WoW · MoM · YoY comparison</div>
+      <div class="chart-wrap"><canvas id="cAllClosed"></canvas></div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-card-header">
+      <div class="table-card-title">Full Summary — All Markets</div>
+      <div class="table-card-sub">Pipeline &amp; Closed ARR across WoW, MoM, YoY</div>
+    </div>
+    <table>
+      <thead><tr><th>Metric</th><th>Timeframe</th><th>Previous Period</th><th>Current Period</th><th>Change %</th></tr></thead>
+      <tbody>
+        <tr><td>Pipeline ARR</td><td>WoW (May 11–17)</td><td>$192,451.76</td><td>$64,935.00</td><td class="cn">▼ 66.26%</td></tr>
+        <tr><td>Closed ARR</td><td>WoW (May 11–17)</td><td>$2,523.56</td><td>$3,472.24</td><td class="cp">▲ 37.59%</td></tr>
+        <tr><td>Pipeline ARR</td><td>MoM (May 1–17)</td><td>$284,039.94</td><td>$283,651.76</td><td class="cn">▼ 0.14%</td></tr>
+        <tr><td>Closed ARR</td><td>MoM (May 1–17)</td><td>$17,947.65</td><td>$5,995.80</td><td class="cn">▼ 66.59%</td></tr>
+        <tr><td>Pipeline ARR</td><td>YoY (May 1–17)</td><td>$75,574.40</td><td>$283,651.76</td><td class="cp">▲ 275.33%</td></tr>
+        <tr><td>Closed ARR</td><td>YoY (May 1–17)</td><td>$33,245.43</td><td>$5,995.80</td><td class="cn">▼ 81.97%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+<!-- ══════════════════ TAB 2 — KEY MARKETS ══════════════════ -->
+<div id="tab-key" class="tab-panel">
+
+  <div class="section-title">Pipeline Quota Coverage — Key Markets (May 1–17, 2026)</div>
+  <div class="kpi-grid g4">
+    <div class="kpi-card red">
+      <div class="kpi-label">UK Coverage</div>
+      <div class="kpi-value">23.43%</div>
+      <div class="kpi-sub">$61,617 / $263,038</div>
+      <div class="kpi-delta neg">Gap –$201k</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">RO Coverage</div>
+      <div class="kpi-value">45.45%</div>
+      <div class="kpi-sub">$111,097 / $244,445</div>
+      <div class="kpi-delta neg">Gap –$133k</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">ANZ Coverage</div>
+      <div class="kpi-value">72.26%</div>
+      <div class="kpi-sub">$35,200 / $48,715</div>
+      <div class="kpi-delta neu">Gap –$14k</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">DACH Coverage</div>
+      <div class="kpi-value">60.76%</div>
+      <div class="kpi-sub">$24,800 / $40,817</div>
+      <div class="kpi-delta neu">Gap –$16k</div>
+    </div>
+  </div>
+
+  <div class="chart-card" style="margin-bottom:24px">
+    <div class="chart-title">Pipeline vs Target Quota — All Key Markets</div>
+    <div class="chart-sub">May 1–17, 2026 · Bars = actual pipeline · Line = quota target</div>
+    <div class="chart-wrap tall"><canvas id="cQuotaAll"></canvas></div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-card-header">
+      <div class="table-card-title">Pipeline Quota Coverage Summary</div>
+      <div class="table-card-sub">May 1–17, 2026</div>
+    </div>
+    <table>
+      <thead><tr><th>Market</th><th>Pipeline (May 1–17)</th><th>May Target Quota</th><th>Coverage %</th><th>Gap</th></tr></thead>
+      <tbody>
+        <tr><td><span class="market-badge badge-uk">UK</span></td><td>$61,616.76</td><td>$263,038</td><td class="cn">23.43%</td><td class="cn">–$201,421</td></tr>
+        <tr><td><span class="market-badge badge-ro">RO</span></td><td>$111,097.24</td><td>$244,445</td><td class="cn">45.45%</td><td class="cn">–$133,348</td></tr>
+        <tr><td><span class="market-badge badge-anz">ANZ</span></td><td>$35,200.00</td><td>$48,715</td><td class="cn">72.26%</td><td class="cn">–$13,515</td></tr>
+        <tr><td><span class="market-badge badge-dach">DACH</span></td><td>$24,800.00</td><td>$40,817</td><td class="cn">60.76%</td><td class="cn">–$16,017</td></tr>
+        <tr class="total-row"><td>TOTAL</td><td>$232,714.00</td><td>$597,015</td><td class="cn">38.98%</td><td class="cn">–$364,301</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Individual market WoW -->
+  <div class="section-title">Key Markets — Individual WoW Pipeline &amp; Closed ARR</div>
+
+  <!-- DACH -->
+  <div class="market-header">
+    <span class="market-badge badge-dach">DACH</span>
+    <span class="market-name">Germany · Austria · Switzerland</span>
+  </div>
+  <div class="kpi-grid g2" style="margin-bottom:8px">
+    <div class="kpi-card red">
+      <div class="kpi-label">Pipeline WoW</div>
+      <div class="kpi-value sm">$4,800</div>
+      <div class="kpi-sub">May 11–17, 2026</div>
+      <div class="kpi-prev">Previous week: <span>$33,600</span></div>
+      <div class="kpi-delta neg">▼ 85.71%</div>
+    </div>
+    <div class="kpi-card flat">
+      <div class="kpi-label">Closed WoW</div>
+      <div class="kpi-value sm">—</div>
+      <div class="kpi-sub">May 11–17, 2026</div>
+      <div class="kpi-prev">Previous week: <span>—</span></div>
+      <div class="kpi-delta na">n/a</div>
+    </div>
+  </div>
+  <div class="chart-card" style="margin-bottom:8px">
+    <div class="chart-title">DACH — Pipeline Quota Coverage · 60.76%</div>
+    <div class="chart-sub">May 1–17, 2026 · $24,800 vs $40,817 target</div>
+    <div class="quota-bar-wrap">
+      <div class="quota-bar-track"><div class="quota-bar-fill qb-mid" style="width:60.76%"></div></div>
+      <div class="quota-bar-labels"><span>$0</span><span>60.76% of $40,817 target · gap –$16,017</span><span>$40,817</span></div>
+    </div>
+  </div>
+
+  <!-- UK -->
+  <div class="market-header" style="margin-top:32px">
+    <span class="market-badge badge-uk">UK</span>
+    <span class="market-name">United Kingdom</span>
+  </div>
+  <div class="kpi-grid g2" style="margin-bottom:8px">
+    <div class="kpi-card red">
+      <div class="kpi-label">Pipeline WoW</div>
+      <div class="kpi-value sm">$8,000</div>
+      <div class="kpi-sub">May 11–17, 2026</div>
+      <div class="kpi-prev">Previous week: <span>$55,217</span></div>
+      <div class="kpi-delta neg">▼ 85.51%</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Closed WoW</div>
+      <div class="kpi-value sm">$1,600</div>
+      <div class="kpi-sub">May 11–17, 2026</div>
+      <div class="kpi-prev">Previous week: <span>$817</span></div>
+      <div class="kpi-delta pos">▲ 95.90%</div>
+    </div>
+  </div>
+  <div class="chart-card" style="margin-bottom:8px">
+    <div class="chart-title">UK — Pipeline Quota Coverage · 23.43%</div>
+    <div class="chart-sub">May 1–17, 2026 · $61,617 vs $263,038 target</div>
+    <div class="quota-bar-wrap">
+      <div class="quota-bar-track"><div class="quota-bar-fill qb-low" style="width:23.43%"></div></div>
+      <div class="quota-bar-labels"><span>$0</span><span>23.43% of $263,038 target · gap –$201,421</span><span>$263,038</span></div>
+    </div>
+  </div>
+
+  <!-- RO -->
+  <div class="market-header" style="margin-top:32px">
+    <span class="market-badge badge-ro">RO</span>
+    <span class="market-name">Romania</span>
+  </div>
+  <div class="kpi-grid g2" style="margin-bottom:8px">
+    <div class="kpi-card red">
+      <div class="kpi-label">Pipeline WoW</div>
+      <div class="kpi-value sm">$47,335</div>
+      <div class="kpi-sub">May 11–17, 2026</div>
+      <div class="kpi-prev">Previous week: <span>$78,035</span></div>
+      <div class="kpi-delta neg">▼ 39.34%</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Closed WoW</div>
+      <div class="kpi-value sm">$1,872</div>
+      <div class="kpi-sub">May 11–17, 2026</div>
+      <div class="kpi-prev">Previous week: <span>—</span></div>
+      <div class="kpi-delta na">n/a (new)</div>
+    </div>
+  </div>
+  <div class="chart-card" style="margin-bottom:8px">
+    <div class="chart-title">RO — Pipeline Quota Coverage · 45.45%</div>
+    <div class="chart-sub">May 1–17, 2026 · $111,097 vs $244,445 target</div>
+    <div class="quota-bar-wrap">
+      <div class="quota-bar-track"><div class="quota-bar-fill qb-low" style="width:45.45%"></div></div>
+      <div class="quota-bar-labels"><span>$0</span><span>45.45% of $244,445 target · gap –$133,348</span><span>$244,445</span></div>
+    </div>
+  </div>
+
+  <!-- ANZ -->
+  <div class="market-header" style="margin-top:32px">
+    <span class="market-badge badge-anz">ANZ</span>
+    <span class="market-name">Australia &amp; New Zealand</span>
+  </div>
+  <div class="kpi-grid g2" style="margin-bottom:8px">
+    <div class="kpi-card red">
+      <div class="kpi-label">Pipeline WoW</div>
+      <div class="kpi-value sm">$4,800</div>
+      <div class="kpi-sub">May 11–17, 2026</div>
+      <div class="kpi-prev">Previous week: <span>$25,600</span></div>
+      <div class="kpi-delta neg">▼ 81.25%</div>
+    </div>
+    <div class="kpi-card flat">
+      <div class="kpi-label">Closed WoW</div>
+      <div class="kpi-value sm">—</div>
+      <div class="kpi-sub">May 11–17, 2026</div>
+      <div class="kpi-prev">Previous week: <span>—</span></div>
+      <div class="kpi-delta na">n/a</div>
+    </div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">ANZ — Pipeline Quota Coverage · 72.26%</div>
+    <div class="chart-sub">May 1–17, 2026 · $35,200 vs $48,715 target</div>
+    <div class="quota-bar-wrap">
+      <div class="quota-bar-track"><div class="quota-bar-fill qb-mid" style="width:72.26%"></div></div>
+      <div class="quota-bar-labels"><span>$0</span><span>72.26% of $48,715 target · gap –$13,515</span><span>$48,715</span></div>
+    </div>
+  </div>
+
+</div><!-- /tab-key -->
+
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.font.size   = 12;
+Chart.defaults.color       = '#6B7A99';
+
+const NAVY  = '#1F2D5C';
+const BLUE  = '#4B9CD3';
+const GREEN = '#2ECC71';
+const RED   = '#E74C3C';
+
+new Chart(document.getElementById('cAllPipe'), {
+  type: 'bar',
+  data: {
+    labels: ['WoW Prev\nMay 4–10','WoW Curr\nMay 11–17','MoM Prev\nApr 1–17','MoM Curr\nMay 1–17','YoY 2025\nMay 1–17','YoY 2026\nMay 1–17'],
+    datasets: [{
+      label: 'Pipeline ARR',
+      data: [192451.76, 64935, 284039.94, 283651.76, 75574.40, 283651.76],
+      backgroundColor: ['rgba(75,156,211,0.25)','rgba(231,76,60,0.3)','rgba(75,156,211,0.25)','rgba(75,156,211,0.6)','rgba(75,156,211,0.25)','rgba(46,204,113,0.55)'],
+      borderColor:     [BLUE, RED, BLUE, BLUE, BLUE, GREEN],
+      borderWidth: 2, borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ display:false } },
+    scales:{
+      x:{ grid:{ display:false }, ticks:{ font:{ size:10 } } },
+      y:{ grid:{ color:'#F0F2F7' }, ticks:{ callback: v => '$'+(v/1000).toFixed(0)+'k' } }
+    }
+  }
+});
+
+new Chart(document.getElementById('cAllClosed'), {
+  type: 'bar',
+  data: {
+    labels: ['WoW Prev','WoW Curr','MoM Prev','MoM Curr','YoY 2025','YoY 2026'],
+    datasets: [{
+      label: 'Closed ARR',
+      data: [2523.56, 3472.24, 17947.65, 5995.80, 33245.43, 5995.80],
+      backgroundColor: ['rgba(75,156,211,0.25)','rgba(46,204,113,0.55)','rgba(75,156,211,0.25)','rgba(231,76,60,0.3)','rgba(75,156,211,0.25)','rgba(231,76,60,0.3)'],
+      borderColor:     [BLUE, GREEN, BLUE, RED, BLUE, RED],
+      borderWidth: 2, borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ display:false } },
+    scales:{
+      x:{ grid:{ display:false } },
+      y:{ grid:{ color:'#F0F2F7' }, ticks:{ callback: v => '$'+(v/1000).toFixed(1)+'k' } }
+    }
+  }
+});
+
+new Chart(document.getElementById('cQuotaAll'), {
+  type: 'bar',
+  data: {
+    labels: ['UK','RO','ANZ','DACH'],
+    datasets: [
+      {
+        label: 'Pipeline (May 1–17)',
+        data: [61616.76, 111097.24, 35200, 24800],
+        backgroundColor: 'rgba(75,156,211,0.65)',
+        borderColor: BLUE, borderWidth: 2, borderRadius: 6, order: 2,
+      },
+      {
+        label: 'May Target Quota',
+        data: [263038, 244445, 48715, 40817],
+        type: 'line', order: 1,
+        borderColor: NAVY, borderWidth: 2, borderDash: [6,4],
+        pointBackgroundColor: NAVY, pointRadius: 5,
+        backgroundColor: 'transparent', tension: 0,
+      }
+    ]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ position:'top' } },
+    scales:{
+      x:{ grid:{ display:false } },
+      y:{ grid:{ color:'#F0F2F7' }, ticks:{ callback: v => '$'+(v/1000).toFixed(0)+'k' } }
+    }
+  }
+});
+</script>
+</body>
+</html>
