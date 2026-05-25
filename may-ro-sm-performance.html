@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Romania SM Performance · Jan–May 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy: #1F2D5C;
+    --blue: #4B9CD3;
+    --green: #2ECC71;
+    --amber: #F39C12;
+    --red: #E74C3C;
+    --bg: #F4F6FB;
+    --card: #ffffff;
+    --border: #E2E8F0;
+    --text: #1a2340;
+    --muted: #8A94A6;
+    --may: #4B9CD3;
+    --may-bg: #EBF5FB;
+    --highlight: #FFF3CD;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 32px 24px 48px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* HEADER */
+  .report-header {
+    margin-bottom: 36px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .report-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: -0.3px;
+  }
+  .report-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+  .may-badge {
+    background: var(--navy);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    align-self: center;
+  }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    margin-top: 36px;
+  }
+
+  /* KPI GRID */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 18px 16px;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card.highlight {
+    border: 2px solid var(--blue);
+    background: var(--may-bg);
+  }
+  .kpi-card.highlight::before {
+    content: '★ May MTD';
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--blue);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .kpi-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+  .kpi-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1;
+    font-family: 'DM Mono', monospace;
+  }
+  .kpi-value.blue { color: var(--blue); }
+  .kpi-delta {
+    font-size: 12px;
+    margin-top: 6px;
+    font-weight: 600;
+  }
+  .positive { color: var(--green); }
+  .negative { color: var(--red); }
+  .neutral { color: var(--amber); }
+  .kpi-platform {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 28px 0;
+  }
+
+  /* CHART GRID */
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 8px;
+  }
+  .chart-grid.full { grid-template-columns: 1fr; }
+
+  .chart-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--border);
+  }
+  .chart-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .chart-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .chart-container {
+    position: relative;
+    height: 200px;
+  }
+  .chart-container.tall { height: 240px; }
+
+  /* TABLE */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 4px;
+  }
+  .data-table th {
+    background: var(--navy);
+    color: #fff;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .data-table th.may-col {
+    background: var(--blue);
+  }
+  .data-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .data-table tr:nth-child(even) td { background: #f9fafc; }
+  .data-table td.may-col {
+    background: var(--may-bg) !important;
+    color: var(--navy);
+    font-weight: 600;
+  }
+  .data-table td.row-label { font-weight: 500; color: var(--navy); }
+  .data-table td.empty { color: var(--muted); text-align: center; }
+
+  /* COMPARISON TABLE */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .compare-table th {
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: left;
+  }
+  .compare-table th.col-metric { background: var(--navy); color: #fff; }
+  .compare-table th.col-apr { background: #E8EAF0; color: var(--navy); text-align: right; }
+  .compare-table th.col-may { background: var(--blue); color: #fff; text-align: right; }
+  .compare-table th.col-delta { background: var(--navy); color: #fff; text-align: right; }
+
+  .compare-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .compare-table tr:nth-child(even) td { background: #f9fafc; }
+  .compare-table td.col-metric { font-weight: 500; color: var(--navy); }
+  .compare-table td.col-apr { text-align: right; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 12px; }
+  .compare-table td.col-may { text-align: right; font-weight: 700; color: var(--navy); font-family: 'DM Mono', monospace; background: var(--may-bg) !important; }
+  .compare-table td.col-delta { text-align: right; font-weight: 700; font-size: 12px; font-family: 'DM Mono', monospace; }
+  .compare-table td.col-delta.pos { color: var(--green); }
+  .compare-table td.col-delta.neg { color: var(--red); }
+
+  /* ER callout banner */
+  .er-callout {
+    background: linear-gradient(135deg, #1F2D5C 0%, #2a3f7a 100%);
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .er-callout-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .er-callout-platform {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+  }
+  .er-callout-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .er-callout-apr {
+    font-size: 16px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.45);
+    font-family: 'DM Mono', monospace;
+    text-decoration: line-through;
+    text-decoration-color: rgba(255,255,255,0.25);
+  }
+  .er-arrow { font-size: 18px; color: rgba(255,255,255,0.3); }
+  .er-callout-may {
+    font-size: 30px;
+    font-weight: 700;
+    color: #ffffff;
+    font-family: 'DM Mono', monospace;
+    line-height: 1;
+  }
+  .er-callout-delta {
+    font-size: 13px;
+    font-weight: 700;
+    color: #2ECC71;
+    background: rgba(46,204,113,0.15);
+    padding: 3px 8px;
+    border-radius: 6px;
+    align-self: center;
+  }
+  .er-callout-note {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    margin-top: 2px;
+  }
+  .er-callout-header {
+    grid-column: 1 / -1;
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .er-callout-header span.green-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #2ECC71;
+    display: inline-block;
+  }
+
+  /* FOOTER */
+  .report-footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  @media (max-width: 640px) {
+    .chart-grid { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    body { padding: 20px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="report-header">
+  <div>
+    <div class="report-title">Romania Social Media Performance</div>
+    <div class="report-subtitle">January – May 2026 &nbsp;·&nbsp; Facebook &amp; LinkedIn Organic &nbsp;·&nbsp; Landing Page Traffic</div>
+  </div>
+  <div class="may-badge">🔍 Presenting: May MTD</div>
+</div>
+
+<!-- SECTION: MAY MTD SNAPSHOT -->
+<div class="section-label">May MTD — Key Numbers</div>
+<div class="kpi-grid">
+  <div class="kpi-card highlight">
+    <div class="kpi-label">LinkedIn Impressions</div>
+    <div class="kpi-value blue">1,019</div>
+    <div class="kpi-delta negative">▼ 25.6% vs Apr</div>
+    <div class="kpi-platform">LinkedIn Organic</div>
+  </div>
+  <div class="kpi-card highlight">
+    <div class="kpi-label">Facebook Reach</div>
+    <div class="kpi-value blue">2,875</div>
+    <div class="kpi-delta negative">▼ 66.4% vs Apr</div>
+    <div class="kpi-platform">Facebook Organic</div>
+  </div>
+  <div class="kpi-card highlight">
+    <div class="kpi-label">Facebook Views</div>
+    <div class="kpi-value blue">5,916</div>
+    <div class="kpi-delta negative">▼ 43.3% vs Apr</div>
+    <div class="kpi-platform">Facebook Organic</div>
+  </div>
+  <div class="kpi-card highlight">
+    <div class="kpi-label">LP Clicks from SM</div>
+    <div class="kpi-value blue">76</div>
+    <div class="kpi-delta negative">▼ 48.3% vs Apr</div>
+    <div class="kpi-platform">Organic Traffic</div>
+  </div>
+  <div class="kpi-card highlight">
+    <div class="kpi-label">LinkedIn ER</div>
+    <div class="kpi-value blue">5.59%</div>
+    <div class="kpi-delta positive">▲ 0.48pp vs Apr</div>
+    <div class="kpi-platform">Engagement Rate</div>
+  </div>
+  <div class="kpi-card highlight">
+    <div class="kpi-label">Facebook ER</div>
+    <div class="kpi-value blue">2.71%</div>
+    <div class="kpi-delta positive">▲ 1.09pp vs Apr</div>
+    <div class="kpi-platform">Engagement Rate</div>
+  </div>
+  <div class="kpi-card highlight">
+    <div class="kpi-label">WIA from Total SM</div>
+    <div class="kpi-value blue">61</div>
+    <div class="kpi-delta negative">▼ 37.1% vs Apr</div>
+    <div class="kpi-platform">Total SM</div>
+  </div>
+  <div class="kpi-card highlight">
+    <div class="kpi-label">Post Shares / Reposts</div>
+    <div class="kpi-value blue">13</div>
+    <div class="kpi-delta negative">▼ 61.8% vs Apr</div>
+    <div class="kpi-platform">Organic</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- SECTION: ER CALLOUT -->
+<div class="section-label">✦ Engagement Rate — The Bright Spot</div>
+<div class="er-callout">
+  <div class="er-callout-header">
+    <span class="green-dot"></span>
+    Both LinkedIn &amp; Facebook ER improved in May MTD despite lower reach — audience quality is strengthening
+  </div>
+  <div class="er-callout-item">
+    <div class="er-callout-platform">LinkedIn ER (Organic)</div>
+    <div class="er-callout-row">
+      <span class="er-callout-apr">5.11%</span>
+      <span class="er-arrow">→</span>
+      <span class="er-callout-may">5.59%</span>
+      <span class="er-callout-delta">▲ +0.48pp</span>
+    </div>
+    <div class="er-callout-note">April → May MTD · Best ER since tracking began</div>
+  </div>
+  <div class="er-callout-item">
+    <div class="er-callout-platform">Facebook ER (Organic)</div>
+    <div class="er-callout-row">
+      <span class="er-callout-apr">1.62%</span>
+      <span class="er-arrow">→</span>
+      <span class="er-callout-may">2.71%</span>
+      <span class="er-callout-delta">▲ +1.09pp</span>
+    </div>
+    <div class="er-callout-note">April → May MTD · Strong recovery from April dip</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- SECTION: APRIL VS MAY COMPARISON -->
+<div class="section-label">April vs May MTD — Full Comparison</div>
+<div class="chart-card" style="overflow-x:auto;">
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th class="col-metric">Metric</th>
+        <th class="col-apr">April 2026</th>
+        <th class="col-may">May 2026 MTD</th>
+        <th class="col-delta">Change</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="col-metric">LinkedIn Organic Impressions</td>
+        <td class="col-apr">1,369</td>
+        <td class="col-may">1,019</td>
+        <td class="col-delta neg">▼ 25.6%</td>
+      </tr>
+      <tr>
+        <td class="col-metric">Facebook Organic Reach</td>
+        <td class="col-apr">8,568</td>
+        <td class="col-may">2,875</td>
+        <td class="col-delta neg">▼ 66.4%</td>
+      </tr>
+      <tr>
+        <td class="col-metric">Facebook Organic Views</td>
+        <td class="col-apr">10,448</td>
+        <td class="col-may">5,916</td>
+        <td class="col-delta neg">▼ 43.3%</td>
+      </tr>
+      <tr>
+        <td class="col-metric">LP Clicks from RO SM (Total)</td>
+        <td class="col-apr">147</td>
+        <td class="col-may">76</td>
+        <td class="col-delta neg">▼ 48.3%</td>
+      </tr>
+      <tr>
+        <td class="col-metric">&nbsp;&nbsp;&nbsp;LP from Facebook</td>
+        <td class="col-apr">129</td>
+        <td class="col-may">61</td>
+        <td class="col-delta neg">▼ 52.7%</td>
+      </tr>
+      <tr>
+        <td class="col-metric">&nbsp;&nbsp;&nbsp;LP from LinkedIn</td>
+        <td class="col-apr">17</td>
+        <td class="col-may">9</td>
+        <td class="col-delta neg">▼ 47.1%</td>
+      </tr>
+      <tr>
+        <td class="col-metric">WIA from Total SM</td>
+        <td class="col-apr">97</td>
+        <td class="col-may">61</td>
+        <td class="col-delta neg">▼ 37.1%</td>
+      </tr>
+      <tr style="background: #f0faf5;">
+        <td class="col-metric" style="color:#1a8a4a; font-weight:700;">★ LinkedIn ER (Organic)</td>
+        <td class="col-apr">5.11%</td>
+        <td class="col-may" style="color:#1a8a4a;">5.59%</td>
+        <td class="col-delta pos">▲ +0.48pp</td>
+      </tr>
+      <tr style="background: #f0faf5;">
+        <td class="col-metric" style="color:#1a8a4a; font-weight:700;">★ Facebook ER (Organic)</td>
+        <td class="col-apr">1.62%</td>
+        <td class="col-may" style="color:#1a8a4a;">2.71%</td>
+        <td class="col-delta pos">▲ +1.09pp</td>
+      </tr>
+      <tr>
+        <td class="col-metric">Total Post Shares / Reposts</td>
+        <td class="col-apr">34</td>
+        <td class="col-may">13</td>
+        <td class="col-delta neg">▼ 61.8%</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="divider"></div>
+
+<!-- SECTION: TREND CHARTS -->
+<div class="section-label">Jan–May 2026 — Trend Overview</div>
+<div class="chart-grid">
+
+  <div class="chart-card">
+    <div class="chart-title">LinkedIn Organic Impressions</div>
+    <div class="chart-sub">Monthly trend · May is MTD</div>
+    <div class="chart-container">
+      <canvas id="liImpressions"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Facebook Organic Reach &amp; Views</div>
+    <div class="chart-sub">Monthly trend · May is MTD</div>
+    <div class="chart-container">
+      <canvas id="fbReach"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Engagement Rate (ER%)</div>
+    <div class="chart-sub">LinkedIn vs Facebook · May is MTD</div>
+    <div class="chart-container">
+      <canvas id="erChart"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Landing Page Clicks from SM</div>
+    <div class="chart-sub">Total &amp; by channel · Mar–May (data available from Mar)</div>
+    <div class="chart-container">
+      <canvas id="lpChart"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- SECTION: FULL DATA TABLE -->
+<div class="section-label">Full Data Table — Jan to May MTD 2026</div>
+<div class="chart-card" style="overflow-x:auto;">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Metric</th>
+        <th>Jan 2026</th>
+        <th>Feb 2026</th>
+        <th>Mar 2026</th>
+        <th>Apr 2026</th>
+        <th class="may-col">May 2026 MTD</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="row-label">LinkedIn Organic Impressions</td>
+        <td>917</td><td>848</td><td>3,814</td><td>1,369</td>
+        <td class="may-col">1,019</td>
+      </tr>
+      <tr>
+        <td class="row-label">Facebook Organic Reach</td>
+        <td>558</td><td>140</td><td>2,430</td><td>8,568</td>
+        <td class="may-col">2,875</td>
+      </tr>
+      <tr>
+        <td class="row-label">Facebook Organic Views</td>
+        <td>2,283</td><td>1,098</td><td>6,791</td><td>10,448</td>
+        <td class="may-col">5,916</td>
+      </tr>
+      <tr>
+        <td class="row-label">Organic Traffic — LP from RO SM</td>
+        <td class="empty">—</td><td class="empty">—</td><td>225</td><td>147</td>
+        <td class="may-col">76</td>
+      </tr>
+      <tr>
+        <td class="row-label">&nbsp;&nbsp;&nbsp;LP from Facebook</td>
+        <td class="empty">—</td><td class="empty">—</td><td>180</td><td>129</td>
+        <td class="may-col">61</td>
+      </tr>
+      <tr>
+        <td class="row-label">&nbsp;&nbsp;&nbsp;LP from LinkedIn</td>
+        <td class="empty">—</td><td class="empty">—</td><td>39</td><td>17</td>
+        <td class="may-col">9</td>
+      </tr>
+      <tr>
+        <td class="row-label">WIA from Total SM</td>
+        <td class="empty">—</td><td class="empty">—</td><td>149</td><td>97</td>
+        <td class="may-col">61</td>
+      </tr>
+      <tr>
+        <td class="row-label">LinkedIn ER (Organic)</td>
+        <td>4.70%</td><td>4.29%</td><td>4.64%</td><td>5.11%</td>
+        <td class="may-col">5.59%</td>
+      </tr>
+      <tr>
+        <td class="row-label">Facebook ER (Organic)</td>
+        <td>5.91%</td><td>9.29%</td><td>7.20%</td><td>1.62%</td>
+        <td class="may-col">2.71%</td>
+      </tr>
+      <tr>
+        <td class="row-label">Total Post Shares / Reposts</td>
+        <td>5</td><td>1</td><td>12</td><td>34</td>
+        <td class="may-col">13</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- FOOTER -->
+<div class="report-footer">
+  <span>Romania · Social Media Performance Report · January–May 2026</span>
+  <span>May figures are month-to-date (MTD) · Data: Facebook &amp; LinkedIn Organic</span>
+</div>
+
+<script>
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May MTD'];
+  const mayColor = 'rgba(75,156,211,1)';
+  const mayBg = 'rgba(75,156,211,0.15)';
+  const navyColor = 'rgba(31,45,92,1)';
+  const navyBg = 'rgba(31,45,92,0.1)';
+
+  function barColors(data, highlightIdx) {
+    return data.map((_, i) => i === highlightIdx ? mayColor : 'rgba(31,45,92,0.55)');
+  }
+
+  const defaultOpts = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { font: { family: 'DM Sans', size: 11 }, color: '#8A94A6', boxWidth: 12 } },
+      tooltip: { bodyFont: { family: 'DM Mono' }, titleFont: { family: 'DM Sans' } }
+    },
+    scales: {
+      x: { ticks: { font: { family: 'DM Sans', size: 11 }, color: '#8A94A6' }, grid: { display: false } },
+      y: { ticks: { font: { family: 'DM Mono', size: 10 }, color: '#8A94A6' }, grid: { color: '#EEF0F4' }, beginAtZero: true }
+    }
+  };
+
+  // LinkedIn Impressions
+  new Chart(document.getElementById('liImpressions'), {
+    type: 'bar',
+    data: {
+      labels: months,
+      datasets: [{
+        label: 'Impressions',
+        data: [917, 848, 3814, 1369, 1019],
+        backgroundColor: barColors([917,848,3814,1369,1019], 4),
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: { ...defaultOpts }
+  });
+
+  // Facebook Reach & Views
+  new Chart(document.getElementById('fbReach'), {
+    type: 'bar',
+    data: {
+      labels: months,
+      datasets: [
+        {
+          label: 'Reach',
+          data: [558, 140, 2430, 8568, 2875],
+          backgroundColor: months.map((_, i) => i === 4 ? mayColor : 'rgba(31,45,92,0.55)'),
+          borderRadius: 5,
+          borderSkipped: false
+        },
+        {
+          label: 'Views',
+          data: [2283, 1098, 6791, 10448, 5916],
+          backgroundColor: months.map((_, i) => i === 4 ? 'rgba(75,156,211,0.35)' : 'rgba(31,45,92,0.2)'),
+          borderRadius: 5,
+          borderSkipped: false
+        }
+      ]
+    },
+    options: { ...defaultOpts }
+  });
+
+  // ER Chart
+  new Chart(document.getElementById('erChart'), {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [
+        {
+          label: 'LinkedIn ER%',
+          data: [4.70, 4.29, 4.64, 5.11, 5.59],
+          borderColor: navyColor,
+          backgroundColor: navyBg,
+          pointBackgroundColor: months.map((_, i) => i === 4 ? mayColor : navyColor),
+          pointRadius: months.map((_, i) => i === 4 ? 7 : 4),
+          borderWidth: 2,
+          tension: 0.35,
+          fill: false
+        },
+        {
+          label: 'Facebook ER%',
+          data: [5.91, 9.29, 7.20, 1.62, 2.71],
+          borderColor: mayColor,
+          backgroundColor: mayBg,
+          pointBackgroundColor: months.map((_, i) => i === 4 ? mayColor : 'rgba(75,156,211,0.7)'),
+          pointRadius: months.map((_, i) => i === 4 ? 7 : 4),
+          borderWidth: 2,
+          tension: 0.35,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      ...defaultOpts,
+      scales: {
+        ...defaultOpts.scales,
+        y: {
+          ...defaultOpts.scales.y,
+          ticks: {
+            ...defaultOpts.scales.y.ticks,
+            callback: v => v + '%'
+          }
+        }
+      }
+    }
+  });
+
+  // LP Chart
+  new Chart(document.getElementById('lpChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Mar', 'Apr', 'May MTD'],
+      datasets: [
+        {
+          label: 'LP from Facebook',
+          data: [180, 129, 61],
+          backgroundColor: ['rgba(31,45,92,0.55)', 'rgba(31,45,92,0.55)', mayColor],
+          borderRadius: 5,
+          borderSkipped: false
+        },
+        {
+          label: 'LP from LinkedIn',
+          data: [39, 17, 9],
+          backgroundColor: ['rgba(31,45,92,0.2)', 'rgba(31,45,92,0.2)', 'rgba(75,156,211,0.35)'],
+          borderRadius: 5,
+          borderSkipped: false
+        }
+      ]
+    },
+    options: { ...defaultOpts }
+  });
+</script>
+</body>
+</html>
