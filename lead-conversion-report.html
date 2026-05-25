@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lead Conversion Report — May 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy: #1F2D5C;
+    --blue: #4B9CD3;
+    --blue-light: #EBF4FB;
+    --green: #2ECC71;
+    --green-bg: #EAFAF1;
+    --amber: #F39C12;
+    --amber-bg: #FEF9EE;
+    --red: #E74C3C;
+    --red-bg: #FDEDEC;
+    --bg: #F4F6FB;
+    --white: #FFFFFF;
+    --border: #E3E8F4;
+    --text: #1F2D5C;
+    --muted: #7A88A8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 0;
+    min-height: 100vh;
+  }
+
+  .report-header {
+    background: var(--navy);
+    color: white;
+    padding: 28px 32px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .report-title {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+
+  .report-period {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    font-family: 'DM Mono', monospace;
+    margin-top: 3px;
+  }
+
+  .report-badge {
+    background: rgba(75,156,211,0.25);
+    color: #9DD4F5;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(75,156,211,0.3);
+  }
+
+  /* TABS */
+  .tab-nav {
+    background: var(--white);
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    padding: 0 24px;
+    gap: 4px;
+    overflow-x: auto;
+  }
+
+  .tab-btn {
+    padding: 14px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--muted);
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+    margin-bottom: -2px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .tab-btn:hover { color: var(--navy); }
+
+  .tab-btn.active {
+    color: var(--navy);
+    border-bottom-color: var(--blue);
+    font-weight: 700;
+  }
+
+  .tab-pane { display: none; padding: 28px 24px; }
+  .tab-pane.active { display: block; }
+
+  /* SUB-TABS */
+  .sub-tab-nav {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .sub-tab-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .sub-tab-btn:hover { border-color: var(--blue); color: var(--navy); }
+
+  .sub-tab-btn.active {
+    background: var(--navy);
+    color: white;
+    border-color: var(--navy);
+  }
+
+  .sub-pane { display: none; }
+  .sub-pane.active { display: block; }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* KPI GRID */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .kpi-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 18px 16px;
+    box-shadow: 0 1px 4px rgba(31,45,92,0.07);
+    border: 1.5px solid var(--border);
+    text-align: center;
+  }
+
+  .kpi-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .kpi-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1;
+    margin-bottom: 6px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .kpi-delta {
+    font-size: 12.5px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+
+  .kpi-delta.positive { color: #1aab59; background: var(--green-bg); }
+  .kpi-delta.negative { color: #c0392b; background: var(--red-bg); }
+  .kpi-delta.neutral  { color: #d68910; background: var(--amber-bg); }
+
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* CHART GRID */
+  .chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+
+  .chart-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 4px rgba(31,45,92,0.07);
+    border: 1.5px solid var(--border);
+  }
+
+  .chart-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 16px;
+  }
+
+  .chart-wrapper { position: relative; height: 220px; }
+
+  /* COMPARISON TABLE */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    margin-bottom: 28px;
+    background: var(--white);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(31,45,92,0.07);
+    border: 1.5px solid var(--border);
+  }
+
+  .data-table thead tr {
+    background: var(--navy);
+    color: white;
+  }
+
+  .data-table th {
+    padding: 11px 16px;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-align: right;
+  }
+
+  .data-table th:first-child { text-align: left; }
+
+  .data-table tbody tr:nth-child(even) { background: #F8FAFE; }
+
+  .data-table tbody tr:hover { background: var(--blue-light); }
+
+  .data-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+  }
+
+  .data-table td:first-child {
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    color: var(--navy);
+  }
+
+  .data-table .row-rate td { color: var(--muted); font-size: 12px; }
+
+  .cell-pos { color: #1aab59; font-weight: 600; }
+  .cell-neg { color: #c0392b; font-weight: 600; }
+  .cell-na  { color: var(--muted); }
+
+  /* MARKET GRID */
+  .market-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+
+  .market-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1.5px solid var(--border);
+    box-shadow: 0 1px 4px rgba(31,45,92,0.07);
+  }
+
+  .market-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .market-flag { font-size: 22px; line-height: 1; }
+
+  .market-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .market-sub { font-size: 11.5px; color: var(--muted); }
+
+  .market-kpi-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .market-kpi {
+    text-align: center;
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 10px 6px;
+  }
+
+  .market-kpi-val {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--navy);
+    font-family: 'DM Mono', monospace;
+    line-height: 1;
+  }
+
+  .market-kpi-lbl {
+    font-size: 10.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  .market-rates {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .rate-badge {
+    font-size: 11.5px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .rate-badge.blue { background: var(--blue-light); color: #2a6fa0; }
+
+  .market-delta-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  /* TIMEFRAME HEADER */
+  .timeframe-header {
+    background: linear-gradient(135deg, #EBF4FB 0%, #F4F6FB 100%);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .timeframe-icon { font-size: 20px; }
+
+  .timeframe-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .timeframe-range {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .flag-emoji { font-size: 16px; }
+</style>
+</head>
+<body>
+
+<div class="report-header">
+  <div>
+    <div class="report-title">🌍 Lead Conversion Report</div>
+    <div class="report-period">All Markets & Key Markets · May 2026</div>
+  </div>
+  <div class="report-badge">Week ending May 24, 2026</div>
+</div>
+
+<!-- MAIN TABS -->
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('all-markets', this)">🌐 All Markets</button>
+  <button class="tab-btn" onclick="switchTab('key-markets', this)">🎯 Key Markets</button>
+</div>
+
+<!-- ================================================ TAB 1: ALL MARKETS ================================================ -->
+<div id="tab-all-markets" class="tab-pane active">
+
+  <div class="sub-tab-nav">
+    <button class="sub-tab-btn active" onclick="switchSubTab('all-markets', 'mom', this)">📅 MoM</button>
+    <button class="sub-tab-btn" onclick="switchSubTab('all-markets', 'yoy', this)">📆 YoY</button>
+    <button class="sub-tab-btn" onclick="switchSubTab('all-markets', 'wow', this)">📊 WoW</button>
+  </div>
+
+  <!-- ALL MoM -->
+  <div id="sub-all-markets-mom" class="sub-pane active">
+    <div class="timeframe-header">
+      <div class="timeframe-icon">📅</div>
+      <div>
+        <div class="timeframe-title">Month-over-Month Comparison</div>
+        <div class="timeframe-range">April 01–24, 2026 vs May 01–24, 2026</div>
+      </div>
+    </div>
+
+    <div class="section-label">Key Metrics</div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Leads</div>
+        <div class="kpi-value">237</div>
+        <div><span class="kpi-delta positive">▲ 115.45%</span></div>
+        <div class="kpi-sub">vs 110 in Apr</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">MQL</div>
+        <div class="kpi-value">58</div>
+        <div><span class="kpi-delta negative">▼ 19.44%</span></div>
+        <div class="kpi-sub">vs 72 in Apr</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">SQL</div>
+        <div class="kpi-value">26</div>
+        <div><span class="kpi-delta negative">▼ 42.22%</span></div>
+        <div class="kpi-sub">vs 45 in Apr</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Lead → MQL</div>
+        <div class="kpi-value">24.47%</div>
+        <div><span class="kpi-delta negative">▼ 40.98%</span></div>
+        <div class="kpi-sub">vs 65.45% in Apr</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">MQL → SQL</div>
+        <div class="kpi-value">44.83%</div>
+        <div><span class="kpi-delta negative">▼ 17.67%</span></div>
+        <div class="kpi-sub">vs 62.50% in Apr</div>
+      </div>
+    </div>
+
+    <div class="section-label">Funnel Detail</div>
+    <table class="data-table">
+      <thead><tr>
+        <th>Metric</th>
+        <th>Apr 01–24</th>
+        <th>May 01–24</th>
+        <th>MoM Change</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>Leads</td><td>110</td><td>237</td><td class="cell-pos">▲ 115.45%</td></tr>
+        <tr><td>MQL</td><td>72</td><td>58</td><td class="cell-neg">▼ 19.44%</td></tr>
+        <tr><td>SQL</td><td>45</td><td>26</td><td class="cell-neg">▼ 42.22%</td></tr>
+        <tr class="row-rate"><td>Lead / MQL</td><td>65.45%</td><td>24.47%</td><td class="cell-neg">▼ 40.98%</td></tr>
+        <tr class="row-rate"><td>MQL / SQL</td><td>62.50%</td><td>44.83%</td><td class="cell-neg">▼ 17.67%</td></tr>
+      </tbody>
+    </table>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">Volume: Leads, MQL, SQL</div>
+        <div class="chart-wrapper"><canvas id="chart-mom-volume"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Conversion Rates</div>
+        <div class="chart-wrapper"><canvas id="chart-mom-rates"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALL YoY -->
+  <div id="sub-all-markets-yoy" class="sub-pane">
+    <div class="timeframe-header">
+      <div class="timeframe-icon">📆</div>
+      <div>
+        <div class="timeframe-title">Year-over-Year Comparison</div>
+        <div class="timeframe-range">May 01–24, 2025 vs May 01–24, 2026</div>
+      </div>
+    </div>
+
+    <div class="section-label">Key Metrics</div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Leads</div>
+        <div class="kpi-value">237</div>
+        <div><span class="kpi-delta positive">▲ 220.27%</span></div>
+        <div class="kpi-sub">vs 74 in May '25</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">MQL</div>
+        <div class="kpi-value">58</div>
+        <div><span class="kpi-delta positive">▲ 1060%</span></div>
+        <div class="kpi-sub">vs 5 in May '25</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">SQL</div>
+        <div class="kpi-value">26</div>
+        <div><span class="kpi-delta neutral">n/a</span></div>
+        <div class="kpi-sub">vs 0 in May '25</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Lead → MQL</div>
+        <div class="kpi-value">24.47%</div>
+        <div><span class="kpi-delta positive">▲ 17.72%</span></div>
+        <div class="kpi-sub">vs 6.76% in May '25</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">MQL → SQL</div>
+        <div class="kpi-value">44.83%</div>
+        <div><span class="kpi-delta positive">▲ 44.83%</span></div>
+        <div class="kpi-sub">vs 0.00% in May '25</div>
+      </div>
+    </div>
+
+    <div class="section-label">Funnel Detail</div>
+    <table class="data-table">
+      <thead><tr>
+        <th>Metric</th>
+        <th>May '25</th>
+        <th>May '26</th>
+        <th>YoY Change</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>Leads</td><td>74</td><td>237</td><td class="cell-pos">▲ 220.27%</td></tr>
+        <tr><td>MQL</td><td>5</td><td>58</td><td class="cell-pos">▲ 1060.00%</td></tr>
+        <tr><td>SQL</td><td>0</td><td>26</td><td class="cell-na">n/a</td></tr>
+        <tr class="row-rate"><td>Lead / MQL</td><td>6.76%</td><td>24.47%</td><td class="cell-pos">▲ 17.72%</td></tr>
+        <tr class="row-rate"><td>MQL / SQL</td><td>0.00%</td><td>44.83%</td><td class="cell-pos">▲ 44.83%</td></tr>
+      </tbody>
+    </table>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">Volume: Leads, MQL, SQL</div>
+        <div class="chart-wrapper"><canvas id="chart-yoy-volume"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Conversion Rates</div>
+        <div class="chart-wrapper"><canvas id="chart-yoy-rates"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALL WoW -->
+  <div id="sub-all-markets-wow" class="sub-pane">
+    <div class="timeframe-header">
+      <div class="timeframe-icon">📊</div>
+      <div>
+        <div class="timeframe-title">Week-over-Week Comparison</div>
+        <div class="timeframe-range">May 11–17, 2026 vs May 18–24, 2026</div>
+      </div>
+    </div>
+
+    <div class="section-label">Key Metrics</div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Leads</div>
+        <div class="kpi-value">200</div>
+        <div><span class="kpi-delta positive">▲ 733.33%</span></div>
+        <div class="kpi-sub">vs 24 prev week</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">MQL</div>
+        <div class="kpi-value">27</div>
+        <div><span class="kpi-delta positive">▲ 28.57%</span></div>
+        <div class="kpi-sub">vs 21 prev week</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">SQL</div>
+        <div class="kpi-value">12</div>
+        <div><span class="kpi-delta positive">▲ 33.33%</span></div>
+        <div class="kpi-sub">vs 9 prev week</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Lead → MQL</div>
+        <div class="kpi-value">13.50%</div>
+        <div><span class="kpi-delta negative">▼ 74.00%</span></div>
+        <div class="kpi-sub">vs 87.50% prev week</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">MQL → SQL</div>
+        <div class="kpi-value">44.44%</div>
+        <div><span class="kpi-delta positive">▲ 1.59%</span></div>
+        <div class="kpi-sub">vs 42.86% prev week</div>
+      </div>
+    </div>
+
+    <div class="section-label">Funnel Detail</div>
+    <table class="data-table">
+      <thead><tr>
+        <th>Metric</th>
+        <th>May 11–17</th>
+        <th>May 18–24</th>
+        <th>WoW Change</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>Leads</td><td>24</td><td>200</td><td class="cell-pos">▲ 733.33%</td></tr>
+        <tr><td>MQL</td><td>21</td><td>27</td><td class="cell-pos">▲ 28.57%</td></tr>
+        <tr><td>SQL</td><td>9</td><td>12</td><td class="cell-pos">▲ 33.33%</td></tr>
+        <tr class="row-rate"><td>Lead / MQL</td><td>87.50%</td><td>13.50%</td><td class="cell-neg">▼ 74.00%</td></tr>
+        <tr class="row-rate"><td>MQL / SQL</td><td>42.86%</td><td>44.44%</td><td class="cell-pos">▲ 1.59%</td></tr>
+      </tbody>
+    </table>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">Volume: Leads, MQL, SQL</div>
+        <div class="chart-wrapper"><canvas id="chart-wow-volume"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Conversion Rates</div>
+        <div class="chart-wrapper"><canvas id="chart-wow-rates"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================================================ TAB 2: KEY MARKETS ================================================ -->
+<div id="tab-key-markets" class="tab-pane">
+
+  <div class="sub-tab-nav">
+    <button class="sub-tab-btn active" onclick="switchSubTab('key-markets', 'overview', this)">🌍 Overview</button>
+    <button class="sub-tab-btn" onclick="switchSubTab('key-markets', 'dach', this)">🇩🇪 DACH</button>
+    <button class="sub-tab-btn" onclick="switchSubTab('key-markets', 'uk', this)">🇬🇧 UK</button>
+    <button class="sub-tab-btn" onclick="switchSubTab('key-markets', 'ro', this)">🇷🇴 RO</button>
+    <button class="sub-tab-btn" onclick="switchSubTab('key-markets', 'anz', this)">🇦🇺 ANZ</button>
+  </div>
+
+  <!-- KEY MARKETS OVERVIEW -->
+  <div id="sub-key-markets-overview" class="sub-pane active">
+    <div class="timeframe-header">
+      <div class="timeframe-icon">📊</div>
+      <div>
+        <div class="timeframe-title">Key Markets — WoW Overview</div>
+        <div class="timeframe-range">May 11–17, 2026 vs May 18–24, 2026</div>
+      </div>
+    </div>
+
+    <div class="section-label">Key Markets Combined</div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Leads</div>
+        <div class="kpi-value">189</div>
+        <div><span class="kpi-delta positive">▲ 1353.85%</span></div>
+        <div class="kpi-sub">vs 13 prev week</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">MQL</div>
+        <div class="kpi-value">17</div>
+        <div><span class="kpi-delta positive">▲ 54.55%</span></div>
+        <div class="kpi-sub">vs 11 prev week</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">SQL</div>
+        <div class="kpi-value">10</div>
+        <div><span class="kpi-delta positive">▲ 42.86%</span></div>
+        <div class="kpi-sub">vs 7 prev week</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Lead → MQL</div>
+        <div class="kpi-value">8.99%</div>
+        <div><span class="kpi-delta negative">▼ 75.62%</span></div>
+        <div class="kpi-sub">vs 84.62% prev week</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">MQL → SQL</div>
+        <div class="kpi-value">58.82%</div>
+        <div><span class="kpi-delta negative">▼ 4.81%</span></div>
+        <div class="kpi-sub">vs 63.64% prev week</div>
+      </div>
+    </div>
+
+    <div class="section-label">All Key Markets — Side by Side (WoW)</div>
+    <table class="data-table">
+      <thead><tr>
+        <th>Market</th>
+        <th>Leads W1</th>
+        <th>Leads W2</th>
+        <th>MQL W1</th>
+        <th>MQL W2</th>
+        <th>SQL W1</th>
+        <th>SQL W2</th>
+        <th>Leads WoW</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>🌍 All Key Markets</td><td>13</td><td>189</td><td>11</td><td>17</td><td>7</td><td>10</td><td class="cell-pos">▲ 1353.85%</td></tr>
+        <tr><td>🇩🇪 DACH</td><td>4</td><td>13</td><td>3</td><td>9</td><td>1</td><td>5</td><td class="cell-pos">▲ 225.00%</td></tr>
+        <tr><td>🇬🇧 UK</td><td>6</td><td>176</td><td>5</td><td>6</td><td>3</td><td>3</td><td class="cell-pos">▲ 2833.33%</td></tr>
+        <tr><td>🇷🇴 RO</td><td>1</td><td>3</td><td>1</td><td>1</td><td>1</td><td>1</td><td class="cell-pos">▲ 200.00%</td></tr>
+        <tr><td>🇦🇺 ANZ</td><td>2</td><td>2</td><td>2</td><td>2</td><td>2</td><td>2</td><td class="cell-na">0.00%</td></tr>
+      </tbody>
+    </table>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">Leads by Market — W1 vs W2</div>
+        <div class="chart-wrapper"><canvas id="chart-km-leads"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">MQL / SQL by Market — W2</div>
+        <div class="chart-wrapper"><canvas id="chart-km-funnel"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DACH -->
+  <div id="sub-key-markets-dach" class="sub-pane">
+    <div class="timeframe-header">
+      <div class="timeframe-icon">🇩🇪</div>
+      <div>
+        <div class="timeframe-title">DACH — Week-over-Week</div>
+        <div class="timeframe-range">May 11–17 vs May 18–24, 2026</div>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Leads</div>
+        <div class="kpi-value">13</div>
+        <div><span class="kpi-delta positive">▲ 225.00%</span></div>
+        <div class="kpi-sub">vs 4</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">MQL</div>
+        <div class="kpi-value">9</div>
+        <div><span class="kpi-delta positive">▲ 200.00%</span></div>
+        <div class="kpi-sub">vs 3</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">SQL</div>
+        <div class="kpi-value">5</div>
+        <div><span class="kpi-delta positive">▲ 400.00%</span></div>
+        <div class="kpi-sub">vs 1</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Lead → MQL</div>
+        <div class="kpi-value">69.23%</div>
+        <div><span class="kpi-delta negative">▼ 5.77%</span></div>
+        <div class="kpi-sub">vs 75.00%</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">MQL → SQL</div>
+        <div class="kpi-value">55.56%</div>
+        <div><span class="kpi-delta positive">▲ 22.22%</span></div>
+        <div class="kpi-sub">vs 33.33%</div>
+      </div>
+    </div>
+
+    <table class="data-table">
+      <thead><tr><th>Metric</th><th>May 11–17</th><th>May 18–24</th><th>WoW Change</th></tr></thead>
+      <tbody>
+        <tr><td>Leads</td><td>4</td><td>13</td><td class="cell-pos">▲ 225.00%</td></tr>
+        <tr><td>MQL</td><td>3</td><td>9</td><td class="cell-pos">▲ 200.00%</td></tr>
+        <tr><td>SQL</td><td>1</td><td>5</td><td class="cell-pos">▲ 400.00%</td></tr>
+        <tr class="row-rate"><td>Lead / MQL</td><td>75.00%</td><td>69.23%</td><td class="cell-neg">▼ 5.77%</td></tr>
+        <tr class="row-rate"><td>MQL / SQL</td><td>33.33%</td><td>55.56%</td><td class="cell-pos">▲ 22.22%</td></tr>
+      </tbody>
+    </table>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">🇩🇪 DACH — Volume WoW</div>
+        <div class="chart-wrapper"><canvas id="chart-dach-vol"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">🇩🇪 DACH — Conversion Rates WoW</div>
+        <div class="chart-wrapper"><canvas id="chart-dach-rates"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UK -->
+  <div id="sub-key-markets-uk" class="sub-pane">
+    <div class="timeframe-header">
+      <div class="timeframe-icon">🇬🇧</div>
+      <div>
+        <div class="timeframe-title">UK — Week-over-Week</div>
+        <div class="timeframe-range">May 11–17 vs May 18–24, 2026</div>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Leads</div>
+        <div class="kpi-value">176</div>
+        <div><span class="kpi-delta positive">▲ 2833.33%</span></div>
+        <div class="kpi-sub">vs 6</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">MQL</div>
+        <div class="kpi-value">6</div>
+        <div><span class="kpi-delta positive">▲ 20.00%</span></div>
+        <div class="kpi-sub">vs 5</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">SQL</div>
+        <div class="kpi-value">3</div>
+        <div><span class="kpi-delta neutral">0.00%</span></div>
+        <div class="kpi-sub">vs 3</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Lead → MQL</div>
+        <div class="kpi-value">3.41%</div>
+        <div><span class="kpi-delta negative">▼ 79.92%</span></div>
+        <div class="kpi-sub">vs 83.33%</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">MQL → SQL</div>
+        <div class="kpi-value">50.00%</div>
+        <div><span class="kpi-delta negative">▼ 10.00%</span></div>
+        <div class="kpi-sub">vs 60.00%</div>
+      </div>
+    </div>
+
+    <table class="data-table">
+      <thead><tr><th>Metric</th><th>May 11–17</th><th>May 18–24</th><th>WoW Change</th></tr></thead>
+      <tbody>
+        <tr><td>Leads</td><td>6</td><td>176</td><td class="cell-pos">▲ 2833.33%</td></tr>
+        <tr><td>MQL</td><td>5</td><td>6</td><td class="cell-pos">▲ 20.00%</td></tr>
+        <tr><td>SQL</td><td>3</td><td>3</td><td class="cell-na">0.00%</td></tr>
+        <tr class="row-rate"><td>Lead / MQL</td><td>83.33%</td><td>3.41%</td><td class="cell-neg">▼ 79.92%</td></tr>
+        <tr class="row-rate"><td>MQL / SQL</td><td>60.00%</td><td>50.00%</td><td class="cell-neg">▼ 10.00%</td></tr>
+      </tbody>
+    </table>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">🇬🇧 UK — Volume WoW</div>
+        <div class="chart-wrapper"><canvas id="chart-uk-vol"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">🇬🇧 UK — Conversion Rates WoW</div>
+        <div class="chart-wrapper"><canvas id="chart-uk-rates"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RO -->
+  <div id="sub-key-markets-ro" class="sub-pane">
+    <div class="timeframe-header">
+      <div class="timeframe-icon">🇷🇴</div>
+      <div>
+        <div class="timeframe-title">Romania — Week-over-Week</div>
+        <div class="timeframe-range">May 11–17 vs May 18–24, 2026</div>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Leads</div>
+        <div class="kpi-value">3</div>
+        <div><span class="kpi-delta positive">▲ 200.00%</span></div>
+        <div class="kpi-sub">vs 1</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">MQL</div>
+        <div class="kpi-value">1</div>
+        <div><span class="kpi-delta neutral">0.00%</span></div>
+        <div class="kpi-sub">vs 1</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">SQL</div>
+        <div class="kpi-value">1</div>
+        <div><span class="kpi-delta neutral">0.00%</span></div>
+        <div class="kpi-sub">vs 1</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Lead → MQL</div>
+        <div class="kpi-value">33.33%</div>
+        <div><span class="kpi-delta negative">▼ 66.67%</span></div>
+        <div class="kpi-sub">vs 100.00%</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">MQL → SQL</div>
+        <div class="kpi-value">100.00%</div>
+        <div><span class="kpi-delta neutral">0.00%</span></div>
+        <div class="kpi-sub">vs 100.00%</div>
+      </div>
+    </div>
+
+    <table class="data-table">
+      <thead><tr><th>Metric</th><th>May 11–17</th><th>May 18–24</th><th>WoW Change</th></tr></thead>
+      <tbody>
+        <tr><td>Leads</td><td>1</td><td>3</td><td class="cell-pos">▲ 200.00%</td></tr>
+        <tr><td>MQL</td><td>1</td><td>1</td><td class="cell-na">0.00%</td></tr>
+        <tr><td>SQL</td><td>1</td><td>1</td><td class="cell-na">0.00%</td></tr>
+        <tr class="row-rate"><td>Lead / MQL</td><td>100.00%</td><td>33.33%</td><td class="cell-neg">▼ 66.67%</td></tr>
+        <tr class="row-rate"><td>MQL / SQL</td><td>100.00%</td><td>100.00%</td><td class="cell-na">0.00%</td></tr>
+      </tbody>
+    </table>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">🇷🇴 RO — Volume WoW</div>
+        <div class="chart-wrapper"><canvas id="chart-ro-vol"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">🇷🇴 RO — Conversion Rates WoW</div>
+        <div class="chart-wrapper"><canvas id="chart-ro-rates"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANZ -->
+  <div id="sub-key-markets-anz" class="sub-pane">
+    <div class="timeframe-header">
+      <div class="timeframe-icon">🇦🇺</div>
+      <div>
+        <div class="timeframe-title">ANZ (Australia & New Zealand) — Week-over-Week</div>
+        <div class="timeframe-range">May 11–17 vs May 18–24, 2026</div>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Leads</div>
+        <div class="kpi-value">2</div>
+        <div><span class="kpi-delta neutral">0.00%</span></div>
+        <div class="kpi-sub">vs 2</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">MQL</div>
+        <div class="kpi-value">2</div>
+        <div><span class="kpi-delta neutral">0.00%</span></div>
+        <div class="kpi-sub">vs 2</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">SQL</div>
+        <div class="kpi-value">2</div>
+        <div><span class="kpi-delta neutral">0.00%</span></div>
+        <div class="kpi-sub">vs 2</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Lead → MQL</div>
+        <div class="kpi-value">100.00%</div>
+        <div><span class="kpi-delta neutral">0.00%</span></div>
+        <div class="kpi-sub">vs 100.00%</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">MQL → SQL</div>
+        <div class="kpi-value">100.00%</div>
+        <div><span class="kpi-delta neutral">0.00%</span></div>
+        <div class="kpi-sub">vs 100.00%</div>
+      </div>
+    </div>
+
+    <table class="data-table">
+      <thead><tr><th>Metric</th><th>May 11–17</th><th>May 18–24</th><th>WoW Change</th></tr></thead>
+      <tbody>
+        <tr><td>Leads</td><td>2</td><td>2</td><td class="cell-na">0.00%</td></tr>
+        <tr><td>MQL</td><td>2</td><td>2</td><td class="cell-na">0.00%</td></tr>
+        <tr><td>SQL</td><td>2</td><td>2</td><td class="cell-na">0.00%</td></tr>
+        <tr class="row-rate"><td>Lead / MQL</td><td>100.00%</td><td>100.00%</td><td class="cell-na">0.00%</td></tr>
+        <tr class="row-rate"><td>MQL / SQL</td><td>100.00%</td><td>100.00%</td><td class="cell-na">0.00%</td></tr>
+      </tbody>
+    </table>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">🇦🇺 ANZ — Volume WoW</div>
+        <div class="chart-wrapper"><canvas id="chart-anz-vol"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">🇦🇺 ANZ — Conversion Rates WoW</div>
+        <div class="chart-wrapper"><canvas id="chart-anz-rates"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ==================== TAB LOGIC ====================
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function switchSubTab(parent, id, btn) {
+  const parentEl = document.getElementById('tab-' + parent);
+  parentEl.querySelectorAll('.sub-pane').forEach(p => p.classList.remove('active'));
+  parentEl.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sub-' + parent + '-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ==================== CHART HELPERS ====================
+const C = (id, type, labels, datasets, opts = {}) => {
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  new Chart(ctx, {
+    type,
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: 'DM Sans', size: 11 } } },
+        tooltip: { bodyFont: { family: 'DM Mono' }, titleFont: { family: 'DM Sans', weight: '600' } }
+      },
+      scales: type !== 'doughnut' ? {
+        x: { grid: { color: '#E3E8F4' }, ticks: { font: { family: 'DM Sans', size: 11 } } },
+        y: { grid: { color: '#E3E8F4' }, ticks: { font: { family: 'DM Mono', size: 11 } }, beginAtZero: true, ...opts }
+      } : {}
+    }
+  });
+};
+
+const navy = '#1F2D5C', blue = '#4B9CD3', green = '#2ECC71', amber = '#F39C12', red = '#E74C3C';
+const navyA = 'rgba(31,45,92,0.7)', blueA = 'rgba(75,156,211,0.7)';
+
+// ==================== CHARTS: ALL MoM ====================
+C('chart-mom-volume', 'bar',
+  ['Leads', 'MQL', 'SQL'],
+  [
+    { label: 'Apr 01–24', data: [110, 72, 45], backgroundColor: navyA, borderRadius: 5 },
+    { label: 'May 01–24', data: [237, 58, 26], backgroundColor: blueA, borderRadius: 5 }
+  ]
+);
+
+C('chart-mom-rates', 'bar',
+  ['Lead → MQL', 'MQL → SQL'],
+  [
+    { label: 'Apr 01–24', data: [65.45, 62.50], backgroundColor: navyA, borderRadius: 5 },
+    { label: 'May 01–24', data: [24.47, 44.83], backgroundColor: blueA, borderRadius: 5 }
+  ], { max: 100 }
+);
+
+// ==================== CHARTS: ALL YoY ====================
+C('chart-yoy-volume', 'bar',
+  ['Leads', 'MQL', 'SQL'],
+  [
+    { label: 'May \'25', data: [74, 5, 0], backgroundColor: navyA, borderRadius: 5 },
+    { label: 'May \'26', data: [237, 58, 26], backgroundColor: blueA, borderRadius: 5 }
+  ]
+);
+
+C('chart-yoy-rates', 'bar',
+  ['Lead → MQL', 'MQL → SQL'],
+  [
+    { label: 'May \'25', data: [6.76, 0], backgroundColor: navyA, borderRadius: 5 },
+    { label: 'May \'26', data: [24.47, 44.83], backgroundColor: blueA, borderRadius: 5 }
+  ], { max: 100 }
+);
+
+// ==================== CHARTS: ALL WoW ====================
+C('chart-wow-volume', 'bar',
+  ['Leads', 'MQL', 'SQL'],
+  [
+    { label: 'May 11–17', data: [24, 21, 9], backgroundColor: navyA, borderRadius: 5 },
+    { label: 'May 18–24', data: [200, 27, 12], backgroundColor: blueA, borderRadius: 5 }
+  ]
+);
+
+C('chart-wow-rates', 'bar',
+  ['Lead → MQL', 'MQL → SQL'],
+  [
+    { label: 'May 11–17', data: [87.50, 42.86], backgroundColor: navyA, borderRadius: 5 },
+    { label: 'May 18–24', data: [13.50, 44.44], backgroundColor: blueA, borderRadius: 5 }
+  ], { max: 100 }
+);
+
+// ==================== CHARTS: KEY MARKETS OVERVIEW ====================
+C('chart-km-leads', 'bar',
+  ['DACH 🇩🇪', 'UK 🇬🇧', 'RO 🇷🇴', 'ANZ 🇦🇺'],
+  [
+    { label: 'May 11–17', data: [4, 6, 1, 2], backgroundColor: navyA, borderRadius: 5 },
+    { label: 'May 18–24', data: [13, 176, 3, 2], backgroundColor: blueA, borderRadius: 5 }
+  ]
+);
+
+C('chart-km-funnel', 'bar',
+  ['DACH 🇩🇪', 'UK 🇬🇧', 'RO 🇷🇴', 'ANZ 🇦🇺'],
+  [
+    { label: 'Leads W2', data: [13, 176, 3, 2], backgroundColor: 'rgba(31,45,92,0.7)', borderRadius: 5 },
+    { label: 'MQL W2', data: [9, 6, 1, 2], backgroundColor: 'rgba(75,156,211,0.8)', borderRadius: 5 },
+    { label: 'SQL W2', data: [5, 3, 1, 2], backgroundColor: 'rgba(46,204,113,0.8)', borderRadius: 5 }
+  ]
+);
+
+// ==================== CHARTS: DACH ====================
+C('chart-dach-vol', 'bar', ['Leads', 'MQL', 'SQL'],
+  [
+    { label: 'May 11–17', data: [4, 3, 1], backgroundColor: navyA, borderRadius: 5 },
+    { label: 'May 18–24', data: [13, 9, 5], backgroundColor: blueA, borderRadius: 5 }
+  ]
+);
+C('chart-dach-rates', 'bar', ['Lead → MQL', 'MQL → SQL'],
+  [
+    { label: 'May 11–17', data: [75.00, 33.33], backgroundColor: navyA, borderRadius: 5 },
+    { label: 'May 18–24', data: [69.23, 55.56], backgroundColor: blueA, borderRadius: 5 }
+  ], { max: 100 }
+);
+
+// ==================== CHARTS: UK ====================
+C('chart-uk-vol', 'bar', ['Leads', 'MQL', 'SQL'],
+  [
+    { label: 'May 11–17', data: [6, 5, 3], backgroundColor: navyA, borderRadius: 5 },
+    { label: 'May 18–24', data: [176, 6, 3], backgroundColor: blueA, borderRadius: 5 }
+  ]
+);
+C('chart-uk-rates', 'bar', ['Lead → MQL', 'MQL → SQL'],
+  [
+    { label: 'May 11–17', data: [83.33, 60.00], backgroundColor: navyA, borderRadius: 5 },
+    { label: 'May 18–24', data: [3.41, 50.00], backgroundColor: blueA, borderRadius: 5 }
+  ], { max: 100 }
+);
+
+// ==================== CHARTS: RO ====================
+C('chart-ro-vol', 'bar', ['Leads', 'MQL', 'SQL'],
+  [
+    { label: 'May 11–17', data: [1, 1, 1], backgroundColor: navyA, borderRadius: 5 },
+    { label: 'May 18–24', data: [3, 1, 1], backgroundColor: blueA, borderRadius: 5 }
+  ]
+);
+C('chart-ro-rates', 'bar', ['Lead → MQL', 'MQL → SQL'],
+  [
+    { label: 'May 11–17', data: [100, 100], backgroundColor: navyA, borderRadius: 5 },
+    { label: 'May 18–24', data: [33.33, 100], backgroundColor: blueA, borderRadius: 5 }
+  ], { max: 100 }
+);
+
+// ==================== CHARTS: ANZ ====================
+C('chart-anz-vol', 'bar', ['Leads', 'MQL', 'SQL'],
+  [
+    { label: 'May 11–17', data: [2, 2, 2], backgroundColor: navyA, borderRadius: 5 },
+    { label: 'May 18–24', data: [2, 2, 2], backgroundColor: blueA, borderRadius: 5 }
+  ]
+);
+C('chart-anz-rates', 'bar', ['Lead → MQL', 'MQL → SQL'],
+  [
+    { label: 'May 11–17', data: [100, 100], backgroundColor: navyA, borderRadius: 5 },
+    { label: 'May 18–24', data: [100, 100], backgroundColor: blueA, borderRadius: 5 }
+  ], { max: 100 }
+);
+</script>
+</body>
+</html>
