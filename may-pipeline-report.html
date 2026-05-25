@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pipeline Report — May 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #1F2D5C;
+    --blue: #4B9CD3;
+    --blue-light: #EBF4FB;
+    --green: #2ECC71;
+    --green-light: #E8FAF1;
+    --amber: #F39C12;
+    --amber-light: #FEF6E6;
+    --red: #E74C3C;
+    --red-light: #FDEDEC;
+    --bg: #F0F3FA;
+    --card: #FFFFFF;
+    --border: #E2E8F4;
+    --text: #1F2D5C;
+    --text-muted: #8896B3;
+    --text-light: #BCC6DA;
+    --shadow: 0 2px 12px rgba(31,45,92,0.08);
+    --shadow-md: 0 4px 24px rgba(31,45,92,0.12);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* ── Header ── */
+  .report-header {
+    background: var(--navy);
+    padding: 28px 40px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+  .report-header::after {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: rgba(75,156,211,0.12);
+  }
+  .report-header::before {
+    content: '';
+    position: absolute;
+    right: 80px; bottom: -80px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(75,156,211,0.07);
+  }
+  .header-left h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.3px;
+  }
+  .header-left p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    margin-top: 3px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 400;
+  }
+  .header-badge {
+    background: rgba(75,156,211,0.2);
+    border: 1px solid rgba(75,156,211,0.35);
+    color: #7EC8ED;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-family: 'DM Mono', monospace;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Tabs ── */
+  .tabs-wrapper {
+    background: var(--navy);
+    padding: 0 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .tabs {
+    display: flex;
+    gap: 4px;
+  }
+  .tab-btn {
+    padding: 14px 22px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.45);
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: rgba(255,255,255,0.75); }
+  .tab-btn.active {
+    color: #fff;
+    border-bottom-color: var(--blue);
+  }
+
+  /* ── Content ── */
+  .tab-panel { display: none; padding: 36px 40px 48px; }
+  .tab-panel.active { display: block; }
+
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── KPI Grid ── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 20px 20px 18px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .kpi-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .kpi-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .kpi-type {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+  }
+  .kpi-period {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: var(--text-light);
+    background: var(--bg);
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+  .kpi-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: -0.5px;
+    line-height: 1;
+    margin-bottom: 8px;
+    font-family: 'DM Mono', monospace;
+  }
+  .kpi-compare {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .kpi-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+  .kpi-delta.up   { color: #1A9E54; background: var(--green-light); }
+  .kpi-delta.down { color: #C0392B; background: var(--red-light); }
+  .kpi-delta.na   { color: var(--text-muted); background: var(--bg); }
+
+  .kpi-prev {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── Comparison Row ── */
+  .compare-block {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+  .compare-block h3 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .compare-block h3 span.dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .compare-table th {
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    background: var(--bg);
+    border-radius: 6px;
+  }
+  .compare-table th:not(:first-child) { text-align: right; }
+  .compare-table td {
+    padding: 11px 12px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--text);
+    vertical-align: middle;
+  }
+  .compare-table td:not(:first-child) { text-align: right; }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table td.label {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--navy);
+  }
+  .compare-table td.label.total {
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .badge.up   { color: #1A9E54; background: var(--green-light); }
+  .badge.down { color: #C0392B; background: var(--red-light); }
+  .badge.warn { color: #B7770A; background: var(--amber-light); }
+  .badge.na   { color: var(--text-muted); background: var(--bg); }
+
+  /* ── Chart row ── */
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+  .chart-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+  .chart-card h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .chart-card p {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+  .chart-container { position: relative; height: 200px; }
+
+  /* ── Market Cards (Key Markets tab) ── */
+  .market-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+  .market-card {
+    background: var(--card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .market-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .market-card-header {
+    padding: 16px 20px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .market-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.02em;
+  }
+  .market-tag {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.7);
+    background: rgba(255,255,255,0.12);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-family: 'DM Mono', monospace;
+  }
+  .market-card-body { padding: 16px 20px 18px; }
+  .market-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .market-row:last-child { border-bottom: none; }
+  .market-row-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .market-row-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .market-row-val {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* Market colours */
+  .m-dach .market-card-header { background: linear-gradient(135deg, #1F2D5C 0%, #2D4A8A 100%); }
+  .m-uk   .market-card-header { background: linear-gradient(135deg, #1D5B8B 0%, #2980B9 100%); }
+  .m-ro   .market-card-header { background: linear-gradient(135deg, #1A6B4A 0%, #27AE60 100%); }
+  .m-anz  .market-card-header { background: linear-gradient(135deg, #7D3C98 0%, #A569BD 100%); }
+
+  /* ── Quota Progress ── */
+  .quota-bar-wrap { margin-top: 4px; }
+  .quota-bar-track {
+    width: 100%;
+    height: 6px;
+    background: var(--bg);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+  .quota-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s ease;
+  }
+  .quota-pct {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 600;
+  }
+
+  /* ── Divider ── */
+  .spacer { height: 8px; }
+  .divider { height: 1px; background: var(--border); margin: 28px 0; }
+
+  /* ── Footer ── */
+  .report-footer {
+    padding: 16px 40px;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .report-footer p {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  @media (max-width: 700px) {
+    .report-header, .tabs-wrapper, .tab-panel, .report-footer { padding-left: 20px; padding-right: 20px; }
+    .chart-grid { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="report-header">
+  <div class="header-left">
+    <h1>Pipeline & Closed Deals Report</h1>
+    <p>All Markets · Key Markets · Period: May 1 – 24, 2026</p>
+  </div>
+  <div class="header-badge">ARR Metrics</div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs-wrapper">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('all-markets', this)">🌐 All Markets</button>
+    <button class="tab-btn" onclick="switchTab('key-markets', this)">📍 Key Markets</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 1 — ALL MARKETS
+══════════════════════════════════════ -->
+<div id="all-markets" class="tab-panel active">
+
+  <!-- WoW -->
+  <div class="section-title">Week-over-Week (WoW) · May 11–17 vs May 18–24, 2026</div>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-card-header">
+        <span class="kpi-type">Pipeline</span>
+        <span class="kpi-period">WoW</span>
+      </div>
+      <div class="kpi-value">$206.7k</div>
+      <div class="kpi-compare">
+        <span class="kpi-delta up">▲ 117.55%</span>
+        <span class="kpi-prev">vs $95.0k</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-card-header">
+        <span class="kpi-type">Closed</span>
+        <span class="kpi-period">WoW</span>
+      </div>
+      <div class="kpi-value">$12.9k</div>
+      <div class="kpi-compare">
+        <span class="kpi-delta up">▲ 93.22%</span>
+        <span class="kpi-prev">vs $6.7k</span>
+      </div>
+    </div>
+
+    <!-- MoM -->
+    <div class="kpi-card">
+      <div class="kpi-card-header">
+        <span class="kpi-type">Pipeline</span>
+        <span class="kpi-period">MoM</span>
+      </div>
+      <div class="kpi-value">$431.4k</div>
+      <div class="kpi-compare">
+        <span class="kpi-delta up">▲ 19.45%</span>
+        <span class="kpi-prev">vs $361.1k (Apr)</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-card-header">
+        <span class="kpi-type">Closed</span>
+        <span class="kpi-period">MoM</span>
+      </div>
+      <div class="kpi-value">$21.3k</div>
+      <div class="kpi-compare">
+        <span class="kpi-delta down">▼ 10.12%</span>
+        <span class="kpi-prev">vs $23.7k (Apr)</span>
+      </div>
+    </div>
+
+    <!-- YoY -->
+    <div class="kpi-card">
+      <div class="kpi-card-header">
+        <span class="kpi-type">Pipeline</span>
+        <span class="kpi-period">YoY</span>
+      </div>
+      <div class="kpi-value">$431.4k</div>
+      <div class="kpi-compare">
+        <span class="kpi-delta up">▲ 429.92%</span>
+        <span class="kpi-prev">vs $81.4k (May '25)</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-card-header">
+        <span class="kpi-type">Closed</span>
+        <span class="kpi-period">YoY</span>
+      </div>
+      <div class="kpi-value">$21.3k</div>
+      <div class="kpi-compare">
+        <span class="kpi-delta na">n/a</span>
+        <span class="kpi-prev">vs — (May '25)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="chart-grid">
+    <div class="chart-card">
+      <h3>Pipeline — WoW Comparison</h3>
+      <p>All Markets · Week of May 11–17 vs May 18–24</p>
+      <div class="chart-container">
+        <canvas id="chart-wow-pipeline"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>Pipeline — Time Frame Overview</h3>
+      <p>All Markets · MoM, YoY (May 2025 vs May 2026)</p>
+      <div class="chart-container">
+        <canvas id="chart-all-overview"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary table -->
+  <div class="section-title">Summary Table — All Periods</div>
+  <div class="compare-block">
+    <h3><span class="dot" style="background:var(--navy)"></span> All Markets — Pipeline & Closed by Period</h3>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>Period A</th>
+          <th>Period B</th>
+          <th>Change</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="label">Pipeline — WoW</td>
+          <td>$95,008</td>
+          <td>$206,690</td>
+          <td><span class="badge up">▲ 117.55%</span></td>
+        </tr>
+        <tr>
+          <td class="label">Closed — WoW</td>
+          <td>$6,672</td>
+          <td>$12,892</td>
+          <td><span class="badge up">▲ 93.22%</span></td>
+        </tr>
+        <tr>
+          <td class="label">Pipeline — MoM</td>
+          <td>$361,124 (Apr)</td>
+          <td>$431,363</td>
+          <td><span class="badge up">▲ 19.45%</span></td>
+        </tr>
+        <tr>
+          <td class="label">Closed — MoM</td>
+          <td>$23,724 (Apr)</td>
+          <td>$21,323</td>
+          <td><span class="badge down">▼ 10.12%</span></td>
+        </tr>
+        <tr>
+          <td class="label">Pipeline — YoY</td>
+          <td>$81,402 (May '25)</td>
+          <td>$431,363</td>
+          <td><span class="badge up">▲ 429.92%</span></td>
+        </tr>
+        <tr>
+          <td class="label">Closed — YoY</td>
+          <td>— (May '25)</td>
+          <td>$21,323</td>
+          <td><span class="badge na">n/a</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 2 — KEY MARKETS
+══════════════════════════════════════ -->
+<div id="key-markets" class="tab-panel">
+
+  <!-- Quota Coverage -->
+  <div class="section-title">Pipeline Quota Coverage · May 1 – 24, 2026</div>
+  <div class="compare-block">
+    <h3><span class="dot" style="background:var(--blue)"></span> Pipeline vs May Target Quota — Key Markets</h3>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Market</th>
+          <th>Pipeline (May 1–24)</th>
+          <th>May Target Quota</th>
+          <th>Coverage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="label">🇬🇧 UK</td>
+          <td>$107,850</td>
+          <td>$263,038</td>
+          <td>
+            <div class="quota-bar-wrap">
+              <span class="quota-pct" style="color:#F39C12">41.00%</span>
+              <div class="quota-bar-track"><div class="quota-bar-fill" style="width:41%;background:#F39C12;"></div></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="label">🇷🇴 RO</td>
+          <td>$185,099</td>
+          <td>$244,445</td>
+          <td>
+            <div class="quota-bar-wrap">
+              <span class="quota-pct" style="color:#F39C12">75.72%</span>
+              <div class="quota-bar-track"><div class="quota-bar-fill" style="width:75.72%;background:#F39C12;"></div></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="label">🇦🇺 ANZ</td>
+          <td>$40,700</td>
+          <td>$48,715</td>
+          <td>
+            <div class="quota-bar-wrap">
+              <span class="quota-pct" style="color:#2ECC71">83.55%</span>
+              <div class="quota-bar-track"><div class="quota-bar-fill" style="width:83.55%;background:#2ECC71;"></div></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="label">🇩🇪 DACH</td>
+          <td>$41,618</td>
+          <td>$40,817</td>
+          <td>
+            <div class="quota-bar-wrap">
+              <span class="quota-pct" style="color:#2ECC71">101.96%</span>
+              <div class="quota-bar-track"><div class="quota-bar-fill" style="width:100%;background:#2ECC71;"></div></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="label total">TOTAL</td>
+          <td><strong>$375,268</strong></td>
+          <td><strong>$597,015</strong></td>
+          <td>
+            <div class="quota-bar-wrap">
+              <span class="quota-pct" style="color:#F39C12">62.86%</span>
+              <div class="quota-bar-track"><div class="quota-bar-fill" style="width:62.86%;background:linear-gradient(90deg,#F39C12,#E74C3C);"></div></div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Quota chart -->
+  <div class="chart-grid">
+    <div class="chart-card">
+      <h3>Pipeline vs Quota by Market</h3>
+      <p>May 1–24 · Actual vs Target</p>
+      <div class="chart-container">
+        <canvas id="chart-quota"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>Coverage % by Market</h3>
+      <p>Quota attainment so far this month</p>
+      <div class="chart-container">
+        <canvas id="chart-coverage"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- WoW per market -->
+  <div class="section-title">Week-over-Week by Market · May 11–17 vs May 18–24, 2026</div>
+  <div class="market-grid">
+
+    <!-- DACH -->
+    <div class="market-card m-dach">
+      <div class="market-card-header">
+        <span class="market-name">🇩🇪 DACH</span>
+        <span class="market-tag">WoW</span>
+      </div>
+      <div class="market-card-body">
+        <div class="market-row">
+          <span class="market-row-label">Pipeline (May 11–17)</span>
+          <span class="market-row-val">$5,442</span>
+        </div>
+        <div class="market-row">
+          <span class="market-row-label">Pipeline (May 18–24)</span>
+          <span class="market-row-val">$13,675</span>
+        </div>
+        <div class="market-row">
+          <span class="market-row-label">Pipeline WoW Change</span>
+          <div class="market-row-right">
+            <span class="market-row-val">▲</span>
+            <span class="badge up">151.27%</span>
+          </div>
+        </div>
+        <div class="market-row">
+          <span class="market-row-label">Closed (May 11–17)</span>
+          <span class="market-row-val">—</span>
+        </div>
+        <div class="market-row">
+          <span class="market-row-label">Closed (May 18–24)</span>
+          <span class="market-row-val">$1,861</span>
+        </div>
+        <div class="market-row">
+          <span class="market-row-label">Closed WoW Change</span>
+          <div class="market-row-right">
+            <span class="badge na">n/a</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UK -->
+    <div class="market-card m-uk">
+      <div class="market-card-header">
+        <span class="market-name">🇬🇧 UK</span>
+        <span class="market-tag">WoW</span>
+      </div>
+      <div class="market-card-body">
+        <div class="market-row">
+          <span class="market-row-label">Pipeline (May 11–17)</span>
+          <span class="market-row-val">$5,600</span>
+        </div>
+        <div class="market-row">
+          <span class="market-row-label">Pipeline (May 18–24)</span>
+          <span class="market-row-val">$84,650</span>
+        </div>
+        <div class="market-row">
+          <span class="market-row-label">Pipeline WoW Change</span>
+          <div class="market-row-right">
+            <span class="market-row-val">▲</span>
+            <span class="badge up">1,411.61%</span>
+          </div>
+        </div>
+        <div class="market-row">
+          <span class="market-row-label">Closed (May 11–17)</span>
+          <span class="market-row-val">$1,600</span>
+        </div>
+        <div class="market-row">
+          <span class="market-row-label">Closed (May 18–24)</span>
+          <span class="market-row-val">$1,600</span>
+        </div>
+        <div class="market-row">
+          <span class="market-row-label">Closed WoW Change</span>
+          <div class="market-row-right">
+            <span class="badge na">0.00%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RO -->
+    <div class="market-card m-ro">
+      <div class="market-card-header">
+        <span class="market-name">🇷🇴 RO</span>
+        <span class="market-tag">WoW</span>
+      </div>
+      <div class="market-card-body">
+        <div class="market-row">
+          <span class="market-row-label">Pipeline (May 11–17)</span>
+          <span class="market-row-val">$33,735</span>
+        </div>
+        <div class="market-row">
+          <span class="market-row-label">Pipeline (May 18–24)</span>
+          <span class="market-row-val">$80,664</span>
+        </div>
+        <div class="market-row">
+          <span class="market-row-label">Pipeline WoW Change</span>
+          <div class="market-row-right">
+            <span class="market-row-val">▲</span>
+            <span class="badge up">139.11%</span>
+          </div>
+        </div>
+        <div class="market-row">
+          <span class="market-row-label">Closed (May 11–17)</span>
+          <span class="market-row-val">$1,872</span>
+        </div>
+        <div class="market-row">
+          <span class="market-row-label">Closed (May 18–24)</span>
+          <span class="market-row-val">—</span>
+        </div>
+        <div class="market-row">
+          <span class="market-row-label">Closed WoW Change</span>
+          <div class="market-row-right">
+            <span class="badge na">n/a</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANZ -->
+    <div class="market-card m-anz">
+      <div class="market-card-header">
+        <span class="market-name">🇦🇺 ANZ</span>
+        <span class="market-tag">WoW</span>
+      </div>
+      <div class="market-card-body">
+        <div class="market-row">
+          <span class="market-row-label">Pipeline (May 11–17)</span>
+          <span class="market-row-val">$6,100</span>
+        </div>
+        <div class="market-row">
+          <span class="market-row-label">Pipeline (May 18–24)</span>
+          <span class="market-row-val">$11,700</span>
+        </div>
+        <div class="market-row">
+          <span class="market-row-label">Pipeline WoW Change</span>
+          <div class="market-row-right">
+            <span class="market-row-val">▲</span>
+            <span class="badge up">91.80%</span>
+          </div>
+        </div>
+        <div class="market-row">
+          <span class="market-row-label">Closed (May 11–17)</span>
+          <span class="market-row-val">$3,200</span>
+        </div>
+        <div class="market-row">
+          <span class="market-row-label">Closed (May 18–24)</span>
+          <span class="market-row-val">$8,500</span>
+        </div>
+        <div class="market-row">
+          <span class="market-row-label">Closed WoW Change</span>
+          <div class="market-row-right">
+            <span class="market-row-val">▲</span>
+            <span class="badge up">165.63%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- WoW Pipeline chart per market -->
+  <div class="chart-grid">
+    <div class="chart-card">
+      <h3>Pipeline WoW by Market</h3>
+      <p>May 11–17 vs May 18–24 · per market</p>
+      <div class="chart-container">
+        <canvas id="chart-km-wow-pipeline"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>Closed WoW by Market</h3>
+      <p>May 11–17 vs May 18–24 · per market</p>
+      <div class="chart-container">
+        <canvas id="chart-km-wow-closed"></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<div class="report-footer">
+  <p>TaxDome · International Growth · May 2026 Report</p>
+  <p>Generated May 25, 2026</p>
+</div>
+
+<script>
+  /* ── Tab switching ── */
+  function switchTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  /* ── Chart defaults ── */
+  Chart.defaults.font.family = "'DM Sans', sans-serif";
+  Chart.defaults.color = '#8896B3';
+
+  const NAVY  = '#1F2D5C';
+  const BLUE  = '#4B9CD3';
+  const GREEN = '#2ECC71';
+  const AMBER = '#F39C12';
+  const RED   = '#E74C3C';
+  const PURPLE= '#9B59B6';
+
+  /* ── Chart 1: WoW Pipeline All Markets ── */
+  new Chart(document.getElementById('chart-wow-pipeline'), {
+    type: 'bar',
+    data: {
+      labels: ['May 11–17', 'May 18–24'],
+      datasets: [{
+        label: 'Pipeline',
+        data: [95008, 206690],
+        backgroundColor: [BLUE + '99', NAVY],
+        borderRadius: 8,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { grid: { color: '#E2E8F4' }, ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'k' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  /* ── Chart 2: Overview MoM/YoY Pipeline ── */
+  new Chart(document.getElementById('chart-all-overview'), {
+    type: 'bar',
+    data: {
+      labels: ['May 2025 (YoY)', 'Apr 2026 (MoM)', 'May 2026'],
+      datasets: [
+        { label: 'Pipeline', data: [81402, 361124, 431363], backgroundColor: [BLUE+'66', BLUE+'99', NAVY], borderRadius: 8, borderSkipped: false },
+        { label: 'Closed',   data: [0, 23724, 21323],       backgroundColor: [GREEN+'22', GREEN+'99', GREEN], borderRadius: 8, borderSkipped: false },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12 } } },
+      scales: {
+        y: { grid: { color: '#E2E8F4' }, ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'k' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  /* ── Chart 3: Pipeline vs Quota ── */
+  new Chart(document.getElementById('chart-quota'), {
+    type: 'bar',
+    data: {
+      labels: ['UK', 'RO', 'ANZ', 'DACH'],
+      datasets: [
+        { label: 'Pipeline', data: [107850, 185099, 40700, 41618], backgroundColor: NAVY, borderRadius: 6, borderSkipped: false },
+        { label: 'Quota',    data: [263038, 244445, 48715, 40817], backgroundColor: BLUE+'55', borderRadius: 6, borderSkipped: false },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12 } } },
+      scales: {
+        y: { grid: { color: '#E2E8F4' }, ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'k' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  /* ── Chart 4: Coverage % ── */
+  new Chart(document.getElementById('chart-coverage'), {
+    type: 'bar',
+    data: {
+      labels: ['UK', 'RO', 'ANZ', 'DACH'],
+      datasets: [{
+        label: 'Coverage %',
+        data: [41, 75.72, 83.55, 101.96],
+        backgroundColor: [AMBER, AMBER, GREEN, GREEN],
+        borderRadius: 8,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        annotation: {}
+      },
+      scales: {
+        y: {
+          max: 120,
+          grid: { color: '#E2E8F4' },
+          ticks: { callback: v => v + '%' }
+        },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  /* ── Chart 5: KM WoW Pipeline ── */
+  new Chart(document.getElementById('chart-km-wow-pipeline'), {
+    type: 'bar',
+    data: {
+      labels: ['DACH', 'UK', 'RO', 'ANZ'],
+      datasets: [
+        { label: 'May 11–17', data: [5443, 5600, 33735, 6100],  backgroundColor: BLUE+'77', borderRadius: 6, borderSkipped: false },
+        { label: 'May 18–24', data: [13675, 84650, 80664, 11700], backgroundColor: NAVY,    borderRadius: 6, borderSkipped: false },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12 } } },
+      scales: {
+        y: { grid: { color: '#E2E8F4' }, ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'k' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  /* ── Chart 6: KM WoW Closed ── */
+  new Chart(document.getElementById('chart-km-wow-closed'), {
+    type: 'bar',
+    data: {
+      labels: ['DACH', 'UK', 'RO', 'ANZ'],
+      datasets: [
+        { label: 'May 11–17', data: [0, 1600, 1872, 3200],    backgroundColor: GREEN+'77', borderRadius: 6, borderSkipped: false },
+        { label: 'May 18–24', data: [1861, 1600, 0, 8500],    backgroundColor: GREEN,     borderRadius: 6, borderSkipped: false },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12 } } },
+      scales: {
+        y: { grid: { color: '#E2E8F4' }, ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'k' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+</script>
+</body>
+</html>
