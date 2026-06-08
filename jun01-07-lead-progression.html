@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lead Progression Report — All Markets</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy: #1F2D5C;
+    --blue: #4B9CD3;
+    --green: #2ECC71;
+    --amber: #F39C12;
+    --red: #E74C3C;
+    --bg: #F4F6FB;
+    --card: #ffffff;
+    --border: #E3E8F0;
+    --text: #1a2340;
+    --muted: #6b7a99;
+    --tan: #F9F5EE;
+    --tan-border: #E8DFD0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 32px 28px 48px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 36px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .header-left {}
+  .report-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 6px;
+  }
+  .report-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.2;
+  }
+  .report-period {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .header-badge {
+    background: var(--navy);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 20px;
+    white-space: nowrap;
+    margin-top: 4px;
+  }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 32px 0 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── KPI GRID ── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 20px 18px;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--blue);
+    border-radius: 12px 12px 0 0;
+  }
+  .kpi-card.green-bar::before { background: var(--green); }
+  .kpi-card.amber-bar::before { background: var(--amber); }
+  .kpi-card.red-bar::before   { background: var(--red); }
+
+  .kpi-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .kpi-value {
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1;
+    margin-bottom: 8px;
+    font-family: 'DM Mono', monospace;
+  }
+  .kpi-delta {
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .kpi-delta.pos { color: var(--green); }
+  .kpi-delta.neg { color: var(--red); }
+  .kpi-delta.neu { color: var(--amber); }
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  /* ── COMPARISON TABLE ── */
+  .table-wrap {
+    background: var(--card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .table-title {
+    padding: 14px 20px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--navy);
+    background: #f8faff;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .table-title .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--blue);
+    display: inline-block;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  thead th {
+    padding: 10px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: #fafbff;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+  }
+  thead th:first-child { text-align: left; }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f6f8ff; }
+  tbody tr.rate-row { background: #f9fafe; }
+  tbody td {
+    padding: 10px 16px;
+    font-size: 13px;
+    text-align: right;
+    font-family: 'DM Mono', monospace;
+    color: var(--text);
+  }
+  tbody td:first-child {
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    color: var(--navy);
+    font-size: 13px;
+  }
+  .rate-row td:first-child {
+    color: var(--muted);
+    font-weight: 400;
+    font-size: 12px;
+    padding-left: 28px;
+  }
+
+  .change-pos { color: var(--green); font-weight: 600; }
+  .change-neg { color: var(--red);   font-weight: 600; }
+  .change-na  { color: var(--muted); font-weight: 500; font-style: italic; }
+  .val-red    { color: var(--red);   font-weight: 600; }
+
+  /* ── TABLES GRID ── */
+  .tables-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  @media (max-width: 700px) {
+    .tables-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── CHART CARD ── */
+  .chart-card {
+    background: var(--card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 20px;
+    margin-bottom: 8px;
+  }
+  .chart-card-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .chart-card-title .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); display: inline-block; }
+  .chart-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  @media (max-width: 700px) { .chart-row { grid-template-columns: 1fr; } }
+
+  /* ── DISCLAIMER ── */
+  .disclaimer {
+    background: var(--tan);
+    border: 1px solid var(--tan-border);
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-top: 36px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .disclaimer-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .disclaimer-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8a7450;
+    margin-bottom: 5px;
+  }
+  .disclaimer-text {
+    font-size: 13px;
+    color: #6b5a3e;
+    line-height: 1.6;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 28px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="report-eyebrow">TaxDome · International Growth</div>
+    <div class="report-title">Lead Progression Report<br>— All Markets</div>
+    <div class="report-period">Reporting period: Jun 01–07, 2026 &nbsp;·&nbsp; Generated Jun 08, 2026</div>
+  </div>
+  <div class="header-badge">Weekly Snapshot</div>
+</div>
+
+<!-- TOP KPI STRIP -->
+<div class="section-label">Current week at a glance — Jun 01–07, 2026</div>
+<div class="kpi-grid">
+  <div class="kpi-card green-bar">
+    <div class="kpi-label">Leads</div>
+    <div class="kpi-value">198</div>
+    <div class="kpi-delta pos">▲ 110.64% WoW</div>
+    <div class="kpi-sub">vs 94 prev. week</div>
+  </div>
+  <div class="kpi-card green-bar">
+    <div class="kpi-label">MQL</div>
+    <div class="kpi-value">39</div>
+    <div class="kpi-delta pos">▲ 11.43% WoW</div>
+    <div class="kpi-sub">vs 35 prev. week</div>
+  </div>
+  <div class="kpi-card green-bar">
+    <div class="kpi-label">SQL</div>
+    <div class="kpi-value">20</div>
+    <div class="kpi-delta pos">▲ 5.26% WoW</div>
+    <div class="kpi-sub">vs 19 prev. week</div>
+  </div>
+  <div class="kpi-card red-bar">
+    <div class="kpi-label">Lead → MQL Rate</div>
+    <div class="kpi-value">19.70%</div>
+    <div class="kpi-delta neg">▼ 17.54% WoW</div>
+    <div class="kpi-sub">vs 37.23% prev. week</div>
+  </div>
+  <div class="kpi-card red-bar">
+    <div class="kpi-label">MQL → SQL Rate</div>
+    <div class="kpi-value">51.28%</div>
+    <div class="kpi-delta neg">▼ 3.00% WoW</div>
+    <div class="kpi-sub">vs 54.29% prev. week</div>
+  </div>
+</div>
+
+<!-- COMPARISON TABLES -->
+<div class="section-label">Period comparisons</div>
+<div class="tables-grid">
+
+  <!-- MoM TABLE -->
+  <div class="table-wrap">
+    <div class="table-title"><span class="dot"></span> Month-over-Month &nbsp;<span style="color:var(--muted);font-weight:400;font-size:11px;">May 01–07 vs Jun 01–07, 2026</span></div>
+    <table>
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>May 01–07</th>
+          <th>Jun 01–07</th>
+          <th>MoM Δ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Leads</td>
+          <td>32</td>
+          <td>198</td>
+          <td class="change-pos">▲ 518.75%</td>
+        </tr>
+        <tr>
+          <td>MQL</td>
+          <td>15</td>
+          <td>39</td>
+          <td class="change-pos">▲ 160.00%</td>
+        </tr>
+        <tr>
+          <td>SQL</td>
+          <td>13</td>
+          <td>20</td>
+          <td class="change-pos">▲ 53.85%</td>
+        </tr>
+        <tr class="rate-row">
+          <td>Lead / MQL</td>
+          <td>46.88%</td>
+          <td>19.70%</td>
+          <td class="change-neg">▼ 27.18%</td>
+        </tr>
+        <tr class="rate-row">
+          <td>MQL / SQL</td>
+          <td>86.67%</td>
+          <td>51.28%</td>
+          <td class="change-neg">▼ 35.38%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- YoY TABLE -->
+  <div class="table-wrap">
+    <div class="table-title"><span class="dot" style="background:var(--amber)"></span> Year-over-Year &nbsp;<span style="color:var(--muted);font-weight:400;font-size:11px;">Jun 01–07, 2025 vs 2026</span></div>
+    <table>
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>Jun 01–07 '25</th>
+          <th>Jun 01–07 '26</th>
+          <th>YoY Δ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Leads</td>
+          <td class="val-red">428</td>
+          <td>198</td>
+          <td class="change-neg">▼ 53.74%</td>
+        </tr>
+        <tr>
+          <td>MQL</td>
+          <td>24</td>
+          <td>39</td>
+          <td class="change-pos">▲ 62.50%</td>
+        </tr>
+        <tr>
+          <td>SQL</td>
+          <td>0</td>
+          <td>20</td>
+          <td class="change-na">n/a</td>
+        </tr>
+        <tr class="rate-row">
+          <td>Lead / MQL</td>
+          <td>5.61%</td>
+          <td>19.70%</td>
+          <td class="change-pos">▲ 14.09%</td>
+        </tr>
+        <tr class="rate-row">
+          <td>MQL / SQL</td>
+          <td>0.00%</td>
+          <td>51.28%</td>
+          <td class="change-pos">▲ 51.28%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- WoW TABLE (full width) -->
+<div class="table-wrap">
+  <div class="table-title"><span class="dot" style="background:var(--green)"></span> Week-over-Week &nbsp;<span style="color:var(--muted);font-weight:400;font-size:11px;">May 25–31 vs Jun 01–07, 2026</span></div>
+  <table>
+    <thead>
+      <tr>
+        <th>Metric</th>
+        <th>May 25–31, 2026</th>
+        <th>Jun 01–07, 2026</th>
+        <th>WoW Δ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Leads</td>
+        <td>94</td>
+        <td>198</td>
+        <td class="change-pos">▲ 110.64%</td>
+      </tr>
+      <tr>
+        <td>MQL</td>
+        <td>35</td>
+        <td>39</td>
+        <td class="change-pos">▲ 11.43%</td>
+      </tr>
+      <tr>
+        <td>SQL</td>
+        <td>19</td>
+        <td>20</td>
+        <td class="change-pos">▲ 5.26%</td>
+      </tr>
+      <tr class="rate-row">
+        <td>Lead / MQL</td>
+        <td>37.23%</td>
+        <td>19.70%</td>
+        <td class="change-neg">▼ 17.54%</td>
+      </tr>
+      <tr class="rate-row">
+        <td>MQL / SQL</td>
+        <td>54.29%</td>
+        <td>51.28%</td>
+        <td class="change-neg">▼ 3.00%</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CHARTS -->
+<div class="section-label">Visual breakdown</div>
+<div class="chart-row">
+  <div class="chart-card">
+    <div class="chart-card-title"><span class="dot"></span> Volume MoM</div>
+    <canvas id="chartMoM" height="180"></canvas>
+  </div>
+  <div class="chart-card">
+    <div class="chart-card-title"><span class="dot" style="background:var(--amber)"></span> Volume YoY</div>
+    <canvas id="chartYoY" height="180"></canvas>
+  </div>
+  <div class="chart-card">
+    <div class="chart-card-title"><span class="dot" style="background:var(--green)"></span> Volume WoW</div>
+    <canvas id="chartWoW" height="180"></canvas>
+  </div>
+</div>
+
+<!-- CONVERSION RATES CHART -->
+<div class="chart-card">
+  <div class="chart-card-title"><span class="dot" style="background:var(--amber)"></span> Conversion Rates across periods</div>
+  <canvas id="chartRates" height="100"></canvas>
+</div>
+
+<!-- DISCLAIMER -->
+<div class="disclaimer">
+  <div class="disclaimer-icon">📋</div>
+  <div>
+    <div class="disclaimer-title">Data Notice — Key Markets Report</div>
+    <div class="disclaimer-text">
+      The Key Markets lead progression data is not included in this report due to a data issue. We will provide the full Key Markets breakdown once the data is available.
+    </div>
+  </div>
+</div>
+
+<div class="footer">Lead Progression Report · All Markets · Jun 01–07, 2026 · TaxDome International Growth</div>
+
+<script>
+const navy = '#1F2D5C', blue = '#4B9CD3', green = '#2ECC71', amber = '#F39C12', red = '#E74C3C';
+
+// MoM Volume
+new Chart(document.getElementById('chartMoM'), {
+  type: 'bar',
+  data: {
+    labels: ['Leads', 'MQL', 'SQL'],
+    datasets: [
+      { label: 'May 01–07', data: [32, 15, 13], backgroundColor: navy + 'cc', borderRadius: 6 },
+      { label: 'Jun 01–07', data: [198, 39, 20], backgroundColor: blue, borderRadius: 6 }
+    ]
+  },
+  options: {
+    plugins: { legend: { labels: { font: { family: 'DM Sans', size: 11 }, color: '#6b7a99' } } },
+    scales: {
+      x: { ticks: { font: { family: 'DM Sans', size: 11 }, color: '#6b7a99' }, grid: { display: false } },
+      y: { ticks: { font: { family: 'DM Mono', size: 10 }, color: '#6b7a99' }, grid: { color: '#f0f2f8' } }
+    }
+  }
+});
+
+// YoY Volume
+new Chart(document.getElementById('chartYoY'), {
+  type: 'bar',
+  data: {
+    labels: ['Leads', 'MQL', 'SQL'],
+    datasets: [
+      { label: 'Jun 01–07, 2025', data: [428, 24, 0], backgroundColor: amber + 'cc', borderRadius: 6 },
+      { label: 'Jun 01–07, 2026', data: [198, 39, 20], backgroundColor: blue, borderRadius: 6 }
+    ]
+  },
+  options: {
+    plugins: { legend: { labels: { font: { family: 'DM Sans', size: 11 }, color: '#6b7a99' } } },
+    scales: {
+      x: { ticks: { font: { family: 'DM Sans', size: 11 }, color: '#6b7a99' }, grid: { display: false } },
+      y: { ticks: { font: { family: 'DM Mono', size: 10 }, color: '#6b7a99' }, grid: { color: '#f0f2f8' } }
+    }
+  }
+});
+
+// WoW Volume
+new Chart(document.getElementById('chartWoW'), {
+  type: 'bar',
+  data: {
+    labels: ['Leads', 'MQL', 'SQL'],
+    datasets: [
+      { label: 'May 25–31', data: [94, 35, 19], backgroundColor: navy + 'cc', borderRadius: 6 },
+      { label: 'Jun 01–07', data: [198, 39, 20], backgroundColor: green, borderRadius: 6 }
+    ]
+  },
+  options: {
+    plugins: { legend: { labels: { font: { family: 'DM Sans', size: 11 }, color: '#6b7a99' } } },
+    scales: {
+      x: { ticks: { font: { family: 'DM Sans', size: 11 }, color: '#6b7a99' }, grid: { display: false } },
+      y: { ticks: { font: { family: 'DM Mono', size: 10 }, color: '#6b7a99' }, grid: { color: '#f0f2f8' } }
+    }
+  }
+});
+
+// Conversion Rates
+new Chart(document.getElementById('chartRates'), {
+  type: 'bar',
+  data: {
+    labels: ['Lead/MQL — May 01–07', 'Lead/MQL — May 25–31', 'Lead/MQL — Jun 01–07 (MoM)', 'Lead/MQL — Jun 01–07 (WoW)', 'MQL/SQL — May 01–07', 'MQL/SQL — May 25–31', 'MQL/SQL — Jun 01–07 (MoM)', 'MQL/SQL — Jun 01–07 (WoW)'],
+    datasets: [{
+      label: 'Conversion Rate (%)',
+      data: [46.88, 37.23, 19.70, 19.70, 86.67, 54.29, 51.28, 51.28],
+      backgroundColor: [blue, blue+'99', red, red+'99', amber, amber+'99', navy, navy+'99'],
+      borderRadius: 6
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: {
+      x: {
+        ticks: { callback: v => v + '%', font: { family: 'DM Mono', size: 10 }, color: '#6b7a99' },
+        grid: { color: '#f0f2f8' },
+        max: 100
+      },
+      y: { ticks: { font: { family: 'DM Sans', size: 11 }, color: '#6b7a99' }, grid: { display: false } }
+    }
+  }
+});
+</script>
+</body>
+</html>
