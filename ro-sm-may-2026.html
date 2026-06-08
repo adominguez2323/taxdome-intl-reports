@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Romania Social Media Performance — May 2026 Spotlight</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy: #1F2D5C;
+    --blue: #4B9CD3;
+    --green: #2ECC71;
+    --amber: #F39C12;
+    --red: #E74C3C;
+    --bg: #F4F6FB;
+    --surface: #ffffff;
+    --border: #E2E8F0;
+    --text: #1a2340;
+    --muted: #7a87a8;
+    --highlight: #E8F0FE;
+    --may: #1F2D5C;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 32px 28px 48px;
+    min-width: 720px;
+  }
+
+  /* ─── Header ──────────────────────────────── */
+  .report-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid var(--navy);
+  }
+
+  .report-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: -0.3px;
+  }
+
+  .report-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .period-badge {
+    background: var(--navy);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin-top: 4px;
+  }
+
+  /* ─── May Spotlight banner ─────────────────── */
+  .spotlight-banner {
+    background: linear-gradient(135deg, #1F2D5C 0%, #2a4080 60%, #3a5aaa 100%);
+    color: #fff;
+    border-radius: 14px;
+    padding: 22px 28px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .spotlight-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+
+  .spotlight-text strong {
+    font-size: 15px;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  .spotlight-text span {
+    font-size: 13px;
+    opacity: 0.8;
+  }
+
+  /* ─── Section title ───────────────────────── */
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 14px;
+    margin-top: 32px;
+  }
+
+  /* ─── KPI grid ────────────────────────────── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+
+  .kpi-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 18px 16px 16px;
+    box-shadow: 0 1px 4px rgba(31,45,92,0.07);
+    border: 1.5px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow 0.15s;
+  }
+
+  .kpi-card.highlight {
+    border-color: var(--navy);
+    background: linear-gradient(160deg, #f0f4ff 0%, #ffffff 100%);
+    box-shadow: 0 2px 12px rgba(31,45,92,0.13);
+  }
+
+  .kpi-card.highlight::before {
+    content: '★ May';
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--navy);
+    opacity: 0.55;
+    letter-spacing: 0.04em;
+  }
+
+  .kpi-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .kpi-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .kpi-delta {
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .kpi-delta.up { color: var(--green); }
+  .kpi-delta.down { color: var(--red); }
+  .kpi-delta.neutral { color: var(--amber); }
+
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* ─── Charts grid ─────────────────────────── */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  .chart-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 4px rgba(31,45,92,0.07);
+    border: 1.5px solid var(--border);
+  }
+
+  .chart-card.full {
+    grid-column: 1 / -1;
+  }
+
+  .chart-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+
+  .chart-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .chart-wrap {
+    position: relative;
+    height: 200px;
+  }
+
+  .chart-wrap.tall {
+    height: 240px;
+  }
+
+  /* ─── Traffic breakdown table ─────────────── */
+  .traffic-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  .traffic-table th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .traffic-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    color: var(--text);
+  }
+
+  .traffic-table tr:last-child td { border-bottom: none; }
+
+  .traffic-table td.may-col {
+    font-weight: 700;
+    color: var(--navy);
+    background: #f0f4ff;
+  }
+
+  .traffic-table th.may-col {
+    background: #e8eeff;
+    color: var(--navy);
+  }
+
+  .traffic-table td.partial {
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* ─── ER cards side by side ───────────────── */
+  .er-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 8px;
+  }
+
+  .er-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 18px;
+    border: 1.5px solid var(--border);
+    box-shadow: 0 1px 4px rgba(31,45,92,0.06);
+  }
+
+  .er-platform {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .er-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+
+  .er-note {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ─── Footer ──────────────────────────────── */
+  .report-footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .june-note {
+    background: #fffbea;
+    border: 1px solid #f0d060;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #7a5c00;
+    margin-top: 16px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="report-header">
+  <div>
+    <div class="report-title">Romania — Social Media Performance</div>
+    <div class="report-subtitle">Facebook &amp; LinkedIn Organic · Jan–Jun 2026 · <strong>May Spotlight</strong></div>
+  </div>
+  <div class="period-badge">Jan – Jun 2026</div>
+</div>
+
+<!-- Spotlight banner -->
+<div class="spotlight-banner">
+  <div class="spotlight-icon">📌</div>
+  <div class="spotlight-text">
+    <strong>Presenting: May 2026</strong>
+    <span>May was our strongest month across reach, views, and LP traffic. June data is partial (MTD) and shown for context only.</span>
+  </div>
+</div>
+
+<!-- KPI Section -->
+<div class="section-title">May 2026 — Key Metrics</div>
+<div class="kpi-grid">
+
+  <div class="kpi-card highlight">
+    <div class="kpi-label">LinkedIn Impressions</div>
+    <div class="kpi-value">1,951</div>
+    <div class="kpi-delta up">▲ 42% vs Apr</div>
+    <div class="kpi-sub">Apr: 1,369</div>
+  </div>
+
+  <div class="kpi-card highlight">
+    <div class="kpi-label">Facebook Reach</div>
+    <div class="kpi-value">5,067</div>
+    <div class="kpi-delta down">▼ 41% vs Apr</div>
+    <div class="kpi-sub">Apr peak: 8,568</div>
+  </div>
+
+  <div class="kpi-card highlight">
+    <div class="kpi-label">Facebook Views</div>
+    <div class="kpi-value">9,258</div>
+    <div class="kpi-delta down">▼ 11% vs Apr</div>
+    <div class="kpi-sub">Apr: 10,448 — near-peak</div>
+  </div>
+
+  <div class="kpi-card highlight">
+    <div class="kpi-label">LP Clicks from RO SM</div>
+    <div class="kpi-value">121</div>
+    <div class="kpi-delta down">▼ 18% vs Apr</div>
+    <div class="kpi-sub">Apr: 147</div>
+  </div>
+
+  <div class="kpi-card highlight">
+    <div class="kpi-label">WIA (from SM)</div>
+    <div class="kpi-value">73</div>
+    <div class="kpi-delta down">▼ 25% vs Apr</div>
+    <div class="kpi-sub">Mar: 149 · Apr: 97</div>
+  </div>
+
+  <div class="kpi-card highlight">
+    <div class="kpi-label">Shares / Reposts</div>
+    <div class="kpi-value">17</div>
+    <div class="kpi-delta down">▼ 50% vs Apr</div>
+    <div class="kpi-sub">Apr: 34 (best)</div>
+  </div>
+
+</div>
+
+<!-- Charts -->
+<div class="section-title">Reach &amp; Visibility Trends</div>
+<div class="charts-grid">
+
+  <div class="chart-card">
+    <div class="chart-title">LinkedIn Organic Impressions</div>
+    <div class="chart-sub">Jan–Jun 2026 · May highlighted</div>
+    <div class="chart-wrap">
+      <canvas id="liChart"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Facebook Organic Reach</div>
+    <div class="chart-sub">Jan–Jun 2026 · May highlighted</div>
+    <div class="chart-wrap">
+      <canvas id="fbReachChart"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-card full">
+    <div class="chart-title">Facebook Organic Views</div>
+    <div class="chart-sub">Jan–Jun 2026 · Area trend</div>
+    <div class="chart-wrap tall">
+      <canvas id="fbViewsChart"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<!-- LP Traffic section -->
+<div class="section-title">Organic Traffic to Landing Page from RO Social Media</div>
+
+<div class="charts-grid">
+  <div class="chart-card">
+    <div class="chart-title">Total LP Clicks from RO SM</div>
+    <div class="chart-sub">Mar–Jun 2026 (tracking started Mar)</div>
+    <div class="chart-wrap">
+      <canvas id="lpChart"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">LP Traffic Breakdown — May 2026</div>
+    <div class="chart-sub">Facebook vs LinkedIn source split</div>
+    <div class="chart-wrap">
+      <canvas id="lpBreakdownChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- WIA -->
+<div class="section-title">WIA from Total Social Media</div>
+<div class="charts-grid">
+  <div class="chart-card full">
+    <div class="chart-title">WIA (Website Initiated Actions) from Social Media</div>
+    <div class="chart-sub">Mar–Jun 2026 · Conversion signal</div>
+    <div class="chart-wrap">
+      <canvas id="wiaChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Engagement Rate -->
+<div class="section-title">Engagement Rates (Organic)</div>
+<div class="er-row">
+  <div class="er-card">
+    <div class="er-platform">LinkedIn ER</div>
+    <div class="er-value">4.82%</div>
+    <div class="kpi-delta down" style="font-size:13px;margin-bottom:8px;">▼ vs Apr (5.11%)</div>
+    <div class="er-note">Steady range 4.29%–5.41% across Jan–Jun. Jun MTD: 5.41% — highest so far.</div>
+  </div>
+  <div class="er-card">
+    <div class="er-platform">Facebook ER</div>
+    <div class="er-value">2.43%</div>
+    <div class="kpi-delta up" style="font-size:13px;margin-bottom:8px;">▲ vs Apr (1.62%)</div>
+    <div class="er-note">Recovery after Apr dip. Jan–Mar range 5.91%–9.29%. Jun MTD: 2.76%.</div>
+  </div>
+</div>
+
+<!-- Traffic detail table -->
+<div class="section-title">LP Traffic Detail — All Tracked Months</div>
+<div class="chart-card" style="margin-top:8px;padding:20px;">
+  <table class="traffic-table">
+    <thead>
+      <tr>
+        <th>Source</th>
+        <th>Mar-2026</th>
+        <th>Apr-2026</th>
+        <th class="may-col">May-2026 ★</th>
+        <th>Jun-2026 (MTD)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Total LP from RO SM</strong></td>
+        <td>225</td>
+        <td>147</td>
+        <td class="may-col">121</td>
+        <td class="partial">51 ↓</td>
+      </tr>
+      <tr>
+        <td>LP from Facebook</td>
+        <td>180</td>
+        <td>129</td>
+        <td class="may-col">97</td>
+        <td class="partial">37</td>
+      </tr>
+      <tr>
+        <td>LP from LinkedIn</td>
+        <td>39</td>
+        <td>17</td>
+        <td class="may-col">17</td>
+        <td class="partial">—</td>
+      </tr>
+      <tr>
+        <td><strong>WIA from SM</strong></td>
+        <td>149</td>
+        <td>97</td>
+        <td class="may-col">73</td>
+        <td class="partial">44%*</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="june-note">⚠️ June data is MTD (partial month). Some Jun cells show percentages due to a source sheet formatting issue — interpret with caution. Do not compare Jun directly to prior full months.</div>
+</div>
+
+<!-- Footer -->
+<div class="report-footer">
+  <span>Romania Social Media · TaxDome International Growth</span>
+  <span>Data: Jan–Jun 2026 · LP tracking started Mar 2026 · Prepared Jun 2026</span>
+</div>
+
+<script>
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun'];
+const MAY_IDX = 4;
+
+const barColors = (data) => data.map((_, i) =>
+  i === MAY_IDX ? '#1F2D5C' : i === 5 ? '#b0bcd4' : '#4B9CD3'
+);
+const barBorder = (data) => data.map((_, i) =>
+  i === MAY_IDX ? '#1F2D5C' : i === 5 ? '#9aabcc' : '#3a8bbf'
+);
+
+// LinkedIn Impressions
+new Chart(document.getElementById('liChart'), {
+  type: 'bar',
+  data: {
+    labels: MONTHS,
+    datasets: [{
+      data: [917, 848, 3814, 1369, 1951, 314],
+      backgroundColor: barColors([917, 848, 3814, 1369, 1951, 314]),
+      borderColor: barBorder([917, 848, 3814, 1369, 1951, 314]),
+      borderWidth: 1.5,
+      borderRadius: 5,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.parsed.y.toLocaleString() } } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { family: 'DM Sans', size: 11 }, color: '#7a87a8' } },
+      y: { grid: { color: '#eef0f4' }, ticks: { font: { family: 'DM Sans', size: 11 }, color: '#7a87a8' } }
+    }
+  }
+});
+
+// FB Reach
+new Chart(document.getElementById('fbReachChart'), {
+  type: 'bar',
+  data: {
+    labels: MONTHS,
+    datasets: [{
+      data: [558, 140, 2430, 8568, 5067, 1953],
+      backgroundColor: barColors([558, 140, 2430, 8568, 5067, 1953]),
+      borderColor: barBorder([558, 140, 2430, 8568, 5067, 1953]),
+      borderWidth: 1.5,
+      borderRadius: 5,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.parsed.y.toLocaleString() } } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { family: 'DM Sans', size: 11 }, color: '#7a87a8' } },
+      y: { grid: { color: '#eef0f4' }, ticks: { font: { family: 'DM Sans', size: 11 }, color: '#7a87a8' } }
+    }
+  }
+});
+
+// FB Views area
+new Chart(document.getElementById('fbViewsChart'), {
+  type: 'line',
+  data: {
+    labels: MONTHS,
+    datasets: [{
+      data: [2283, 1098, 6791, 10448, 9258, 4881],
+      borderColor: '#1F2D5C',
+      backgroundColor: 'rgba(31,45,92,0.08)',
+      pointBackgroundColor: MONTHS.map((_, i) => i === MAY_IDX ? '#1F2D5C' : '#4B9CD3'),
+      pointRadius: MONTHS.map((_, i) => i === MAY_IDX ? 7 : 4),
+      pointBorderWidth: 2,
+      pointBorderColor: '#fff',
+      fill: true,
+      tension: 0.35,
+      borderWidth: 2.5,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.parsed.y.toLocaleString() } } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { family: 'DM Sans', size: 11 }, color: '#7a87a8' } },
+      y: { grid: { color: '#eef0f4' }, ticks: { font: { family: 'DM Sans', size: 11 }, color: '#7a87a8' } }
+    }
+  }
+});
+
+// LP clicks
+const LP_MONTHS = ['Mar','Apr','May','Jun (MTD)'];
+new Chart(document.getElementById('lpChart'), {
+  type: 'bar',
+  data: {
+    labels: LP_MONTHS,
+    datasets: [{
+      data: [225, 147, 121, 51],
+      backgroundColor: ['#4B9CD3','#4B9CD3','#1F2D5C','#b0bcd4'],
+      borderColor: ['#3a8bbf','#3a8bbf','#1F2D5C','#9aabcc'],
+      borderWidth: 1.5,
+      borderRadius: 5,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.parsed.y + ' clicks' } } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { family: 'DM Sans', size: 11 }, color: '#7a87a8' } },
+      y: { grid: { color: '#eef0f4' }, ticks: { font: { family: 'DM Sans', size: 11 }, color: '#7a87a8' } }
+    }
+  }
+});
+
+// LP breakdown donut — May only
+new Chart(document.getElementById('lpBreakdownChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Facebook (97)', 'LinkedIn (17)', 'Other (7)'],
+    datasets: [{
+      data: [97, 17, 7],
+      backgroundColor: ['#1F2D5C','#4B9CD3','#b0bcd4'],
+      borderColor: ['#fff','#fff','#fff'],
+      borderWidth: 3,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: '62%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { font: { family: 'DM Sans', size: 11 }, color: '#7a87a8', padding: 14, boxWidth: 12 }
+      },
+      tooltip: { callbacks: { label: ctx => ' ' + ctx.label } }
+    }
+  }
+});
+
+// WIA chart
+const WIA_MONTHS = ['Mar','Apr','May','Jun (MTD)'];
+new Chart(document.getElementById('wiaChart'), {
+  type: 'line',
+  data: {
+    labels: WIA_MONTHS,
+    datasets: [{
+      label: 'WIA',
+      data: [149, 97, 73, null],
+      borderColor: '#2ECC71',
+      backgroundColor: 'rgba(46,204,113,0.07)',
+      pointBackgroundColor: ['#4B9CD3','#4B9CD3','#1F2D5C','#b0bcd4'],
+      pointRadius: [5, 5, 8, 5],
+      pointBorderWidth: 2,
+      pointBorderColor: '#fff',
+      fill: true,
+      tension: 0.3,
+      borderWidth: 2.5,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + (ctx.parsed.y ?? 'partial') + ' WIA' } } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { family: 'DM Sans', size: 11 }, color: '#7a87a8' } },
+      y: { grid: { color: '#eef0f4' }, ticks: { font: { family: 'DM Sans', size: 11 }, color: '#7a87a8' } }
+    }
+  }
+});
+</script>
+</body>
+</html>
