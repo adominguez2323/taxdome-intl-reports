@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Key Markets — Lead Progression · June 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #F8F9FA;
+      color: #1F2D5C;
+      padding: 28px 32px;
+    }
+
+    /* ── Report header ── */
+    .report-header {
+      background: linear-gradient(135deg, #1F2D5C 0%, #2d4080 100%);
+      color: white;
+      padding: 28px 32px;
+      border-radius: 14px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+    .report-header h1 { font-size: 22px; font-weight: 700; }
+    .report-header p  { font-size: 13px; opacity: 0.70; margin-top: 6px; line-height: 1.6; }
+    .report-badge {
+      background: rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* ── Tabs ── */
+    .tab-nav {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 28px;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 0;
+    }
+    .tab-btn {
+      padding: 10px 22px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #999;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      cursor: pointer;
+      border-radius: 6px 6px 0 0;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab-btn:hover { color: #4B9CD3; }
+    .tab-btn.active { color: #1F2D5C; border-bottom-color: #4B9CD3; background: #fff; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Section headings ── */
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1F2D5C;
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #4B9CD3;
+    }
+    .subsection-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #999;
+      margin-bottom: 12px;
+      margin-top: 28px;
+    }
+    .subsection-label:first-of-type { margin-top: 0; }
+
+    /* ── KPI cards ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .kpi-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px 12px 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      text-align: center;
+    }
+    .kpi-label  { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .kpi-value  { font-size: 26px; font-weight: 700; color: #1F2D5C; line-height: 1.1; }
+    .kpi-prev   {
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 4px;
+      background: #F8F9FA;
+      border-radius: 5px;
+      padding: 3px 6px;
+      display: inline-block;
+    }
+    .kpi-prev strong { color: #666; font-weight: 600; }
+    .kpi-delta  { font-size: 12px; font-weight: 700; margin-top: 7px; }
+    .positive   { color: #2ECC71; }
+    .negative   { color: #E74C3C; }
+    .neutral    { color: #F39C12; }
+
+    /* ── Chart layout ── */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 20px;
+      margin-bottom: 8px;
+    }
+    .chart-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px 20px 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .chart-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1F2D5C;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .chart-container { position: relative; height: 210px; }
+
+    /* ── Market grid (Tab 2) ── */
+    .market-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .market-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .market-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      padding-bottom: 9px;
+      border-bottom: 3px solid;
+    }
+    .market-title.dach { color: #1F2D5C; border-color: #1F2D5C; }
+    .market-title.ro   { color: #4B9CD3; border-color: #4B9CD3; }
+    .market-title.uk   { color: #7B61FF; border-color: #7B61FF; }
+    .market-title.anz  { color: #2ECC71; border-color: #2ECC71; }
+
+    .mini-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .mini-kpi {
+      background: #F8F9FA;
+      border-radius: 8px;
+      padding: 10px 8px;
+      text-align: center;
+    }
+    .mini-kpi-label { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+    .mini-kpi-value { font-size: 20px; font-weight: 700; color: #1F2D5C; }
+    .mini-kpi-prev  { font-size: 10px; color: #bbb; margin-top: 2px; }
+    .mini-kpi-prev strong { color: #888; font-weight: 600; }
+    .mini-kpi-delta { font-size: 11px; font-weight: 700; margin-top: 2px; }
+
+    .mini-chart-container { position: relative; height: 130px; margin-bottom: 12px; }
+
+    .conversion-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .conv-card {
+      background: #F8F9FA;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+    .conv-label { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+    .conv-value { font-size: 17px; font-weight: 700; color: #1F2D5C; }
+    .conv-prev  { font-size: 10px; color: #bbb; margin-top: 2px; }
+    .conv-prev strong { color: #888; font-weight: 600; }
+    .conv-delta { font-size: 11px; font-weight: 700; margin-top: 2px; }
+
+    /* ── Footer note ── */
+    .footnote {
+      font-size: 11px;
+      color: #bbb;
+      margin-top: 32px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ REPORT HEADER ══ -->
+<div class="report-header">
+  <div>
+    <h1>Key Markets — Lead Progression</h1>
+    <p>
+      International Growth · June 2026<br>
+      MoM: May 01–21 vs Jun 01–21 &nbsp;·&nbsp; WoW: Jun 08–14 vs Jun 15–21
+    </p>
+  </div>
+  <div class="report-badge">Key Markets: DACH · RO · UK · ANZ</div>
+</div>
+
+<!-- ══ TABS ══ -->
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('tab1', this)">📊 All Key Markets</button>
+  <button class="tab-btn" onclick="switchTab('tab2', this)">🌍 Market Detail (WoW)</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- TAB 1 — ALL KEY MARKETS                            -->
+<!-- ══════════════════════════════════════════════════ -->
+<div id="tab1" class="tab-panel active">
+
+  <!-- MoM KPIs -->
+  <div class="subsection-label">Month-over-Month &nbsp;·&nbsp; May 01–21 → Jun 01–21</div>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Leads</div>
+      <div class="kpi-value">631</div>
+      <div class="kpi-prev">was <strong>268</strong> in May</div>
+      <div class="kpi-delta positive">▲ 135.45% MoM</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">MQL</div>
+      <div class="kpi-value">287</div>
+      <div class="kpi-prev">was <strong>105</strong> in May</div>
+      <div class="kpi-delta positive">▲ 173.33% MoM</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">SQL</div>
+      <div class="kpi-value">54</div>
+      <div class="kpi-prev">was <strong>62</strong> in May</div>
+      <div class="kpi-delta negative">▼ 12.90% MoM</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Lead → MQL</div>
+      <div class="kpi-value">45.48%</div>
+      <div class="kpi-prev">was <strong>39.18%</strong> in May</div>
+      <div class="kpi-delta positive">▲ 6.30pp MoM</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">MQL → SQL</div>
+      <div class="kpi-value">18.82%</div>
+      <div class="kpi-prev">was <strong>59.05%</strong> in May</div>
+      <div class="kpi-delta negative">▼ 40.23pp MoM</div>
+    </div>
+  </div>
+
+  <!-- WoW KPIs -->
+  <div class="subsection-label">Week-over-Week &nbsp;·&nbsp; Jun 08–14 → Jun 15–21</div>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Leads</div>
+      <div class="kpi-value">61</div>
+      <div class="kpi-prev">was <strong>440</strong> Jun 08–14</div>
+      <div class="kpi-delta negative">▼ 86.14% WoW</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">MQL</div>
+      <div class="kpi-value">56</div>
+      <div class="kpi-prev">was <strong>87</strong> Jun 08–14</div>
+      <div class="kpi-delta negative">▼ 35.63% WoW</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">SQL</div>
+      <div class="kpi-value">22</div>
+      <div class="kpi-prev">was <strong>14</strong> Jun 08–14</div>
+      <div class="kpi-delta positive">▲ 57.14% WoW</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Lead → MQL</div>
+      <div class="kpi-value">91.80%</div>
+      <div class="kpi-prev">was <strong>19.77%</strong> Jun 08–14</div>
+      <div class="kpi-delta positive">▲ 72.03pp WoW</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">MQL → SQL</div>
+      <div class="kpi-value">39.29%</div>
+      <div class="kpi-prev">was <strong>16.09%</strong> Jun 08–14</div>
+      <div class="kpi-delta positive">▲ 23.19pp WoW</div>
+    </div>
+  </div>
+
+  <!-- Charts row 1: MoM -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-title">MoM — Lead Funnel Volume</div>
+      <div class="chart-container"><canvas id="momVolumeChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">MoM — Conversion Rates</div>
+      <div class="chart-container"><canvas id="momConvChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Charts row 2: WoW -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-title">WoW — Lead Funnel Volume</div>
+      <div class="chart-container"><canvas id="wowVolumeChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">WoW — Conversion Rates</div>
+      <div class="chart-container"><canvas id="wowConvChart"></canvas></div>
+    </div>
+  </div>
+
+</div><!-- /tab1 -->
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- TAB 2 — KEY MARKETS DETAIL (WoW)                   -->
+<!-- ══════════════════════════════════════════════════ -->
+<div id="tab2" class="tab-panel">
+
+  <div class="section-title">Key Markets Detail — WoW (Jun 08–14 vs Jun 15–21)</div>
+
+  <div class="market-grid">
+
+    <!-- DACH -->
+    <div class="market-card">
+      <div class="market-title dach">🇩🇪 DACH</div>
+      <div class="mini-kpi-row">
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">Leads</div>
+          <div class="mini-kpi-value">13</div>
+          <div class="mini-kpi-prev">was <strong>7</strong></div>
+          <div class="mini-kpi-delta positive">▲ 85.71%</div>
+        </div>
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">MQL</div>
+          <div class="mini-kpi-value">2</div>
+          <div class="mini-kpi-prev">was <strong>2</strong></div>
+          <div class="mini-kpi-delta neutral">— 0%</div>
+        </div>
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">SQL</div>
+          <div class="mini-kpi-value">2</div>
+          <div class="mini-kpi-prev">was <strong>2</strong></div>
+          <div class="mini-kpi-delta neutral">— 0%</div>
+        </div>
+      </div>
+      <div class="mini-chart-container"><canvas id="dachChart"></canvas></div>
+      <div class="conversion-row">
+        <div class="conv-card">
+          <div class="conv-label">Lead → MQL</div>
+          <div class="conv-value">15.38%</div>
+          <div class="conv-prev">was <strong>28.57%</strong></div>
+          <div class="conv-delta negative">▼ 13.19pp</div>
+        </div>
+        <div class="conv-card">
+          <div class="conv-label">MQL → SQL</div>
+          <div class="conv-value">100.00%</div>
+          <div class="conv-prev">was <strong>100.00%</strong></div>
+          <div class="conv-delta neutral">— 0pp</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RO -->
+    <div class="market-card">
+      <div class="market-title ro">🇷🇴 Romania (RO)</div>
+      <div class="mini-kpi-row">
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">Leads</div>
+          <div class="mini-kpi-value">10</div>
+          <div class="mini-kpi-prev">was <strong>4</strong></div>
+          <div class="mini-kpi-delta positive">▲ 150.00%</div>
+        </div>
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">MQL</div>
+          <div class="mini-kpi-value">4</div>
+          <div class="mini-kpi-prev">was <strong>4</strong></div>
+          <div class="mini-kpi-delta neutral">— 0%</div>
+        </div>
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">SQL</div>
+          <div class="mini-kpi-value">1</div>
+          <div class="mini-kpi-prev">was <strong>1</strong></div>
+          <div class="mini-kpi-delta neutral">— 0%</div>
+        </div>
+      </div>
+      <div class="mini-chart-container"><canvas id="roChart"></canvas></div>
+      <div class="conversion-row">
+        <div class="conv-card">
+          <div class="conv-label">Lead → MQL</div>
+          <div class="conv-value">40.00%</div>
+          <div class="conv-prev">was <strong>100.00%</strong></div>
+          <div class="conv-delta negative">▼ 60.00pp</div>
+        </div>
+        <div class="conv-card">
+          <div class="conv-label">MQL → SQL</div>
+          <div class="conv-value">25.00%</div>
+          <div class="conv-prev">was <strong>25.00%</strong></div>
+          <div class="conv-delta neutral">— 0pp</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UK -->
+    <div class="market-card">
+      <div class="market-title uk">🇬🇧 United Kingdom (UK)</div>
+      <div class="mini-kpi-row">
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">Leads</div>
+          <div class="mini-kpi-value">6</div>
+          <div class="mini-kpi-prev">was <strong>356</strong></div>
+          <div class="mini-kpi-delta negative">▼ 98.31%</div>
+        </div>
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">MQL</div>
+          <div class="mini-kpi-value">8</div>
+          <div class="mini-kpi-prev">was <strong>7</strong></div>
+          <div class="mini-kpi-delta positive">▲ 14.29%</div>
+        </div>
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">SQL</div>
+          <div class="mini-kpi-value">3</div>
+          <div class="mini-kpi-prev">was <strong>3</strong></div>
+          <div class="mini-kpi-delta neutral">— 0%</div>
+        </div>
+      </div>
+      <div class="mini-chart-container"><canvas id="ukChart"></canvas></div>
+      <div class="conversion-row">
+        <div class="conv-card">
+          <div class="conv-label">Lead → MQL</div>
+          <div class="conv-value">133.33%</div>
+          <div class="conv-prev">was <strong>1.97%</strong></div>
+          <div class="conv-delta positive">▲ 131.37pp</div>
+        </div>
+        <div class="conv-card">
+          <div class="conv-label">MQL → SQL</div>
+          <div class="conv-value">37.50%</div>
+          <div class="conv-prev">was <strong>42.86%</strong></div>
+          <div class="conv-delta negative">▼ 5.36pp</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANZ -->
+    <div class="market-card">
+      <div class="market-title anz">🇦🇺 ANZ</div>
+      <div class="mini-kpi-row">
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">Leads</div>
+          <div class="mini-kpi-value">39</div>
+          <div class="mini-kpi-prev">was <strong>73</strong></div>
+          <div class="mini-kpi-delta negative">▼ 46.58%</div>
+        </div>
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">MQL</div>
+          <div class="mini-kpi-value">37</div>
+          <div class="mini-kpi-prev">was <strong>68</strong></div>
+          <div class="mini-kpi-delta negative">▼ 45.59%</div>
+        </div>
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">SQL</div>
+          <div class="mini-kpi-value">2</div>
+          <div class="mini-kpi-prev">was <strong>2</strong></div>
+          <div class="mini-kpi-delta neutral">— 0%</div>
+        </div>
+      </div>
+      <div class="mini-chart-container"><canvas id="anzChart"></canvas></div>
+      <div class="conversion-row">
+        <div class="conv-card">
+          <div class="conv-label">Lead → MQL</div>
+          <div class="conv-value">94.87%</div>
+          <div class="conv-prev">was <strong>93.15%</strong></div>
+          <div class="conv-delta positive">▲ 1.72pp</div>
+        </div>
+        <div class="conv-card">
+          <div class="conv-label">MQL → SQL</div>
+          <div class="conv-value">5.41%</div>
+          <div class="conv-prev">was <strong>2.94%</strong></div>
+          <div class="conv-delta positive">▲ 2.46pp</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /market-grid -->
+
+  <p class="footnote">
+    ⚠ UK Lead→MQL shows >100% due to MQLs (8) exceeding Leads (6) in Jun 15–21 — likely cross-period attribution. · Generated Jun 22, 2026.
+  </p>
+
+</div><!-- /tab2 -->
+
+<!-- ══ JAVASCRIPT ══ -->
+<script>
+// Tab switching
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// Chart defaults
+Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.color = '#666';
+
+const NAVY   = '#1F2D5C';
+const BLUE   = '#4B9CD3';
+const GREEN  = '#2ECC71';
+const PURPLE = '#7B61FF';
+
+// ─── MoM Volume ───
+new Chart(document.getElementById('momVolumeChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Leads', 'MQL', 'SQL'],
+    datasets: [
+      { label: 'May 01–21', data: [268, 105, 62], backgroundColor: NAVY + 'BB', borderRadius: 5 },
+      { label: 'Jun 01–21', data: [631, 287, 54], backgroundColor: BLUE,         borderRadius: 5 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } },
+    scales: { y: { beginAtZero: true, grid: { color: '#f0f0f0' } }, x: { grid: { display: false } } }
+  }
+});
+
+// ─── MoM Conversion ───
+new Chart(document.getElementById('momConvChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Lead → MQL', 'MQL → SQL'],
+    datasets: [
+      { label: 'May 01–21', data: [39.18, 59.05], backgroundColor: NAVY + 'BB', borderRadius: 5 },
+      { label: 'Jun 01–21', data: [45.48, 18.82], backgroundColor: BLUE,         borderRadius: 5 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } },
+    scales: {
+      y: { beginAtZero: true, max: 100, grid: { color: '#f0f0f0' }, ticks: { callback: v => v + '%' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ─── WoW Volume ───
+new Chart(document.getElementById('wowVolumeChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Leads', 'MQL', 'SQL'],
+    datasets: [
+      { label: 'Jun 08–14', data: [440, 87, 14], backgroundColor: NAVY + 'BB', borderRadius: 5 },
+      { label: 'Jun 15–21', data: [61,  56, 22], backgroundColor: BLUE,         borderRadius: 5 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } },
+    scales: { y: { beginAtZero: true, grid: { color: '#f0f0f0' } }, x: { grid: { display: false } } }
+  }
+});
+
+// ─── WoW Conversion ───
+new Chart(document.getElementById('wowConvChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Lead → MQL', 'MQL → SQL'],
+    datasets: [
+      { label: 'Jun 08–14', data: [19.77, 16.09], backgroundColor: NAVY + 'BB', borderRadius: 5 },
+      { label: 'Jun 15–21', data: [91.80, 39.29], backgroundColor: BLUE,         borderRadius: 5 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } },
+    scales: {
+      y: { beginAtZero: true, max: 100, grid: { color: '#f0f0f0' }, ticks: { callback: v => v + '%' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ─── Market mini charts ───
+function miniBar(id, color, w1, w2) {
+  new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: {
+      labels: ['Leads', 'MQL', 'SQL'],
+      datasets: [
+        { label: 'Jun 08–14', data: w1, backgroundColor: color + '88', borderRadius: 4 },
+        { label: 'Jun 15–21', data: w2, backgroundColor: color,         borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { boxWidth: 10, font: { size: 10 } } } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: '#f5f5f5' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+miniBar('dachChart', NAVY,   [7,   2, 2], [13,  2, 2]);
+miniBar('roChart',   BLUE,   [4,   4, 1], [10,  4, 1]);
+miniBar('ukChart',   PURPLE, [356, 7, 3], [6,   8, 3]);
+miniBar('anzChart',  GREEN,  [73, 68, 2], [39, 37, 2]);
+</script>
+
+</body>
+</html>
