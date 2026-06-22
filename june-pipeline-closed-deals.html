@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Key Markets — Pipeline & Closed Deals · June 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #F8F9FA;
+      color: #1F2D5C;
+      padding: 28px 32px;
+    }
+
+    /* ── Header ── */
+    .report-header {
+      background: linear-gradient(135deg, #1F2D5C 0%, #2d4080 100%);
+      color: white;
+      padding: 28px 32px;
+      border-radius: 14px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+    .report-header h1 { font-size: 22px; font-weight: 700; }
+    .report-header p  { font-size: 13px; opacity: 0.70; margin-top: 6px; line-height: 1.6; }
+    .report-badge {
+      background: rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* ── Tabs ── */
+    .tab-nav {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 28px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    .tab-btn {
+      padding: 10px 22px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #999;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      cursor: pointer;
+      border-radius: 6px 6px 0 0;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab-btn:hover { color: #4B9CD3; }
+    .tab-btn.active { color: #1F2D5C; border-bottom-color: #4B9CD3; background: #fff; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Section / subsection labels ── */
+    .section-title {
+      font-size: 15px; font-weight: 700; color: #1F2D5C;
+      margin-bottom: 18px; padding-bottom: 10px;
+      border-bottom: 2px solid #4B9CD3;
+    }
+    .subsection-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #999;
+      margin-bottom: 12px; margin-top: 28px;
+    }
+    .subsection-label:first-of-type { margin-top: 0; }
+
+    /* ── KPI cards — 2-col wide ── */
+    .kpi-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+    .kpi-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px 24px 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .kpi-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+    .kpi-body { flex: 1; }
+    .kpi-label  { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+    .kpi-value  { font-size: 28px; font-weight: 700; color: #1F2D5C; line-height: 1.1; }
+    .kpi-prev   {
+      font-size: 11px; color: #aaa; margin-top: 5px;
+      background: #F8F9FA; border-radius: 5px;
+      padding: 3px 8px; display: inline-block;
+    }
+    .kpi-prev strong { color: #666; font-weight: 600; }
+    .kpi-delta  { font-size: 13px; font-weight: 700; margin-top: 8px; }
+    .positive { color: #2ECC71; }
+    .negative { color: #E74C3C; }
+    .neutral  { color: #F39C12; }
+
+    /* ── Charts ── */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 28px;
+    }
+    .chart-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px 20px 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .chart-title {
+      font-size: 12px; font-weight: 700; color: #1F2D5C;
+      margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .chart-container { position: relative; height: 220px; }
+
+    /* ── Quota coverage (Tab 2 top) ── */
+    .quota-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .quota-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      text-align: center;
+    }
+    .quota-card.total { background: #1F2D5C; color: #fff; }
+    .quota-market { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+    .quota-card.total .quota-market { color: #fff; }
+    .quota-pct {
+      font-size: 26px; font-weight: 700; color: #1F2D5C;
+      margin-bottom: 4px;
+    }
+    .quota-card.total .quota-pct { color: #fff; }
+    .quota-nums { font-size: 11px; color: #aaa; margin-bottom: 10px; line-height: 1.5; }
+    .quota-card.total .quota-nums { color: rgba(255,255,255,0.6); }
+    .progress-track {
+      height: 7px; background: #f0f0f0;
+      border-radius: 10px; overflow: hidden;
+      margin-top: 4px;
+    }
+    .quota-card.total .progress-track { background: rgba(255,255,255,0.2); }
+    .progress-fill {
+      height: 100%; border-radius: 10px;
+      transition: width 0.5s ease;
+    }
+    .progress-fill.over   { background: #2ECC71; }
+    .progress-fill.near   { background: #F39C12; }
+    .progress-fill.under  { background: #E74C3C; }
+    .quota-status {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      margin-top: 6px;
+    }
+
+    /* ── Market grid (Tab 2 bottom) ── */
+    .market-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .market-card {
+      background: #fff; border-radius: 12px;
+      padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .market-title {
+      font-size: 15px; font-weight: 700;
+      margin-bottom: 14px; padding-bottom: 9px;
+      border-bottom: 3px solid;
+    }
+    .market-title.dach { color: #1F2D5C; border-color: #1F2D5C; }
+    .market-title.ro   { color: #4B9CD3; border-color: #4B9CD3; }
+    .market-title.uk   { color: #7B61FF; border-color: #7B61FF; }
+    .market-title.anz  { color: #2ECC71; border-color: #2ECC71; }
+
+    .mini-kpi-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .mini-kpi {
+      background: #F8F9FA; border-radius: 8px;
+      padding: 10px 12px; text-align: center;
+    }
+    .mini-kpi-label { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+    .mini-kpi-value { font-size: 18px; font-weight: 700; color: #1F2D5C; }
+    .mini-kpi-prev  { font-size: 10px; color: #bbb; margin-top: 2px; }
+    .mini-kpi-prev strong { color: #888; font-weight: 600; }
+    .mini-kpi-delta { font-size: 11px; font-weight: 700; margin-top: 3px; }
+
+    .mini-chart-container { position: relative; height: 130px; margin-bottom: 14px; }
+
+    .market-quota-bar { margin-top: 4px; }
+    .market-quota-label {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.04em; color: #999; margin-bottom: 6px;
+    }
+    .market-quota-row {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .market-quota-pct {
+      font-size: 18px; font-weight: 700; color: #1F2D5C;
+      min-width: 64px; text-align: right;
+    }
+    .market-quota-track {
+      flex: 1; height: 8px; background: #f0f0f0;
+      border-radius: 10px; overflow: hidden;
+    }
+    .market-quota-fill {
+      height: 100%; border-radius: 10px;
+    }
+    .market-quota-nums {
+      font-size: 10px; color: #bbb; margin-top: 4px; text-align: right;
+    }
+
+    .footnote {
+      font-size: 11px; color: #bbb;
+      margin-top: 32px; text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div class="report-header">
+  <div>
+    <h1>Key Markets — Pipeline &amp; Closed Deals</h1>
+    <p>
+      International Growth · June 2026<br>
+      MoM: May 01–21 vs Jun 01–21 &nbsp;·&nbsp; YoY: Jun 01–21 2025 vs 2026 &nbsp;·&nbsp; WoW: Jun 08–14 vs Jun 15–21
+    </p>
+  </div>
+  <div class="report-badge">DACH · RO · UK · ANZ</div>
+</div>
+
+<!-- ══ TABS ══ -->
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('tab1', this)">🌐 All Markets</button>
+  <button class="tab-btn" onclick="switchTab('tab2', this)">🎯 Key Markets Detail</button>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- TAB 1 — ALL MARKETS                         -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="tab1" class="tab-panel active">
+
+  <!-- MoM -->
+  <div class="subsection-label">Month-over-Month &nbsp;·&nbsp; May 01–21 → Jun 01–21</div>
+  <div class="kpi-grid-2">
+    <div class="kpi-card">
+      <div class="kpi-icon">📈</div>
+      <div class="kpi-body">
+        <div class="kpi-label">Pipeline Generated</div>
+        <div class="kpi-value">$1,029,311</div>
+        <div class="kpi-prev">was <strong>$595,357</strong> in May 01–21</div>
+        <div class="kpi-delta positive">▲ 72.89% MoM</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">💰</div>
+      <div class="kpi-body">
+        <div class="kpi-label">Closed Deals</div>
+        <div class="kpi-value">$17,132</div>
+        <div class="kpi-prev">was <strong>$11,552</strong> in May 01–21</div>
+        <div class="kpi-delta positive">▲ 48.31% MoM</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- YoY -->
+  <div class="subsection-label">Year-over-Year &nbsp;·&nbsp; Jun 01–21 2025 → Jun 01–21 2026</div>
+  <div class="kpi-grid-2">
+    <div class="kpi-card">
+      <div class="kpi-icon">📈</div>
+      <div class="kpi-body">
+        <div class="kpi-label">Pipeline Generated</div>
+        <div class="kpi-value">$1,029,311</div>
+        <div class="kpi-prev">was <strong>$89,786</strong> in Jun 01–21 2025</div>
+        <div class="kpi-delta positive">▲ 1,046.41% YoY</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">💰</div>
+      <div class="kpi-body">
+        <div class="kpi-label">Closed Deals</div>
+        <div class="kpi-value">$17,132</div>
+        <div class="kpi-prev">was <strong>$26,261</strong> in Jun 01–21 2025</div>
+        <div class="kpi-delta negative">▼ 34.76% YoY</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WoW -->
+  <div class="subsection-label">Week-over-Week &nbsp;·&nbsp; Jun 08–14 → Jun 15–21</div>
+  <div class="kpi-grid-2">
+    <div class="kpi-card">
+      <div class="kpi-icon">📈</div>
+      <div class="kpi-body">
+        <div class="kpi-label">Pipeline Generated</div>
+        <div class="kpi-value">$356,070</div>
+        <div class="kpi-prev">was <strong>$379,354</strong> Jun 08–14</div>
+        <div class="kpi-delta negative">▼ 6.14% WoW</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">💰</div>
+      <div class="kpi-body">
+        <div class="kpi-label">Closed Deals</div>
+        <div class="kpi-value">$12,754</div>
+        <div class="kpi-prev">was <strong>$779</strong> Jun 08–14</div>
+        <div class="kpi-delta positive">▲ 1,536.71% WoW</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-title">Pipeline — Period Comparison ($)</div>
+      <div class="chart-container"><canvas id="pipelineChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Closed Deals — Period Comparison ($)</div>
+      <div class="chart-container"><canvas id="closedChart"></canvas></div>
+    </div>
+  </div>
+
+</div><!-- /tab1 -->
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- TAB 2 — KEY MARKETS DETAIL                  -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="tab2" class="tab-panel">
+
+  <!-- Quota Coverage Overview -->
+  <div class="section-title">Pipeline Quota Coverage &nbsp;·&nbsp; Jun 01–21, 2026</div>
+  <div class="quota-grid">
+
+    <div class="quota-card">
+      <div class="quota-market">🇬🇧 UK</div>
+      <div class="quota-pct positive">178.83%</div>
+      <div class="quota-nums">$470,401 pipeline<br>vs $263,038 quota</div>
+      <div class="progress-track"><div class="progress-fill over" style="width:100%"></div></div>
+      <div class="quota-status positive">✓ Above quota</div>
+    </div>
+
+    <div class="quota-card">
+      <div class="quota-market">🇷🇴 RO</div>
+      <div class="quota-pct neutral">66.57%</div>
+      <div class="quota-nums">$162,736 pipeline<br>vs $244,445 quota</div>
+      <div class="progress-track"><div class="progress-fill under" style="width:66.57%"></div></div>
+      <div class="quota-status negative">✗ Below quota</div>
+    </div>
+
+    <div class="quota-card">
+      <div class="quota-market">🇦🇺 ANZ</div>
+      <div class="quota-pct positive">684.40%</div>
+      <div class="quota-nums">$333,404 pipeline<br>vs $48,715 quota</div>
+      <div class="progress-track"><div class="progress-fill over" style="width:100%"></div></div>
+      <div class="quota-status positive">✓ Above quota</div>
+    </div>
+
+    <div class="quota-card">
+      <div class="quota-market">🇩🇪 DACH</div>
+      <div class="quota-pct positive">128.26%</div>
+      <div class="quota-nums">$52,350 pipeline<br>vs $40,817 quota</div>
+      <div class="progress-track"><div class="progress-fill over" style="width:100%"></div></div>
+      <div class="quota-status positive">✓ Above quota</div>
+    </div>
+
+    <div class="quota-card total">
+      <div class="quota-market">TOTAL</div>
+      <div class="quota-pct">170.66%</div>
+      <div class="quota-nums">$1,018,891 pipeline<br>vs $597,015 quota</div>
+      <div class="progress-track"><div class="progress-fill over" style="width:100%"></div></div>
+      <div class="quota-status" style="color:#2ECC71">✓ Above quota</div>
+    </div>
+
+  </div>
+
+  <!-- Quota Coverage Bar Chart -->
+  <div class="chart-card" style="margin-bottom:28px;">
+    <div class="chart-title">Pipeline vs Quota by Market (Jun 01–21)</div>
+    <div class="chart-container" style="height:200px"><canvas id="quotaChart"></canvas></div>
+  </div>
+
+  <!-- Individual Market Cards -->
+  <div class="section-title">Market Detail — WoW (Jun 08–14 vs Jun 15–21)</div>
+  <div class="market-grid">
+
+    <!-- DACH -->
+    <div class="market-card">
+      <div class="market-title dach">🇩🇪 DACH</div>
+      <div class="mini-kpi-row">
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">Pipeline</div>
+          <div class="mini-kpi-value">$37,950</div>
+          <div class="mini-kpi-prev">was <strong>$14,400</strong></div>
+          <div class="mini-kpi-delta positive">▲ 163.54%</div>
+        </div>
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">Closed</div>
+          <div class="mini-kpi-value">$1,240</div>
+          <div class="mini-kpi-prev">was <strong>—</strong></div>
+          <div class="mini-kpi-delta neutral">n/a (new)</div>
+        </div>
+      </div>
+      <div class="mini-chart-container"><canvas id="dachChart"></canvas></div>
+      <div class="market-quota-bar">
+        <div class="market-quota-label">Pipeline Quota Coverage (Jun 01–21)</div>
+        <div class="market-quota-row">
+          <div class="market-quota-track">
+            <div class="market-quota-fill over" style="width:100%; background:#2ECC71;"></div>
+          </div>
+          <div class="market-quota-pct positive">128.26%</div>
+        </div>
+        <div class="market-quota-nums">$52,350 vs $40,817 quota</div>
+      </div>
+    </div>
+
+    <!-- RO -->
+    <div class="market-card">
+      <div class="market-title ro">🇷🇴 Romania (RO)</div>
+      <div class="mini-kpi-row">
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">Pipeline</div>
+          <div class="mini-kpi-value">$33,600</div>
+          <div class="mini-kpi-prev">was <strong>$59,536</strong></div>
+          <div class="mini-kpi-delta negative">▼ 43.56%</div>
+        </div>
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">Closed</div>
+          <div class="mini-kpi-value">$4,643</div>
+          <div class="mini-kpi-prev">was <strong>—</strong></div>
+          <div class="mini-kpi-delta neutral">n/a (new)</div>
+        </div>
+      </div>
+      <div class="mini-chart-container"><canvas id="roChart"></canvas></div>
+      <div class="market-quota-bar">
+        <div class="market-quota-label">Pipeline Quota Coverage (Jun 01–21)</div>
+        <div class="market-quota-row">
+          <div class="market-quota-track">
+            <div class="market-quota-fill" style="width:66.57%; background:#E74C3C;"></div>
+          </div>
+          <div class="market-quota-pct negative">66.57%</div>
+        </div>
+        <div class="market-quota-nums">$162,736 vs $244,445 quota</div>
+      </div>
+    </div>
+
+    <!-- UK -->
+    <div class="market-card">
+      <div class="market-title uk">🇬🇧 United Kingdom (UK)</div>
+      <div class="mini-kpi-row">
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">Pipeline</div>
+          <div class="mini-kpi-value">$168,000</div>
+          <div class="mini-kpi-prev">was <strong>$162,393</strong></div>
+          <div class="mini-kpi-delta positive">▲ 3.45%</div>
+        </div>
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">Closed</div>
+          <div class="mini-kpi-value">$795</div>
+          <div class="mini-kpi-prev">was <strong>—</strong></div>
+          <div class="mini-kpi-delta neutral">n/a (new)</div>
+        </div>
+      </div>
+      <div class="mini-chart-container"><canvas id="ukChart"></canvas></div>
+      <div class="market-quota-bar">
+        <div class="market-quota-label">Pipeline Quota Coverage (Jun 01–21)</div>
+        <div class="market-quota-row">
+          <div class="market-quota-track">
+            <div class="market-quota-fill" style="width:100%; background:#2ECC71;"></div>
+          </div>
+          <div class="market-quota-pct positive">178.83%</div>
+        </div>
+        <div class="market-quota-nums">$470,401 vs $263,038 quota</div>
+      </div>
+    </div>
+
+    <!-- ANZ -->
+    <div class="market-card">
+      <div class="market-title anz">🇦🇺 ANZ</div>
+      <div class="mini-kpi-row">
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">Pipeline</div>
+          <div class="mini-kpi-value">$116,520</div>
+          <div class="mini-kpi-prev">was <strong>$99,024</strong></div>
+          <div class="mini-kpi-delta positive">▲ 17.67%</div>
+        </div>
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">Closed</div>
+          <div class="mini-kpi-value">$4,232</div>
+          <div class="mini-kpi-prev">was <strong>$779</strong></div>
+          <div class="mini-kpi-delta positive">▲ 443.13%</div>
+        </div>
+      </div>
+      <div class="mini-chart-container"><canvas id="anzChart"></canvas></div>
+      <div class="market-quota-bar">
+        <div class="market-quota-label">Pipeline Quota Coverage (Jun 01–21)</div>
+        <div class="market-quota-row">
+          <div class="market-quota-track">
+            <div class="market-quota-fill" style="width:100%; background:#2ECC71;"></div>
+          </div>
+          <div class="market-quota-pct positive">684.40%</div>
+        </div>
+        <div class="market-quota-nums">$333,404 vs $48,715 quota</div>
+      </div>
+    </div>
+
+  </div><!-- /market-grid -->
+
+  <p class="footnote">
+    ⚠ "n/a (new)" = no closed deals in Jun 08–14 baseline. Quota = May Target Quota. · Generated Jun 22, 2026.
+  </p>
+
+</div><!-- /tab2 -->
+
+<!-- ══ SCRIPTS ══ -->
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.color = '#666';
+
+const NAVY   = '#1F2D5C';
+const BLUE   = '#4B9CD3';
+const GREEN  = '#2ECC71';
+const PURPLE = '#7B61FF';
+const RED    = '#E74C3C';
+const AMBER  = '#F39C12';
+
+function fmtK(v) {
+  if (v >= 1000000) return '$' + (v/1000000).toFixed(2) + 'M';
+  if (v >= 1000)    return '$' + Math.round(v/1000) + 'k';
+  return '$' + Math.round(v);
+}
+
+// ── Pipeline period comparison ──
+new Chart(document.getElementById('pipelineChart'), {
+  type: 'bar',
+  data: {
+    labels: ['May 01–21', 'Jun 01–21', 'Jun 25 (prev yr)', 'Jun 08–14', 'Jun 15–21'],
+    datasets: [{
+      label: 'Pipeline ($)',
+      data: [595356.51, 1029311.92, 89785.72, 379353.92, 356070.31],
+      backgroundColor: [
+        NAVY + 'AA', BLUE, NAVY + '55', NAVY + 'AA', BLUE
+      ],
+      borderRadius: 5
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ' ' + fmtK(ctx.raw) } }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: { color: '#f0f0f0' },
+        ticks: { callback: v => fmtK(v) }
+      },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ── Closed deals period comparison ──
+new Chart(document.getElementById('closedChart'), {
+  type: 'bar',
+  data: {
+    labels: ['May 01–21', 'Jun 01–21', 'Jun 25 (prev yr)', 'Jun 08–14', 'Jun 15–21'],
+    datasets: [{
+      label: 'Closed ($)',
+      data: [11551.73, 17131.92, 26261.00, 779.27, 12754.42],
+      backgroundColor: [
+        NAVY + 'AA', BLUE, NAVY + '55', NAVY + 'AA', BLUE
+      ],
+      borderRadius: 5
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ' ' + fmtK(ctx.raw) } }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: { color: '#f0f0f0' },
+        ticks: { callback: v => fmtK(v) }
+      },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ── Quota coverage grouped bar ──
+new Chart(document.getElementById('quotaChart'), {
+  type: 'bar',
+  data: {
+    labels: ['UK', 'RO', 'ANZ', 'DACH'],
+    datasets: [
+      {
+        label: 'Pipeline (Jun 01–21)',
+        data: [470401.08, 162736.40, 333403.97, 52350.03],
+        backgroundColor: [GREEN, RED, GREEN, GREEN],
+        borderRadius: 5
+      },
+      {
+        label: 'Quota Target',
+        data: [263038, 244445, 48715, 40817],
+        backgroundColor: [NAVY + '44', NAVY + '44', NAVY + '44', NAVY + '44'],
+        borderRadius: 5
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top', labels: { boxWidth: 12 } },
+      tooltip: { callbacks: { label: ctx => ' ' + fmtK(ctx.raw) } }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: { color: '#f0f0f0' },
+        ticks: { callback: v => fmtK(v) }
+      },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ── Market mini charts (Pipeline WoW) ──
+function miniBar(id, color, w1, w2, labels) {
+  new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: {
+      labels: labels || ['Pipeline', 'Closed'],
+      datasets: [
+        { label: 'Jun 08–14', data: w1, backgroundColor: color + '77', borderRadius: 4 },
+        { label: 'Jun 15–21', data: w2, backgroundColor: color,         borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { boxWidth: 10, font: { size: 10 } } },
+        tooltip: { callbacks: { label: ctx => ' ' + fmtK(ctx.raw) } }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: { color: '#f5f5f5' },
+          ticks: { callback: v => fmtK(v) }
+        },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+miniBar('dachChart', NAVY,   [14400,     0],      [37950.03, 1239.76]);
+miniBar('roChart',   BLUE,   [59536.40,  0],      [33600,    4642.88]);
+miniBar('ukChart',   PURPLE, [162393.11, 0],      [168000,   795.01]);
+miniBar('anzChart',  GREEN,  [99024.41,  779.27], [116520.28, 4232.44]);
+</script>
+
+</body>
+</html>
