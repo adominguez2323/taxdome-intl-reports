@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lead Progression Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --navy:#1F2D5C;
+    --blue:#4B9CD3;
+    --green:#2ECC71;
+    --amber:#F39C12;
+    --red:#E74C3C;
+    --bg:#F4F6F9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+    background:var(--bg);
+    margin:0;
+    padding:20px;
+    color:#22283a;
+  }
+  .wrap{max-width:1080px;margin:0 auto;}
+
+  .card{background:#fff;border:1px solid #e7e9ee;border-radius:12px;box-shadow:0 2px 10px rgba(20,30,60,0.05);margin-bottom:22px;overflow:hidden;}
+
+  .report-head{
+    background:linear-gradient(120deg,var(--navy),#2c3d7a);
+    color:#fff;padding:20px 24px;position:relative;
+  }
+  .report-head h1{margin:0;font-size:19px;font-weight:800;}
+  .report-head .sub{font-size:12px;opacity:0.8;margin-top:4px;font-weight:500;}
+  .as-of{
+    position:absolute;top:20px;right:24px;background:rgba(255,255,255,0.15);
+    padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.03em;
+  }
+
+  .toolbar{padding:16px 24px 0 24px;}
+  .toggle-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .toggle-btn{
+    border:1px solid #dfe3ea;background:#fff;color:#556;padding:7px 16px;border-radius:20px;
+    font-size:12.5px;font-weight:700;cursor:pointer;transition:all .15s;
+  }
+  .toggle-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .toggle-btn.market-pill.active{background:var(--blue);border-color:var(--blue);}
+  .toggle-btn:hover:not(.active){background:#f2f4f8;}
+
+  .period-bar{
+    background:#eef2fb;padding:10px 24px;font-size:12px;font-weight:700;color:var(--navy);
+    text-transform:uppercase;letter-spacing:.04em;
+  }
+  .period-bar span.range{font-weight:600;text-transform:none;color:#5a6478;margin-left:8px;}
+
+  .kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-top:1px solid #eef0f3;}
+  .kpi-cell{padding:18px 14px;text-align:center;border-right:1px solid #eef0f3;}
+  .kpi-cell:last-child{border-right:none;}
+  .kpi-label{font-size:10.5px;color:#98a0ad;text-transform:uppercase;letter-spacing:.05em;font-weight:800;margin-bottom:8px;}
+  .kpi-value{font-size:24px;font-weight:800;color:var(--navy);}
+  .kpi-delta{
+    display:inline-block;margin-top:6px;font-size:11px;font-weight:800;padding:2px 8px;border-radius:10px;
+  }
+  .kpi-delta.positive{background:#eafaf0;color:#1e9e56;}
+  .kpi-delta.negative{background:#fdecea;color:#c0392b;}
+  .kpi-delta.flat{background:#fdf3e3;color:#b9791a;}
+  .kpi-sub{font-size:10.5px;color:#a3aab5;margin-top:8px;line-height:1.5;}
+
+  @media (max-width:800px){.kpi-grid{grid-template-columns:repeat(2,1fr);} .kpi-cell{border-bottom:1px solid #eef0f3;}}
+
+  .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#eef0f3;}
+  .chart-pane{background:#fff;padding:16px 18px 8px 18px;}
+  .chart-pane h4{margin:0 0 8px 0;font-size:11.5px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;}
+  canvas{max-height:230px;}
+  @media (max-width:800px){.charts-grid{grid-template-columns:1fr;}}
+
+  .foot-note{padding:12px 24px 18px 24px;font-size:11px;color:#a3aab5;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="card">
+    <div class="report-head">
+      <h1>Lead Progression Report</h1>
+      <div class="sub">All Markets · Key Markets — MoM · WoW <span style="opacity:.65;">(YoY excluded pending review)</span></div>
+      <div class="as-of">AS OF JUL 19, 2026</div>
+    </div>
+
+    <div class="toolbar">
+      <div class="toggle-row" id="scopeRow">
+        <button class="toggle-btn active" data-scope="all">All Markets</button>
+        <button class="toggle-btn" data-scope="key">Key Markets</button>
+      </div>
+      <div class="toggle-row" id="periodRow">
+        <button class="toggle-btn active" data-period="MoM">MoM</button>
+        <button class="toggle-btn" data-period="WoW">WoW</button>
+      </div>
+      <div class="toggle-row" id="marketRow" style="display:none;">
+        <button class="toggle-btn market-pill active" data-market="overall">Overall</button>
+        <button class="toggle-btn market-pill" data-market="DACH">DACH</button>
+        <button class="toggle-btn market-pill" data-market="UK">UK</button>
+        <button class="toggle-btn market-pill" data-market="RO">RO</button>
+        <button class="toggle-btn market-pill" data-market="ANZ">ANZ</button>
+      </div>
+    </div>
+
+    <div class="period-bar" id="periodBar">MONTH-OVER-MONTH <span class="range">Jun 1–19 vs Jul 1–19, 2026</span></div>
+
+    <div class="kpi-grid" id="kpiGrid"></div>
+
+    <div class="charts-grid">
+      <div class="chart-pane">
+        <h4 id="volTitle">Volume — Jun vs Jul</h4>
+        <canvas id="volChart"></canvas>
+      </div>
+      <div class="chart-pane">
+        <h4 id="convTitle">Conversion Rate — Jun vs Jul</h4>
+        <canvas id="convChart"></canvas>
+      </div>
+    </div>
+
+    <div class="foot-note">Figures pulled directly from HubSpot custom date-range reports — no projections, run-rates, or extrapolation. Individual key-market weekly figures read from dashboard charts; combined "Overall" totals are the more reliable source at low volumes.</div>
+  </div>
+
+</div>
+
+<script>
+const DATA = {
+  all: {
+    MoM: {
+      label: "MONTH-OVER-MONTH", range: "Jun 1–19 vs Jul 1–19, 2026",
+      prevLabel: "Jun 1–19", curLabel: "Jul 1–19",
+      leads:{cur:565,prev:521}, mql:{cur:219,prev:375}, sql:{cur:61,prev:59}
+    },
+    WoW: {
+      label: "WEEK-OVER-WEEK", range: "Jul 6–12 vs Jul 13–19, 2026",
+      prevLabel: "Jul 6–12", curLabel: "Jul 13–19",
+      leads:{cur:242,prev:103}, mql:{cur:79,prev:55}, sql:{cur:25,prev:23}
+    }
+  },
+  key: {
+    overall: {
+      MoM: { label:"MONTH-OVER-MONTH", range:"Jun 1–19 vs Jul 1–19, 2026", prevLabel:"Jun 1–19", curLabel:"Jul 1–19",
+        leads:{cur:251,prev:626}, mql:{cur:89,prev:296}, sql:{cur:55,prev:54} },
+      WoW: { label:"WEEK-OVER-WEEK", range:"Jul 6–12 vs Jul 13–19, 2026", prevLabel:"Jul 6–12", curLabel:"Jul 13–19",
+        leads:{cur:125,prev:54}, mql:{cur:26,prev:55}, sql:{cur:22,prev:22} }
+    },
+    DACH:   { WoW: { label:"WEEK-OVER-WEEK", range:"Jul 6–12 vs Jul 13–19, 2026", prevLabel:"Jul 6–12", curLabel:"Jul 13–19",
+      leads:{cur:22,prev:18}, mql:{cur:6,prev:1}, sql:{cur:0,prev:0} } },
+    UK:     { WoW: { label:"WEEK-OVER-WEEK", range:"Jul 6–12 vs Jul 13–19, 2026", prevLabel:"Jul 6–12", curLabel:"Jul 13–19",
+      leads:{cur:16,prev:4}, mql:{cur:11,prev:7}, sql:{cur:6,prev:6} } },
+    RO:     { WoW: { label:"WEEK-OVER-WEEK", range:"Jul 6–12 vs Jul 13–19, 2026", prevLabel:"Jul 6–12", curLabel:"Jul 13–19",
+      leads:{cur:22,prev:7}, mql:{cur:7,prev:4}, sql:{cur:2,prev:2} } },
+    ANZ:    { WoW: { label:"WEEK-OVER-WEEK", range:"Jul 6–12 vs Jul 13–19, 2026", prevLabel:"Jul 6–12", curLabel:"Jul 13–19",
+      leads:{cur:35,prev:25}, mql:{cur:10,prev:11}, sql:{cur:5,prev:11} } },
+  }
+};
+
+let state = { scope:'all', period:'MoM', market:'overall' };
+
+function pctChange(cur,prev){
+  if (prev===0) return cur===0 ? 0 : null;
+  return (cur-prev)/prev*100;
+}
+function rate(num,den){ return den ? (num/den*100) : 0; }
+function fmtPct(x){
+  if (x===null) return 'new';
+  const arrow = x>0 ? '▲' : (x<0 ? '▼' : '▬');
+  return `${arrow} ${Math.abs(x).toFixed(1)}%`;
+}
+function deltaClass(x){
+  if (x===null) return 'flat';
+  return x>0 ? 'positive' : (x<0 ? 'negative' : 'flat');
+}
+
+let volChart, convChart;
+
+function render(){
+  const d = state.scope==='all' ? DATA.all[state.period] : DATA.key[state.market][state.period];
+
+  document.getElementById('periodBar').innerHTML =
+    `${d.label} <span class="range">${d.range}</span>`;
+
+  const leadMqlCur = rate(d.mql.cur, d.leads.cur);
+  const leadMqlPrev = rate(d.mql.prev, d.leads.prev);
+  const mqlSqlCur = rate(d.sql.cur, d.mql.cur);
+  const mqlSqlPrev = rate(d.sql.prev, d.mql.prev);
+
+  const kpis = [
+    {label:'Leads', cur:d.leads.cur, prev:d.leads.prev, isPct:false},
+    {label:'MQL', cur:d.mql.cur, prev:d.mql.prev, isPct:false},
+    {label:'SQL', cur:d.sql.cur, prev:d.sql.prev, isPct:false},
+    {label:'Lead / MQL', cur:leadMqlCur, prev:leadMqlPrev, isPct:true},
+    {label:'MQL / SQL', cur:mqlSqlCur, prev:mqlSqlPrev, isPct:true},
+  ];
+
+  document.getElementById('kpiGrid').innerHTML = kpis.map(k=>{
+    const delta = pctChange(k.cur,k.prev);
+    const valStr = k.isPct ? k.cur.toFixed(2)+'%' : k.cur;
+    const prevStr = k.isPct ? k.prev.toFixed(2)+'%' : k.prev;
+    return `<div class="kpi-cell">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${valStr}</div>
+      <div class="kpi-delta ${deltaClass(delta)}">${fmtPct(delta)}</div>
+      <div class="kpi-sub">${d.prevLabel}: ${prevStr}<br>${d.curLabel}: ${valStr}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('volTitle').textContent = `Volume — ${d.prevLabel} vs ${d.curLabel}`;
+  document.getElementById('convTitle').textContent = `Conversion Rate — ${d.prevLabel} vs ${d.curLabel}`;
+
+  const volLabels = ['Leads','MQL','SQL'];
+  const volPrev = [d.leads.prev, d.mql.prev, d.sql.prev];
+  const volCur = [d.leads.cur, d.mql.cur, d.sql.cur];
+  const convLabels = ['Lead/MQL','MQL/SQL'];
+  const convPrev = [leadMqlPrev, mqlSqlPrev];
+  const convCur = [leadMqlCur, mqlSqlCur];
+
+  const opts = {
+    responsive:true,
+    plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:11,font:{size:10.5}}}},
+    scales:{y:{beginAtZero:true,grid:{color:'#f0f0f2'}},x:{grid:{display:false}}}
+  };
+
+  if (volChart) volChart.destroy();
+  volChart = new Chart(document.getElementById('volChart'), {
+    type:'bar',
+    data:{labels:volLabels,datasets:[
+      {label:d.prevLabel,data:volPrev,backgroundColor:'#c9d6ef'},
+      {label:d.curLabel,data:volCur,backgroundColor:'#4B9CD3'}
+    ]},
+    options:opts
+  });
+
+  if (convChart) convChart.destroy();
+  convChart = new Chart(document.getElementById('convChart'), {
+    type:'bar',
+    data:{labels:convLabels,datasets:[
+      {label:d.prevLabel,data:convPrev,backgroundColor:'#dcd0f0'},
+      {label:d.curLabel,data:convCur,backgroundColor:'#1F2D5C'}
+    ]},
+    options:{...opts, scales:{...opts.scales, y:{...opts.scales.y, ticks:{callback:v=>v+'%'}}}}
+  });
+}
+
+function syncPeriodRowVisibility(){
+  const showPeriod = state.scope==='all' || (state.scope==='key' && state.market==='overall');
+  document.getElementById('periodRow').style.display = showPeriod ? 'flex' : 'none';
+  if (!showPeriod) state.period = 'WoW';
+  document.querySelectorAll('#periodRow .toggle-btn').forEach(b=>b.classList.toggle('active', b.dataset.period===state.period));
+}
+
+document.getElementById('scopeRow').addEventListener('click', e=>{
+  const btn = e.target.closest('.toggle-btn'); if(!btn) return;
+  state.scope = btn.dataset.scope;
+  document.querySelectorAll('#scopeRow .toggle-btn').forEach(b=>b.classList.toggle('active', b===btn));
+  document.getElementById('marketRow').style.display = state.scope==='key' ? 'flex' : 'none';
+  if (state.scope==='all') state.period='MoM';
+  syncPeriodRowVisibility();
+  render();
+});
+
+document.getElementById('periodRow').addEventListener('click', e=>{
+  const btn = e.target.closest('.toggle-btn'); if(!btn) return;
+  state.period = btn.dataset.period;
+  document.querySelectorAll('#periodRow .toggle-btn').forEach(b=>b.classList.toggle('active', b===btn));
+  render();
+});
+
+document.getElementById('marketRow').addEventListener('click', e=>{
+  const btn = e.target.closest('.toggle-btn'); if(!btn) return;
+  state.market = btn.dataset.market;
+  document.querySelectorAll('#marketRow .toggle-btn').forEach(b=>b.classList.toggle('active', b===btn));
+  if (state.market==='overall' && !state.period) state.period='MoM';
+  syncPeriodRowVisibility();
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
