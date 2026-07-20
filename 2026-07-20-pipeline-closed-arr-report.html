@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pipeline &amp; Closed ARR Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root{ --navy:#1F2D5C; --blue:#4B9CD3; --green:#2ECC71; --amber:#F39C12; --red:#E74C3C; --bg:#F4F6F9; }
+  *{box-sizing:border-box;}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);margin:0;padding:20px;color:#22283a;}
+  .wrap{max-width:1080px;margin:0 auto;}
+  .card{background:#fff;border:1px solid #e7e9ee;border-radius:12px;box-shadow:0 2px 10px rgba(20,30,60,0.05);margin-bottom:22px;overflow:hidden;}
+
+  .report-head{background:linear-gradient(120deg,var(--navy),#2c3d7a);color:#fff;padding:20px 24px;position:relative;}
+  .report-head h1{margin:0;font-size:19px;font-weight:800;}
+  .report-head .sub{font-size:12px;opacity:0.8;margin-top:4px;font-weight:500;}
+  .report-head .sub2{font-size:11px;opacity:0.65;margin-top:6px;font-weight:500;}
+  .as-of{position:absolute;top:20px;right:24px;background:rgba(255,255,255,0.15);padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.03em;}
+
+  .toolbar{padding:16px 24px 0 24px;border-bottom:1px solid #eef0f3;}
+  .toggle-row{display:flex;gap:0;margin-bottom:0;flex-wrap:wrap;}
+  .tab-btn{border:none;background:none;color:#8a92a3;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;}
+  .tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);}
+  .tab-btn:hover:not(.active){color:var(--navy);}
+
+  .period-block{padding:18px 24px 0 24px;}
+  .period-label{font-size:11.5px;font-weight:800;color:#98a0ad;text-transform:uppercase;letter-spacing:.05em;margin:0 0 8px 0;}
+  .period-label span.range{font-weight:600;text-transform:none;color:#6b7280;margin-left:8px;}
+
+  .kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:6px;}
+  .kpi-card{background:#fbfcfe;border:1px solid #eef0f3;border-radius:10px;padding:14px 16px;}
+  .kpi-label{font-size:10.5px;color:#98a0ad;text-transform:uppercase;letter-spacing:.05em;font-weight:800;margin-bottom:6px;}
+  .kpi-value{font-size:21px;font-weight:800;color:var(--navy);}
+  .kpi-sub{font-size:10.5px;color:#a3aab5;margin-top:4px;}
+  .kpi-delta{display:inline-block;margin-top:6px;font-size:11px;font-weight:800;padding:2px 8px;border-radius:10px;}
+  .kpi-delta.positive{background:#eafaf0;color:#1e9e56;}
+  .kpi-delta.negative{background:#fdecea;color:#c0392b;}
+  .kpi-delta.flat{background:#fdf3e3;color:#b9791a;}
+  @media (max-width:760px){.kpi-row{grid-template-columns:1fr;}}
+
+  .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#eef0f3;margin-top:18px;}
+  .chart-pane{background:#fff;padding:16px 18px 8px 18px;}
+  .chart-pane h4{margin:0 0 8px 0;font-size:11.5px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;}
+  canvas{max-height:230px;}
+  @media (max-width:760px){.charts-grid{grid-template-columns:1fr;}}
+
+  .section-title{padding:18px 24px 0 24px;font-size:12px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;}
+  .section-title span.range{font-weight:600;text-transform:none;color:#9aa0ab;margin-left:8px;}
+
+  .goal-grid{padding:12px 24px 6px 24px;display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+  @media (max-width:900px){.goal-grid{grid-template-columns:repeat(2,1fr);}}
+  .goal-card{background:#fbfcfe;border:1px solid #eef0f3;border-radius:10px;padding:14px;text-align:center;}
+  .goal-card.total{background:var(--navy);border-color:var(--navy);}
+  .goal-card.total .goal-market, .goal-card.total .goal-pct{color:#fff;}
+  .goal-card.total .goal-line{color:rgba(255,255,255,0.75);}
+  .goal-card.total .goal-line b{color:#fff;}
+  .goal-market{font-size:12px;font-weight:800;color:var(--navy);margin-bottom:8px;}
+  .goal-line{font-size:10.5px;color:#9aa0ab;margin-bottom:2px;}
+  .goal-line b{color:#22283a;}
+  .goal-bar-track{background:#e7eaf0;border-radius:6px;height:7px;margin:8px 0 8px 0;overflow:hidden;}
+  .goal-card.total .goal-bar-track{background:rgba(255,255,255,0.2);}
+  .goal-bar-fill{height:100%;border-radius:6px;}
+  .goal-pct{font-size:22px;font-weight:800;color:var(--navy);margin-bottom:4px;}
+  .goal-status{display:inline-block;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;margin-top:8px;}
+  .status-above{background:#eafaf0;color:#1e9e56;}
+  .status-below{background:#fdecea;color:#c0392b;}
+
+  .quota-chart-pane{margin:16px 24px 6px 24px;background:#fbfcfe;border:1px solid #eef0f3;border-radius:10px;padding:16px 18px 8px 18px;}
+  .quota-chart-pane h4{margin:0 0 8px 0;font-size:11.5px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;}
+
+  .market-detail-card{margin:16px 24px 0 24px;border:1px solid #eef0f3;border-radius:10px;padding:16px 18px;background:#fff;}
+  .market-detail-head{font-size:13.5px;font-weight:800;color:var(--navy);border-bottom:2px solid var(--navy);padding-bottom:8px;margin-bottom:12px;}
+  .market-stat-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+  .market-stat{background:#fbfcfe;border:1px solid #eef0f3;border-radius:8px;padding:10px 12px;text-align:center;}
+  .market-stat .lbl{font-size:9.5px;color:#98a0ad;text-transform:uppercase;letter-spacing:.05em;font-weight:800;margin-bottom:4px;}
+  .market-stat .val{font-size:16px;font-weight:800;color:var(--navy);}
+  .market-stat .sub{font-size:9.5px;color:#a3aab5;margin-top:2px;}
+  .market-stat .delta{font-size:10px;font-weight:800;margin-top:4px;display:inline-block;}
+  .mini-chart{max-height:110px;margin-bottom:10px;}
+  .market-quota-row{display:flex;align-items:center;gap:10px;font-size:10.5px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.03em;}
+  .market-quota-row .goal-bar-track{flex:1;margin:0;}
+  .market-quota-row .pct-label{font-weight:800;color:var(--navy);font-size:12px;text-transform:none;letter-spacing:0;white-space:nowrap;}
+
+  .foot-note{padding:16px 24px 18px 24px;font-size:11px;color:#a3aab5;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="card">
+    <div class="report-head">
+      <h1>Pipeline &amp; Closed ARR Report</h1>
+      <div class="sub">All Markets · Key Markets — MoM · YoY · WoW</div>
+      <div class="sub2">MoM: Jun 1–19 vs Jul 1–19, 2026 &nbsp;·&nbsp; YoY: Jul 1–19, 2025 vs 2026 &nbsp;·&nbsp; WoW: Jul 6–12 vs Jul 13–19, 2026</div>
+      <div class="as-of">DACH · RO · UK · ANZ</div>
+    </div>
+
+    <div class="toolbar">
+      <div class="toggle-row" id="scopeRow">
+        <button class="tab-btn active" data-scope="all">🌐 All Markets</button>
+        <button class="tab-btn" data-scope="key">🎯 Key Markets Detail</button>
+      </div>
+    </div>
+
+    <div id="allMarketsView">
+      <div id="periodsContainer"></div>
+      <div class="charts-grid">
+        <div class="chart-pane"><h4>Pipeline Generated — Period Comparison ($)</h4><canvas id="pgChart"></canvas></div>
+        <div class="chart-pane"><h4>Closed ARR — Period Comparison ($)</h4><canvas id="caChart"></canvas></div>
+      </div>
+    </div>
+
+    <div id="keyMarketsView" style="display:none;">
+      <div class="section-title">Pipeline Quota Coverage <span class="range">Achieved thru Jul 19 vs full July quota</span></div>
+      <div class="goal-grid" id="goalGrid"></div>
+      <div class="quota-chart-pane">
+        <h4>Pipeline vs Quota by Market</h4>
+        <canvas id="quotaChart"></canvas>
+      </div>
+
+      <div class="section-title" style="margin-top:20px;">Market Detail — WoW <span class="range">Jul 6–12 vs Jul 13–19, 2026</span></div>
+      <div id="marketDetailContainer"></div>
+      <div style="height:8px;"></div>
+    </div>
+
+    <div class="foot-note">Pipeline Generated = ARR of deals with a 1:1 upcoming demo date in the period (Sales International pipeline). Closed ARR = closed-won/upsell deals by close date. <b>Quota coverage below uses each market's full July monthly quota (not prorated) against pipeline achieved so far — pipeline figures are month-to-date as of Jul 19, 2026, not a full-month total.</b> Figures pulled directly from HubSpot custom date-range reports — no projections or run-rates. <b>Note:</b> the Jun 1–19, 2026 All Markets Pipeline Generated total ($1,035,806.6x) had its final digit cut off in the source screenshot — please confirm the exact figure; MoM % above uses $1,035,806.60 as a placeholder.</div>
+  </div>
+
+</div>
+
+<script>
+const DATA = {
+  all: {
+    MoM: { label:"MONTH-OVER-MONTH", range:"Jun 1–19 vs Jul 1–19, 2026", prevLabel:"Jun 1–19", curLabel:"Jul 1–19",
+      pg:{cur:386864.73, prev:1035806.60}, ca:{cur:16263.10, prev:16323.95} },
+    YoY: { label:"YEAR-OVER-YEAR", range:"Jul 1–19, 2025 vs 2026", prevLabel:"Jul 1–19 '25", curLabel:"Jul 1–19 '26",
+      pg:{cur:386864.73, prev:138625.84}, ca:{cur:16263.10, prev:16594.58} },
+    WoW: { label:"WEEK-OVER-WEEK", range:"Jul 6–12 vs Jul 13–19, 2026", prevLabel:"Jul 6–12", curLabel:"Jul 13–19",
+      pg:{cur:180569.14, prev:114154.44}, ca:{cur:9144.42, prev:7118.68} },
+  }
+};
+
+const MARKET_WOW = {
+  DACH: {flag:"🇩🇪", pg:{cur:37827.38, prev:21715.00}, ca:{cur:0, prev:913.00}},
+  RO:   {flag:"🇷🇴", pg:{cur:12800.00, prev:4800.00}, ca:{cur:6400.18, prev:0}},
+  UK:   {flag:"🇬🇧", pg:{cur:55203.49, prev:11200.00}, ca:{cur:1605.97, prev:0}},
+  ANZ:  {flag:"🇦🇺", pg:{cur:41600.00, prev:33039.44}, ca:{cur:0, prev:5205.68}},
+};
+
+const DAYS_ELAPSED = 19, DAYS_IN_MONTH = 31;
+const GOALS_MONTHLY = { UK:166667, RO:274075, ANZ:94489, DACH:35990 };
+const MTD_PIPELINE = { UK:88803.49, RO:66516.22, ANZ:88480.09, DACH:64126.66 };
+const FLAGS = { UK:"🇬🇧", RO:"🇷🇴", ANZ:"🇦🇺", DACH:"🇩🇪" };
+
+let charts = {};
+
+function pctChange(cur,prev){ if(prev===0) return cur===0?0:null; return (cur-prev)/prev*100; }
+function fmtPct(x){ if(x===null) return 'n/a (new)'; const a=x>0?'▲':(x<0?'▼':'▬'); return `${a} ${Math.abs(x).toFixed(1)}%`; }
+function deltaClass(x){ if(x===null) return 'flat'; return x>0?'positive':(x<0?'negative':'flat'); }
+function money(v){ return '$'+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function moneyShort(v){ return '$'+Math.round(v).toLocaleString('en-US'); }
+
+function periodBlock(d){
+  const wrPrev = d.pg.prev ? (d.ca.prev/d.pg.prev*100) : 0;
+  const wrCur = d.pg.cur ? (d.ca.cur/d.pg.cur*100) : 0;
+  const pgD = pctChange(d.pg.cur, d.pg.prev);
+  const caD = pctChange(d.ca.cur, d.ca.prev);
+  const wrD = pctChange(wrCur, wrPrev);
+  return `<div class="period-block">
+    <div class="period-label">${d.label} <span class="range">${d.range}</span></div>
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">📈 Pipeline Generated</div>
+        <div class="kpi-value">${money(d.pg.cur)}</div>
+        <div class="kpi-delta ${deltaClass(pgD)}">${fmtPct(pgD)}</div>
+        <div class="kpi-sub">${d.prevLabel}: ${money(d.pg.prev)}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">💰 Closed ARR</div>
+        <div class="kpi-value">${money(d.ca.cur)}</div>
+        <div class="kpi-delta ${deltaClass(caD)}">${fmtPct(caD)}</div>
+        <div class="kpi-sub">${d.prevLabel}: ${money(d.ca.prev)}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">🎯 Win Rate</div>
+        <div class="kpi-value">${wrCur.toFixed(2)}%</div>
+        <div class="kpi-delta ${deltaClass(wrD)}">${fmtPct(wrD)}</div>
+        <div class="kpi-sub">${d.prevLabel}: ${wrPrev.toFixed(2)}%</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderAllMarkets(){
+  const src = DATA.all;
+  const periods = Object.keys(src);
+  document.getElementById('periodsContainer').innerHTML = periods.map(p=>periodBlock(src[p])).join('');
+
+  const labels=[], pgPrev=[], pgCur=[], caPrev=[], caCur=[];
+  periods.forEach(p=>{ const d=src[p]; labels.push(p); pgPrev.push(d.pg.prev); pgCur.push(d.pg.cur); caPrev.push(d.ca.prev); caCur.push(d.ca.cur); });
+
+  const opts = {
+    responsive:true,
+    plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:11,font:{size:10.5}}}},
+    scales:{y:{beginAtZero:true,grid:{color:'#f0f0f2'},ticks:{callback:v=>'$'+v.toLocaleString()}},x:{grid:{display:false}}}
+  };
+
+  if (charts.pg) charts.pg.destroy();
+  charts.pg = new Chart(document.getElementById('pgChart'), {
+    type:'bar', data:{labels, datasets:[
+      {label:'Previous period',data:pgPrev,backgroundColor:'#c9d6ef'},
+      {label:'Current period',data:pgCur,backgroundColor:'#4B9CD3'}
+    ]}, options:opts
+  });
+  if (charts.ca) charts.ca.destroy();
+  charts.ca = new Chart(document.getElementById('caChart'), {
+    type:'bar', data:{labels, datasets:[
+      {label:'Previous period',data:caPrev,backgroundColor:'#dcd0f0'},
+      {label:'Current period',data:caCur,backgroundColor:'#1F2D5C'}
+    ]}, options:opts
+  });
+}
+
+function goalCard(name, quota, mtd, isTotal){
+  const pct = mtd/quota*100;
+  const above = pct >= 100;
+  const barColor = above ? '#2ECC71' : '#E74C3C';
+  const flag = FLAGS[name] ? FLAGS[name]+' ' : '';
+  return `<div class="goal-card${isTotal?' total':''}">
+    <div class="goal-market">${flag}${name}</div>
+    <div class="goal-pct">${pct.toFixed(2)}%</div>
+    <div class="goal-line">${moneyShort(mtd)} pipeline (thru Jul 19)</div>
+    <div class="goal-line">vs ${moneyShort(quota)} full July quota</div>
+    <div class="goal-bar-track"><div class="goal-bar-fill" style="width:${Math.min(pct,100)}%;background:${barColor};"></div></div>
+    <span class="goal-status ${above?'status-above':'status-below'}">${above?'✓ ABOVE QUOTA':'✗ BELOW QUOTA'}</span>
+  </div>`;
+}
+
+function renderGoals(){
+  let totalQuota=0, totalMtd=0;
+  const cards = Object.keys(GOALS_MONTHLY).map(m=>{
+    const q = GOALS_MONTHLY[m], mtd = MTD_PIPELINE[m];
+    totalQuota += q; totalMtd += mtd;
+    return goalCard(m, q, mtd, false);
+  }).join('');
+  const totalCard = goalCard('TOTAL', totalQuota, totalMtd, true);
+  document.getElementById('goalGrid').innerHTML = cards + totalCard;
+
+  const labels = Object.keys(GOALS_MONTHLY);
+  const pipelineData = labels.map(m=>MTD_PIPELINE[m]);
+  const quotaData = labels.map(m=>GOALS_MONTHLY[m]);
+  const barColors = labels.map(m=> MTD_PIPELINE[m]>=GOALS_MONTHLY[m] ? '#2ECC71' : '#E74C3C');
+
+  if (charts.quota) charts.quota.destroy();
+  charts.quota = new Chart(document.getElementById('quotaChart'), {
+    type:'bar',
+    data:{labels, datasets:[
+      {label:'Pipeline (thru Jul 19)', data:pipelineData, backgroundColor:barColors},
+      {label:'Full July Quota', data:quotaData, backgroundColor:'#d5d9e0'}
+    ]},
+    options:{
+      responsive:true,
+      plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:11,font:{size:10.5}}}},
+      scales:{y:{beginAtZero:true,grid:{color:'#f0f0f2'},ticks:{callback:v=>'$'+v.toLocaleString()}},x:{grid:{display:false}}}
+    }
+  });
+}
+
+function marketDetailCard(name){
+  const m = MARKET_WOW[name];
+  const pgD = pctChange(m.pg.cur, m.pg.prev);
+  const caD = pctChange(m.ca.cur, m.ca.prev);
+  const pct = MTD_PIPELINE[name]/GOALS_MONTHLY[name]*100;
+  const barColor = pct>=100 ? '#2ECC71' : '#E74C3C';
+  return `<div class="market-detail-card">
+    <div class="market-detail-head">${m.flag} ${name==='RO'?'Romania (RO)':name}</div>
+    <div class="market-stat-row">
+      <div class="market-stat">
+        <div class="lbl">Pipeline</div>
+        <div class="val">${money(m.pg.cur)}</div>
+        <div class="sub">was ${money(m.pg.prev)}</div>
+        <div class="delta ${deltaClass(pgD)==='positive'?'kpi-delta positive':deltaClass(pgD)==='negative'?'kpi-delta negative':'kpi-delta flat'}">${fmtPct(pgD)}</div>
+      </div>
+      <div class="market-stat">
+        <div class="lbl">Closed</div>
+        <div class="val">${money(m.ca.cur)}</div>
+        <div class="sub">was ${m.ca.prev? money(m.ca.prev) : '—'}</div>
+        <div class="delta ${deltaClass(caD)==='positive'?'kpi-delta positive':deltaClass(caD)==='negative'?'kpi-delta negative':'kpi-delta flat'}">${fmtPct(caD)}</div>
+      </div>
+    </div>
+    <canvas class="mini-chart" id="mini-${name}"></canvas>
+    <div class="market-quota-row">
+      <span>Pipeline Quota Coverage (thru Jul 19 vs full July quota)</span>
+      <div class="goal-bar-track"><div class="goal-bar-fill" style="width:${Math.min(pct,100)}%;background:${barColor};"></div></div>
+      <span class="pct-label">${pct.toFixed(2)}%</span>
+    </div>
+  </div>`;
+}
+
+function renderMarketDetail(){
+  const order = ['DACH','RO','UK','ANZ'];
+  document.getElementById('marketDetailContainer').innerHTML = order.map(m=>marketDetailCard(m)).join('');
+  order.forEach(name=>{
+    const m = MARKET_WOW[name];
+    const key = 'mini-'+name;
+    if (charts[key]) charts[key].destroy();
+    charts[key] = new Chart(document.getElementById(key), {
+      type:'bar',
+      data:{labels:['Pipeline','Closed'], datasets:[
+        {label:'Jul 6–12', data:[m.pg.prev, m.ca.prev], backgroundColor:'#c9d6ef'},
+        {label:'Jul 13–19', data:[m.pg.cur, m.ca.cur], backgroundColor:'#1F2D5C'}
+      ]},
+      options:{
+        responsive:true,
+        plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:10,font:{size:9.5}}}},
+        scales:{y:{beginAtZero:true,grid:{color:'#f4f4f6'},ticks:{font:{size:9},callback:v=>'$'+v.toLocaleString()}},x:{grid:{display:false},ticks:{font:{size:10}}}}
+      }
+    });
+  });
+}
+
+document.getElementById('scopeRow').addEventListener('click', e=>{
+  const btn = e.target.closest('.tab-btn'); if(!btn) return;
+  document.querySelectorAll('#scopeRow .tab-btn').forEach(b=>b.classList.toggle('active', b===btn));
+  const scope = btn.dataset.scope;
+  document.getElementById('allMarketsView').style.display = scope==='all' ? 'block' : 'none';
+  document.getElementById('keyMarketsView').style.display = scope==='key' ? 'block' : 'none';
+});
+
+renderAllMarkets();
+renderGoals();
+renderMarketDetail();
+</script>
+</body>
+</html>
