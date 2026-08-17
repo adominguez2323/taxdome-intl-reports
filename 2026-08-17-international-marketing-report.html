@@ -96,9 +96,9 @@
     <strong>Reporting cutoff = Aug 16, 2026 (today excluded):</strong> per Andrea's request, today (Aug 17) is left out of every window
     entirely rather than corrected — MoM now compares Jul 1–16 vs Aug 1–16 (matched 16-day ranges) and YoY compares Aug 1–16 in 2025 vs 2026.
     WoW was already unaffected (Aug 10–16 vs Aug 3–9).<br><br>
-    <strong>SQL — All Markets:</strong> MoM/YoY (48/89/42) from the Total SQL monthly export (no country column, but valid as the
-    all-international total). WoW (25 Aug 10–16, 18 Aug 3–9) provided directly by Andrea. <strong>Caveat:</strong> the MoM/YoY figures are
-    monthly-grain — "Aug 1–16" there is really the full August bucket as of the export (Aug 17), not cut off at the 16th like Leads/MQL.<br>
+    <strong>SQL — All Markets:</strong> MoM (Jul 1–16: 50, Aug 1–16: 48) and YoY (Aug 1–16 '25: 19, Aug 1–16 '26: 48) now use Andrea's exact
+    day-16-cutoff figures, matching Leads/MQL properly — the earlier version of this report used whole-month totals from the monthly SQL
+    export as an approximation and that's been replaced. WoW (25 Aug 10–16, 18 Aug 3–9) provided directly by Andrea, already matched.<br>
     <strong>SQL — Key Markets (WoW) from HubSpot screenshot:</strong> Overall 16→26, DACH 0→4, UK 7→7, RO 7→7, ANZ 2→8.
     <strong>⚠ Note:</strong> Key Markets WoW SQL (26) is slightly higher than the All Markets WoW SQL Andrea provided for the same current
     week (25) — since key markets should be a subset of all markets, one of these two figures is probably off by 1 (rounding, a same-day
@@ -119,9 +119,9 @@ const REPORT_DATE = new Date(Date.UTC(2026,7,16)); // 2026-08-16 (today, Aug 17,
 const DATA = {
   all: {
     MoM: { label:"MONTH-OVER-MONTH", range:"Jul 1–16 vs Aug 1–16, 2026", prevLabel:"Jul 1–16", curLabel:"Aug 1–16", prevAbbr:"Jul", curAbbr:"Aug",
-      leads:{cur:224,prev:119}, mql:{cur:177,prev:156}, sql:{cur:48,prev:89} },
+      leads:{cur:224,prev:119}, mql:{cur:177,prev:156}, sql:{cur:48,prev:50} },
     YoY: { label:"YEAR-OVER-YEAR", range:"Aug 1–16, 2025 vs 2026", prevLabel:"Aug 1–16 '25", curLabel:"Aug 1–16 '26", prevAbbr:"'25", curAbbr:"'26",
-      leads:{cur:224,prev:213}, mql:{cur:177,prev:116}, sql:{cur:48,prev:42} },
+      leads:{cur:224,prev:213}, mql:{cur:177,prev:116}, sql:{cur:48,prev:19} },
     WoW: { label:"WEEK-OVER-WEEK", range:"Aug 3–9 vs Aug 10–16, 2026", prevLabel:"Aug 3–9", curLabel:"Aug 10–16", prevAbbr:"Aug 3–9", curAbbr:"Aug 10–16",
       leads:{cur:103,prev:117}, mql:{cur:89,prev:81}, sql:{cur:25,prev:18} }
   },
