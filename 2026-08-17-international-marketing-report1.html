@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lead Progression Report</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<style>
+  :root{
+    color-scheme: light;
+    --navy:#1F2D5C; --navy2:#2E4172; --blue:#4B9CD3; --green:#1E9E52; --red:#C0392B;
+    --grey-bg:#F4F6FA; --card-border:#E6E9F0; --text-muted:#6B7280; --slate:#7A87A8;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--grey-bg);color:var(--navy);}
+  .wrap{max-width:780px;margin:0 auto;padding:20px 20px 40px;}
+  .head{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);border-radius:14px;color:#fff;padding:20px 22px;display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+  .head h1{margin:0 0 4px;font-size:19px;font-weight:800;}
+  .head .sub{font-size:12.5px;opacity:0.85;margin:0;}
+  .head .badge{background:rgba(255,255,255,0.16);border-radius:999px;padding:5px 12px;font-size:11px;font-weight:700;white-space:nowrap;}
+  .tabs{display:flex;gap:8px;margin-bottom:12px;}
+  .tab{flex:0 0 auto;padding:9px 18px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;background:#fff;border:1px solid var(--card-border);color:var(--navy);}
+  .tab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .subtabs{display:flex;gap:6px;margin-bottom:14px;}
+  .subtab{padding:6px 16px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;background:#EDEFF4;color:var(--text-muted);}
+  .subtab.active{background:var(--navy);color:#fff;}
+  .market-pills{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+  .market-pill{padding:6px 14px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;background:#fff;border:1px solid var(--card-border);color:var(--navy);}
+  .market-pill.active{background:#2ECC71;color:#fff;border-color:#2ECC71;}
+  .period-label{font-size:11.5px;font-weight:800;letter-spacing:0.05em;color:var(--text-muted);text-transform:uppercase;margin:4px 0 10px;}
+  .kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:18px;}
+  @media (max-width:700px){.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+  .kpi-card{background:#fff;border:1px solid var(--card-border);border-radius:10px;padding:12px 10px;}
+  .kpi-card .lbl{font-size:10.5px;color:var(--text-muted);font-weight:700;text-transform:uppercase;margin-bottom:5px;}
+  .kpi-card .val{font-size:19px;font-weight:800;color:var(--navy);}
+  .kpi-card .trend{font-size:11.5px;font-weight:700;margin-top:3px;}
+  .trend.up{color:var(--green);} .trend.down{color:var(--red);} .trend.flat{color:var(--text-muted);}
+  .kpi-card .endpoints{display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-top:7px;padding-top:6px;border-top:1px solid var(--card-border);}
+  .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
+  @media (max-width:700px){.chart-row{grid-template-columns:1fr;}}
+  .chart-card{background:#fff;border:1px solid var(--card-border);border-radius:10px;padding:14px;}
+  .chart-card h3{font-size:11.5px;letter-spacing:0.04em;margin:0 0 10px;color:var(--text-muted);font-weight:800;text-transform:uppercase;}
+  .chart-holder{position:relative;height:200px;}
+  table.summary{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--card-border);border-radius:10px;overflow:hidden;font-size:12.5px;}
+  table.summary th{text-align:left;background:#F7F8FB;color:var(--text-muted);font-size:10.5px;text-transform:uppercase;font-weight:800;padding:9px 12px;border-bottom:1px solid var(--card-border);}
+  table.summary td{padding:9px 12px;border-bottom:1px solid var(--card-border);}
+  table.summary tr:last-child td{border-bottom:none;}
+  .chg-up{color:var(--green);font-weight:700;} .chg-down{color:var(--red);font-weight:700;}
+  .section-title{font-size:13px;font-weight:800;margin:20px 0 10px;color:var(--navy);}
+  .footnote{font-size:11px;color:var(--text-muted);line-height:1.5;margin-top:16px;padding-top:12px;border-top:1px solid var(--card-border);}
+  .hidden{display:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div>
+      <h1>Lead Progression Report</h1>
+      <p class="sub">All Markets · Key Markets · MoM · YoY · WoW</p>
+    </div>
+    <div class="badge" id="asOfBadge"></div>
+  </div>
+
+  <div class="tabs" id="scopeRow">
+    <div class="tab active" data-scope="all">🔷 All Markets</div>
+    <div class="tab" data-scope="key">🎯 Key Markets</div>
+  </div>
+
+  <div class="subtabs" id="periodRow">
+    <div class="subtab active" data-period="MoM">MoM</div>
+    <div class="subtab" data-period="YoY">YoY</div>
+    <div class="subtab" data-period="WoW">WoW</div>
+  </div>
+
+  <div class="market-pills hidden" id="marketRow">
+    <div class="market-pill active" data-market="overall">Overall</div>
+    <div class="market-pill" data-market="DACH">DACH</div>
+    <div class="market-pill" data-market="UK">UK</div>
+    <div class="market-pill" data-market="RO">RO</div>
+    <div class="market-pill" data-market="ANZ">ANZ</div>
+  </div>
+
+  <div class="period-label" id="periodBar"></div>
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <div class="chart-row">
+    <div class="chart-card"><h3 id="volTitle">Volume</h3><div class="chart-holder"><canvas id="volChart"></canvas></div></div>
+    <div class="chart-card"><h3 id="convTitle">Conversion Rate</h3><div class="chart-holder"><canvas id="convChart"></canvas></div></div>
+  </div>
+
+  <div class="section-title">Full Summary — <span id="summaryScopeLabel">All Markets</span></div>
+  <table class="summary" id="summaryTable"></table>
+
+  <div class="footnote">
+    <strong>Reporting cutoff = Aug 16, 2026 (today excluded):</strong> per Andrea's request, today (Aug 17) is left out of every window
+    entirely rather than corrected — MoM now compares Jul 1–16 vs Aug 1–16 (matched 16-day ranges) and YoY compares Aug 1–16 in 2025 vs 2026.
+    WoW was already unaffected (Aug 10–16 vs Aug 3–9).<br><br>
+    <strong>SQL — All Markets:</strong> MoM (Jul 1–16: 50, Aug 1–16: 48) and YoY (Aug 1–16 '25: 19, Aug 1–16 '26: 48) now use Andrea's exact
+    day-16-cutoff figures, matching Leads/MQL properly — the earlier version of this report used whole-month totals from the monthly SQL
+    export as an approximation and that's been replaced. WoW (25 Aug 10–16, 18 Aug 3–9) provided directly by Andrea, already matched.<br>
+    <strong>SQL — Key Markets (WoW) from HubSpot screenshot:</strong> Overall 16→26, DACH 0→4, UK 7→7, RO 7→7, ANZ 2→8.
+    <strong>⚠ Note:</strong> Key Markets WoW SQL (26) is slightly higher than the All Markets WoW SQL Andrea provided for the same current
+    week (25) — since key markets should be a subset of all markets, one of these two figures is probably off by 1 (rounding, a same-day
+    timing difference between when each was pulled, or a small transcription slip). Flagging rather than silently adjusting either number —
+    worth a quick double-check next time these are pulled.<br><br>
+    Source: HubSpot CSV exports (Lead generation, Total MQLs, Total SQL) — International markets only, US/Canada excluded.
+    Leads = company create date. MQL = date entered Marketing Qualified Lead stage. SQL = date entered Sales Qualified Lead stage.
+    No run-rates, projections, or prorated figures are used. Key Markets → Overall = DACH + UK + ANZ + RO combined.
+    DACH = Germany + Austria + Switzerland. ANZ = Australia + New Zealand. Reporting date is dynamic — this cycle's date windows
+    are computed from the day the report was generated.
+  </div>
+
+</div>
+
+<script>
+const REPORT_DATE = new Date(Date.UTC(2026,7,16)); // 2026-08-16 (today, Aug 17, excluded per Andrea's request)
+
+const DATA = {
+  all: {
+    MoM: { label:"MONTH-OVER-MONTH", range:"Jul 1–16 vs Aug 1–16, 2026", prevLabel:"Jul 1–16", curLabel:"Aug 1–16", prevAbbr:"Jul", curAbbr:"Aug",
+      leads:{cur:224,prev:119}, mql:{cur:177,prev:156}, sql:{cur:48,prev:50} },
+    YoY: { label:"YEAR-OVER-YEAR", range:"Aug 1–16, 2025 vs 2026", prevLabel:"Aug 1–16 '25", curLabel:"Aug 1–16 '26", prevAbbr:"'25", curAbbr:"'26",
+      leads:{cur:224,prev:213}, mql:{cur:177,prev:116}, sql:{cur:48,prev:19} },
+    WoW: { label:"WEEK-OVER-WEEK", range:"Aug 3–9 vs Aug 10–16, 2026", prevLabel:"Aug 3–9", curLabel:"Aug 10–16", prevAbbr:"Aug 3–9", curAbbr:"Aug 10–16",
+      leads:{cur:103,prev:117}, mql:{cur:89,prev:81}, sql:{cur:25,prev:18} }
+  },
+  key: {
+    overall: { WoW: { label:"WEEK-OVER-WEEK", range:"Aug 3–9 vs Aug 10–16, 2026", prevLabel:"Aug 3–9", curLabel:"Aug 10–16", prevAbbr:"Aug 3–9", curAbbr:"Aug 10–16",
+      leads:{cur:77,prev:88}, mql:{cur:51,prev:47}, sql:{cur:26,prev:16} } },
+    DACH: { WoW: { label:"WEEK-OVER-WEEK", range:"Aug 3–9 vs Aug 10–16, 2026", prevLabel:"Aug 3–9", curLabel:"Aug 10–16", prevAbbr:"Aug 3–9", curAbbr:"Aug 10–16",
+      leads:{cur:11,prev:17}, mql:{cur:5,prev:3}, sql:{cur:4,prev:0} } },
+    UK: { WoW: { label:"WEEK-OVER-WEEK", range:"Aug 3–9 vs Aug 10–16, 2026", prevLabel:"Aug 3–9", curLabel:"Aug 10–16", prevAbbr:"Aug 3–9", curAbbr:"Aug 10–16",
+      leads:{cur:5,prev:6}, mql:{cur:7,prev:9}, sql:{cur:7,prev:7} } },
+    RO: { WoW: { label:"WEEK-OVER-WEEK", range:"Aug 3–9 vs Aug 10–16, 2026", prevLabel:"Aug 3–9", curLabel:"Aug 10–16", prevAbbr:"Aug 3–9", curAbbr:"Aug 10–16",
+      leads:{cur:60,prev:65}, mql:{cur:31,prev:30}, sql:{cur:7,prev:7} } },
+    ANZ: { WoW: { label:"WEEK-OVER-WEEK", range:"Aug 3–9 vs Aug 10–16, 2026", prevLabel:"Aug 3–9", curLabel:"Aug 10–16", prevAbbr:"Aug 3–9", curAbbr:"Aug 10–16",
+      leads:{cur:1,prev:0}, mql:{cur:8,prev:5}, sql:{cur:8,prev:2} } }
+  }
+};
+
+let state = { scope:'all', period:'MoM', market:'overall' };
+let volChart, convChart;
+
+function fmtDate(d){ return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric',timeZone:'UTC'}); }
+document.getElementById('asOfBadge').textContent = 'AS OF ' + fmtDate(REPORT_DATE).toUpperCase();
+
+function pct(cur, prev){ if(cur===null||prev===null) return null; if(prev===0) return cur===0 ? 0 : null; return ((cur-prev)/prev)*100; }
+function fmtPct(p){ if(p===null) return 'n/a'; const s=p>=0?'+':''; return s+p.toFixed(1)+'%'; }
+function trendCls(p){ if(p===null) return 'flat'; return p>0?'up':(p<0?'down':'flat'); }
+function trendArrow(p){ if(p===null) return ''; return p>0?'▲ ':(p<0?'▼ ':'– '); }
+function rate(num, den){ if(num===null||den===null) return null; if(den===0) return null; return (num/den)*100; }
+function fmtRate(r){ return r===null ? 'n/a' : r.toFixed(1)+'%'; }
+function fmtAbs(a){ if(a===null) return 'n/a'; const s=a>0?'+':''; return s+a; }
+function fmtVal(v){ return v===null ? 'Pending' : v; }
+
+function currentData(){
+  if(state.scope==='all') return DATA.all[state.period];
+  return DATA.key[state.market].WoW;
+}
+
+function syncPeriodRow(){
+  const row = document.getElementById('periodRow');
+  if(state.scope==='key'){ row.classList.add('hidden'); state.period='WoW'; }
+  else { row.classList.remove('hidden'); }
+}
+
+function render(){
+  document.querySelectorAll('#scopeRow .tab').forEach(b=>b.classList.toggle('active', b.dataset.scope===state.scope));
+  document.getElementById('marketRow').classList.toggle('hidden', state.scope!=='key');
+  syncPeriodRow();
+  document.querySelectorAll('#periodRow .subtab').forEach(b=>b.classList.toggle('active', b.dataset.period===state.period));
+  document.querySelectorAll('#marketRow .market-pill').forEach(b=>b.classList.toggle('active', b.dataset.market===state.market));
+
+  const d = currentData();
+  document.getElementById('periodBar').textContent = d.label + ' · ' + d.range;
+  document.getElementById('summaryScopeLabel').textContent = state.scope==='all' ? 'All Markets' : ('Key Markets — ' + (state.market==='overall'?'Overall':state.market));
+
+  const leadMql = { cur: rate(d.mql.cur, d.leads.cur), prev: rate(d.mql.prev, d.leads.prev) };
+  const mqlSql = { cur: rate(d.sql.cur, d.mql.cur), prev: rate(d.sql.prev, d.mql.prev) };
+
+  const cells = [
+    {lbl:'Leads', val:d.leads.cur, abs:d.leads.cur-d.leads.prev, p:pct(d.leads.cur,d.leads.prev), prevVal:d.leads.prev},
+    {lbl:'MQL', val:d.mql.cur, abs:d.mql.cur-d.mql.prev, p:pct(d.mql.cur,d.mql.prev), prevVal:d.mql.prev},
+    {lbl:'SQL', val:fmtVal(d.sql.cur), abs:(d.sql.cur===null||d.sql.prev===null)?null:d.sql.cur-d.sql.prev, p:pct(d.sql.cur,d.sql.prev), prevVal:fmtVal(d.sql.prev), pending:d.sql.cur===null},
+    {lbl:'Lead / MQL', val:fmtRate(leadMql.cur), p:leadMql.cur===null||leadMql.prev===null?null:leadMql.cur-leadMql.prev, isRate:true, prevVal:fmtRate(leadMql.prev)},
+    {lbl:'MQL / SQL', val:fmtRate(mqlSql.cur), p:mqlSql.cur===null||mqlSql.prev===null?null:mqlSql.cur-mqlSql.prev, isRate:true, prevVal:fmtRate(mqlSql.prev), pending:d.sql.cur===null}
+  ];
+
+  document.getElementById('kpiGrid').innerHTML = cells.map(c=>{
+    if(c.pending){
+      return `<div class="kpi-card">
+        <div class="lbl">${c.lbl}</div>
+        <div class="val" style="color:#B0B6C3;font-size:15px;">Pending data</div>
+        <div class="trend flat">awaiting corrected SQL export</div>
+        <div class="endpoints"><span>${d.prevAbbr}: —</span><span>${d.curAbbr}: —</span></div>
+      </div>`;
+    }
+    const trendTxt = c.isRate
+      ? (c.p===null ? 'n/a' : trendArrow(c.p)+Math.abs(c.p).toFixed(1)+' pt')
+      : trendArrow(c.p)+fmtAbs(c.abs)+' · '+fmtPct(c.p);
+    return `<div class="kpi-card">
+      <div class="lbl">${c.lbl}</div>
+      <div class="val">${c.val}</div>
+      <div class="trend ${trendCls(c.p)}">${trendTxt}</div>
+      <div class="endpoints"><span>${d.prevAbbr}: ${c.prevVal}</span><span>${d.curAbbr}: ${c.val}</span></div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('volTitle').textContent = 'Volume — ' + d.prevAbbr + ' vs ' + d.curAbbr;
+  document.getElementById('convTitle').textContent = 'Conversion Rate — ' + d.prevAbbr + ' vs ' + d.curAbbr;
+
+  if(volChart) volChart.destroy();
+  volChart = new Chart(document.getElementById('volChart'), {
+    type:'bar',
+    data:{ labels:['Leads','MQL','SQL'], datasets:[
+      {label:d.prevLabel, data:[d.leads.prev,d.mql.prev,d.sql.prev], backgroundColor:'#B8C4E0'},
+      {label:d.curLabel, data:[d.leads.cur,d.mql.cur,d.sql.cur], backgroundColor:'#1F2D5C'}
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:10}}}}, scales:{y:{beginAtZero:true}} }
+  });
+
+  if(convChart) convChart.destroy();
+  convChart = new Chart(document.getElementById('convChart'), {
+    type:'bar',
+    data:{ labels:['Lead/MQL','MQL/SQL'], datasets:[
+      {label:d.prevLabel, data:[leadMql.prev||0, mqlSql.prev||0], backgroundColor:'#B8C4E0'},
+      {label:d.curLabel, data:[leadMql.cur||0, mqlSql.cur||0], backgroundColor:'#4B9CD3'}
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:10}}}}, scales:{y:{beginAtZero:true, ticks:{callback:v=>v+'%'}}} }
+  });
+
+  renderSummary();
+}
+
+function summaryRowsFor(periods, dataset){
+  const rows = [];
+  periods.forEach(p=>{
+    const d = dataset[p];
+    const lm_c = rate(d.mql.cur,d.leads.cur), lm_p = rate(d.mql.prev,d.leads.prev);
+    const ms_c = rate(d.sql.cur,d.mql.cur), ms_p = rate(d.sql.prev,d.mql.prev);
+    rows.push(['Leads', p, d.leads.prev, d.leads.cur, pct(d.leads.cur,d.leads.prev)]);
+    rows.push(['MQL', p, d.mql.prev, d.mql.cur, pct(d.mql.cur,d.mql.prev)]);
+    rows.push(['SQL', p, fmtVal(d.sql.prev), fmtVal(d.sql.cur), pct(d.sql.cur,d.sql.prev)]);
+    rows.push(['Lead → MQL %', p, fmtRate(lm_p), fmtRate(lm_c), null]);
+    rows.push(['MQL → SQL %', p, fmtRate(ms_p), fmtRate(ms_c), null]);
+  });
+  return rows;
+}
+
+function renderSummary(){
+  let rows;
+  if(state.scope==='all'){
+    rows = summaryRowsFor(['MoM','YoY','WoW'], DATA.all);
+  } else {
+    rows = summaryRowsFor(['WoW'], {WoW: DATA.key[state.market].WoW});
+  }
+  const table = document.getElementById('summaryTable');
+  table.innerHTML = `<thead><tr><th>Metric</th><th>Timeframe</th><th>Previous Period</th><th>Current Period</th><th>Change</th></tr></thead>
+    <tbody>${rows.map(r=>{
+      const chg = r[4]===null ? '—' : `<span class="${r[4]>=0?'chg-up':'chg-down'}">${fmtPct(r[4])}</span>`;
+      return `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${chg}</td></tr>`;
+    }).join('')}</tbody>`;
+}
+
+document.getElementById('scopeRow').addEventListener('click', e=>{
+  const t = e.target.closest('[data-scope]'); if(!t) return;
+  state.scope = t.dataset.scope; render();
+});
+document.getElementById('periodRow').addEventListener('click', e=>{
+  const t = e.target.closest('[data-period]'); if(!t) return;
+  state.period = t.dataset.period; render();
+});
+document.getElementById('marketRow').addEventListener('click', e=>{
+  const t = e.target.closest('[data-market]'); if(!t) return;
+  state.market = t.dataset.market; render();
+});
+
+render();
+</script>
+</body>
+</html>
