@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Key Markets — Pipeline & Closed Deals</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<style>
+  :root{
+    color-scheme: light;
+    --navy:#1F2D5C; --navy2:#2E4172; --green:#1E9E52; --red:#C0392B;
+    --grey-bg:#F4F6FA; --card-border:#E6E9F0; --text-muted:#6B7280;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--grey-bg);color:var(--navy);}
+  .wrap{max-width:820px;margin:0 auto;padding:20px 20px 40px;}
+  .head{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);border-radius:14px;color:#fff;padding:20px 22px;display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+  .head h1{margin:0 0 4px;font-size:19px;font-weight:800;}
+  .head .sub{font-size:12.5px;opacity:0.85;margin:0 0 4px;}
+  .head .periods{font-size:11px;opacity:0.75;margin:0;}
+  .head .badge{background:rgba(255,255,255,0.16);border-radius:999px;padding:5px 12px;font-size:11px;font-weight:700;white-space:nowrap;}
+  .tabs{display:flex;gap:22px;border-bottom:2px solid var(--card-border);margin-bottom:18px;}
+  .tab{padding:9px 2px;font-size:13.5px;font-weight:700;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;}
+  .tab.active{color:var(--navy);border-color:var(--navy);}
+  .period-label{font-size:11.5px;font-weight:800;letter-spacing:0.05em;color:var(--text-muted);text-transform:uppercase;margin:14px 0 10px;}
+  .kpi-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:6px;}
+  @media (max-width:650px){.kpi-row2{grid-template-columns:1fr;}}
+  .kpi-card{background:#fff;border:1px solid var(--card-border);border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;}
+  .kpi-card .icon{font-size:18px;line-height:1;margin-top:2px;}
+  .kpi-card .lbl{font-size:10.5px;color:var(--text-muted);font-weight:700;text-transform:uppercase;margin-bottom:5px;}
+  .kpi-card .val{font-size:19px;font-weight:800;color:var(--navy);}
+  .kpi-card .was{font-size:11px;color:var(--text-muted);margin-top:3px;}
+  .kpi-card .trend{font-size:12px;font-weight:700;margin-top:4px;}
+  .trend.up{color:var(--green);} .trend.down{color:var(--red);} .trend.flat{color:var(--text-muted);}
+  .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0;}
+  @media (max-width:700px){.chart-row{grid-template-columns:1fr;}}
+  .chart-card{background:#fff;border:1px solid var(--card-border);border-radius:10px;padding:14px;}
+  .chart-card h3{font-size:11px;letter-spacing:0.04em;margin:0 0 10px;color:var(--text-muted);font-weight:800;text-transform:uppercase;}
+  .chart-holder{position:relative;height:210px;}
+  table.summary{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--card-border);border-radius:10px;overflow:hidden;font-size:12.5px;margin-bottom:8px;}
+  table.summary th{text-align:left;background:#F7F8FB;color:var(--text-muted);font-size:10.5px;text-transform:uppercase;font-weight:800;padding:9px 12px;border-bottom:1px solid var(--card-border);}
+  table.summary td{padding:9px 12px;border-bottom:1px solid var(--card-border);}
+  table.summary tr:last-child td{border-bottom:none;}
+  .chg-up{color:var(--green);font-weight:700;} .chg-down{color:var(--red);font-weight:700;}
+  .section-title{font-size:13px;font-weight:800;margin:22px 0 10px;color:var(--navy);}
+  .goal-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px;}
+  @media (max-width:750px){.goal-grid{grid-template-columns:repeat(2,1fr);}}
+  .goal-card{background:#fff;border:1px solid var(--card-border);border-radius:10px;padding:14px 12px;text-align:center;}
+  .goal-card.total{background:var(--navy);color:#fff;}
+  .goal-card .flag{font-size:16px;}
+  .goal-card .name{font-size:12px;font-weight:700;margin:4px 0 6px;}
+  .goal-card .pct{font-size:19px;font-weight:800;}
+  .goal-card .lines{font-size:10.5px;color:var(--text-muted);margin-top:6px;line-height:1.5;}
+  .goal-card.total .lines{color:rgba(255,255,255,0.75);}
+  .bar-track{background:#EEF0F5;border-radius:999px;height:6px;margin:8px 0;overflow:hidden;}
+  .goal-card.total .bar-track{background:rgba(255,255,255,0.2);}
+  .bar-fill{height:100%;border-radius:999px;}
+  .status-badge{font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;display:inline-block;margin-top:4px;}
+  .status-above{background:#E9F9EF;color:#1E9E52;}
+  .status-below{background:#FDECEA;color:#C0392B;}
+  .goal-card.total .status-above{background:rgba(46,204,113,0.25);color:#eafff2;}
+  .goal-card.total .status-below{background:rgba(231,76,60,0.25);color:#ffecea;}
+  .market-card{background:#fff;border:1px solid var(--card-border);border-radius:10px;padding:14px 16px;margin-bottom:12px;}
+  .market-card .head2{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--card-border);}
+  .stat-row{display:flex;gap:12px;margin-bottom:10px;}
+  .stat{flex:1;background:var(--grey-bg);border-radius:8px;padding:8px 10px;}
+  .stat .lbl{font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;}
+  .stat .val{font-size:15px;font-weight:800;}
+  .stat .delta{font-size:11px;font-weight:700;}
+  .cov-row{display:flex;align-items:center;gap:10px;margin-top:10px;}
+  .cov-row .bar-track{flex:1;margin:0;}
+  .cov-row .cov-pct{font-size:12.5px;font-weight:800;white-space:nowrap;}
+  .footnote{font-size:11px;color:var(--text-muted);line-height:1.5;margin-top:16px;padding-top:12px;border-top:1px solid var(--card-border);}
+  .hidden{display:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div>
+      <h1>Key Markets — Pipeline &amp; Closed Deals</h1>
+      <p class="sub" id="subLine">International Growth · <span id="cycleMonth"></span></p>
+      <p class="periods" id="periodsLine"></p>
+    </div>
+    <div class="badge">DACH · RO · UK · ANZ</div>
+  </div>
+
+  <div class="tabs" id="scopeRow">
+    <div class="tab active" data-scope="all">🌐 All Markets</div>
+    <div class="tab" data-scope="key">🎯 Key Markets Detail</div>
+  </div>
+
+  <div id="allMarketsView"></div>
+  <div id="keyMarketsView" class="hidden"></div>
+
+  <div class="footnote">
+    <strong>Reporting cutoff = Aug 23, 2026 (today excluded):</strong> per the standing rule, Aug 24 is left out of every window —
+    MoM compares Jul 1–23 vs Aug 1–23 (matched 23-day ranges), YoY compares Aug 1–23 in 2025 vs 2026, WoW compares
+    Aug 10–16 vs Aug 17–23.<br><br>
+    <strong>⚠ Romania WoW pipeline = $0:</strong> Romania generated no new pipeline Aug 17–23 (vs $60,483.02 the week before) —
+    flagging since it's a sharp drop-off, not a data gap; Romania's Closed ARR this same week was actually positive ($2,783.02),
+    so this looks like a pipeline-generation lull rather than a broader RO slowdown.<br><br>
+    Source: HubSpot CSV exports (International pipeline generated, Closed deals) — International markets only, US/Canada excluded.
+    Pipeline Generated = ARR of deals with a 1:1 Upcoming Demo Date in the period (not create date). Closed Deals = ARR of deals
+    won/upsold in the "Sales International" pipeline, by close date. Quota coverage uses each market's full monthly quota
+    (not prorated) against pipeline generated so far this month, through Aug 23. No run-rates or projections are used anywhere in this report.
+  </div>
+
+</div>
+
+<script>
+const REPORT_DATE = new Date(Date.UTC(2026,7,23)); // 2026-08-23 (today, Aug 24, excluded per standing rule)
+const MONTH_NAME = REPORT_DATE.toLocaleDateString('en-US',{month:'long',year:'numeric',timeZone:'UTC'});
+document.getElementById('cycleMonth').textContent = MONTH_NAME;
+
+const DATA = {
+  all: {
+    MoM: { label:"MONTH-OVER-MONTH", range:"Jul 1–23 → Aug 1–23", prevLabel:"Jul 1–23", curLabel:"Aug 1–23",
+      pg:{cur:444953.57, prev:656205.26}, ca:{cur:11235.46, prev:20194.58} },
+    YoY: { label:"YEAR-OVER-YEAR", range:"Aug 1–23 2025 → Aug 1–23 2026", prevLabel:"Aug 1–23 '25", curLabel:"Aug 1–23 '26",
+      pg:{cur:444953.57, prev:165288.29}, ca:{cur:11235.46, prev:27331.41} },
+    WoW: { label:"WEEK-OVER-WEEK", range:"Aug 10–16 → Aug 17–23", prevLabel:"Aug 10–16", curLabel:"Aug 17–23",
+      pg:{cur:53480.65, prev:131152.42}, ca:{cur:5337.38, prev:2656.96} }
+  }
+};
+
+document.getElementById('periodsLine').textContent =
+  'MoM: ' + DATA.all.MoM.range + ', 2026 · YoY: ' + DATA.all.YoY.range + ' · WoW: ' + DATA.all.WoW.range + ', 2026';
+
+const MARKET_WOW = {
+  DACH: {flag:"🇩🇪", fullName:"DACH", pg:{cur:1600.00, prev:3335.90}, ca:{cur:935.90, prev:923.46}},
+  RO:   {flag:"🇷🇴", fullName:"Romania (RO)", pg:{cur:0.00, prev:60483.02}, ca:{cur:2783.02, prev:0}},
+  UK:   {flag:"🇬🇧", fullName:"UK", pg:{cur:8000.00, prev:51210.20}, ca:{cur:1618.46, prev:810.20}},
+  ANZ:  {flag:"🇦🇺", fullName:"ANZ", pg:{cur:40800.00, prev:12800.00}, ca:{cur:0, prev:0}}
+};
+
+const GOALS_MONTHLY = { UK:563021, RO:271361, ANZ:44120, DACH:29735 };
+const MTD_PIPELINE  = { UK:80010.20, RO:148483.02, ANZ:122350.00, DACH:5859.36 };
+const FLAGS = { UK:"🇬🇧", RO:"🇷🇴", ANZ:"🇦🇺", DACH:"🇩🇪" };
+
+function pct(cur, prev){ if(prev===0) return cur===0?0:null; return ((cur-prev)/prev)*100; }
+function fmtPct(p){ if(p===null) return 'n/a'; const s=p>=0?'+':''; return s+p.toFixed(2)+'%'; }
+function trendCls(p){ if(p===null) return 'flat'; return p>0?'up':(p<0?'down':'flat'); }
+function trendArrow(p){ if(p===null) return ''; return p>0?'▲ ':(p<0?'▼ ':'– '); }
+function moneyShort(v){ return '$'+Math.round(v).toLocaleString('en-US'); }
+function moneyAbs(v){ const s=v>0?'+$':(v<0?'-$':'$'); return s+Math.round(Math.abs(v)).toLocaleString('en-US'); }
+
+function kpiCard(icon, lbl, cur, prev, prevLabel, periodTag){
+  const p = pct(cur, prev);
+  return `<div class="kpi-card">
+    <div class="icon">${icon}</div>
+    <div>
+      <div class="lbl">${lbl}</div>
+      <div class="val">${moneyShort(cur)}</div>
+      <div class="was">was ${moneyShort(prev)} in ${prevLabel}</div>
+      <div class="trend ${trendCls(p)}">${trendArrow(p)}${fmtPct(p)} ${periodTag}</div>
+    </div>
+  </div>`;
+}
+
+function periodBlock(d, tag){
+  return `
+  <div>
+    <div class="period-label">${d.label} · ${d.range}${tag==='YoY' ? ' 2025 vs 2026' : ', 2026'}</div>
+    <div class="kpi-row2">
+      ${kpiCard('📈','Pipeline Generated', d.pg.cur, d.pg.prev, d.prevLabel, tag)}
+      ${kpiCard('💰','Closed Deals', d.ca.cur, d.ca.prev, d.prevLabel, tag)}
+    </div>
+  </div>`;
+}
+
+function renderAllMarkets(){
+  const el = document.getElementById('allMarketsView');
+  el.innerHTML =
+    periodBlock(DATA.all.MoM,'MoM') +
+    periodBlock(DATA.all.YoY,'YoY') +
+    periodBlock(DATA.all.WoW,'WoW') +
+    `<div class="chart-row">
+      <div class="chart-card"><h3>Pipeline — Period Comparison ($)</h3><div class="chart-holder"><canvas id="pgChart"></canvas></div></div>
+      <div class="chart-card"><h3>Closed Deals — Period Comparison ($)</h3><div class="chart-holder"><canvas id="caChart"></canvas></div></div>
+    </div>
+    <div class="section-title">Full Summary — All Markets</div>
+    <table class="summary" id="summaryTable"></table>`;
+
+  const labels = [DATA.all.MoM.prevLabel, DATA.all.MoM.curLabel, DATA.all.YoY.prevLabel+' (prev yr)', DATA.all.WoW.prevLabel, DATA.all.WoW.curLabel];
+  const colors = ['#7A87A8','#4B9CD3','#C7CCD9','#7A87A8','#4B9CD3'];
+
+  new Chart(document.getElementById('pgChart'), {
+    type:'bar',
+    data:{ labels, datasets:[{ data:[DATA.all.MoM.pg.prev, DATA.all.MoM.pg.cur, DATA.all.YoY.pg.prev, DATA.all.WoW.pg.prev, DATA.all.WoW.pg.cur], backgroundColor:colors }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, ticks:{callback:v=>'$'+(v/1000).toFixed(0)+'k'}}} }
+  });
+  new Chart(document.getElementById('caChart'), {
+    type:'bar',
+    data:{ labels, datasets:[{ data:[DATA.all.MoM.ca.prev, DATA.all.MoM.ca.cur, DATA.all.YoY.ca.prev, DATA.all.WoW.ca.prev, DATA.all.WoW.ca.cur], backgroundColor:colors }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, ticks:{callback:v=>'$'+(v/1000).toFixed(0)+'k'}}} }
+  });
+
+  const rows = [];
+  ['WoW','MoM','YoY'].forEach(tag=>{
+    const d = DATA.all[tag];
+    rows.push(['Pipeline ARR', tag, moneyShort(d.pg.prev), moneyShort(d.pg.cur), pct(d.pg.cur,d.pg.prev)]);
+    rows.push(['Closed ARR', tag, moneyShort(d.ca.prev), moneyShort(d.ca.cur), pct(d.ca.cur,d.ca.prev)]);
+  });
+  document.getElementById('summaryTable').innerHTML =
+    `<thead><tr><th>Metric</th><th>Timeframe</th><th>Previous Period</th><th>Current Period</th><th>Change %</th></tr></thead>
+     <tbody>${rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td class="${r[4]>=0?'chg-up':'chg-down'}">${fmtPct(r[4])}</td></tr>`).join('')}</tbody>`;
+}
+
+function goalCard(name, isTotal){
+  const q = isTotal ? Object.values(GOALS_MONTHLY).reduce((a,b)=>a+b,0) : GOALS_MONTHLY[name];
+  const mtd = isTotal ? Object.values(MTD_PIPELINE).reduce((a,b)=>a+b,0) : MTD_PIPELINE[name];
+  const p = mtd/q*100;
+  const above = p>=100;
+  const remaining = Math.max(q-mtd,0);
+  const surplus = Math.max(mtd-q,0);
+  return `
+  <div class="goal-card ${isTotal?'total':''}">
+    <div class="flag">${isTotal?'🌐':FLAGS[name]}</div>
+    <div class="name">${isTotal?'TOTAL':name}</div>
+    <div class="pct">${p.toFixed(2)}%</div>
+    <div class="bar-track"><div class="bar-fill" style="width:${Math.min(p,100)}%;background:${above?'#2ECC71':'#E74C3C'}"></div></div>
+    <div class="lines">${moneyShort(mtd)} pipeline<br>vs ${moneyShort(q)} quota<br>${above?moneyShort(surplus)+' over':moneyShort(remaining)+' remaining'}</div>
+    <div class="status-badge ${above?'status-above':'status-below'}">${above?'✓ ABOVE QUOTA':'✗ BELOW QUOTA'}</div>
+  </div>`;
+}
+
+function renderGoals(monthLabel){
+  const grid = document.getElementById('goalGrid');
+  grid.innerHTML = ['UK','RO','ANZ','DACH'].map(m=>goalCard(m,false)).join('') + goalCard(null,true);
+  new Chart(document.getElementById('quotaChart'), {
+    type:'bar',
+    data:{ labels:['UK','RO','ANZ','DACH'], datasets:[
+      {label:'Pipeline ('+monthLabel+')', data:['UK','RO','ANZ','DACH'].map(m=>MTD_PIPELINE[m]),
+        backgroundColor:['UK','RO','ANZ','DACH'].map(m=>MTD_PIPELINE[m]>=GOALS_MONTHLY[m]?'#2ECC71':'#E74C3C')},
+      {label:'Quota Target', data:['UK','RO','ANZ','DACH'].map(m=>GOALS_MONTHLY[m]), backgroundColor:'#D7DCE5'}
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:10}}}}, scales:{y:{beginAtZero:true, ticks:{callback:v=>'$'+(v/1000).toFixed(0)+'k'}}} }
+  });
+}
+
+function marketDetailCard(name, wowLabel){
+  const m = MARKET_WOW[name];
+  const pgP = pct(m.pg.cur, m.pg.prev), caP = pct(m.ca.cur, m.ca.prev);
+  const pgAbs = m.pg.cur-m.pg.prev, caAbs = m.ca.cur-m.ca.prev;
+  const covPct = MTD_PIPELINE[name]/GOALS_MONTHLY[name]*100;
+  return `
+  <div class="market-card">
+    <div class="head2"><span>${m.flag}</span><span>${m.fullName}</span></div>
+    <div class="stat-row">
+      <div class="stat"><div class="lbl">Pipeline</div><div class="val">${moneyShort(m.pg.cur)}</div><div class="delta ${trendCls(pgP)}">was ${moneyShort(m.pg.prev)} · ${trendArrow(pgP)}${fmtPct(pgP)}</div></div>
+      <div class="stat"><div class="lbl">Closed</div><div class="val">${moneyShort(m.ca.cur)}</div><div class="delta ${m.ca.prev===0 && m.ca.cur>0 ? 'up':trendCls(caP)}">${m.ca.prev===0 ? (m.ca.cur>0?'n/a (new)':'n/a') : 'was '+moneyShort(m.ca.prev)+' · '+trendArrow(caP)+fmtPct(caP)}</div></div>
+    </div>
+    <div class="chart-holder" style="height:110px;"><canvas id="mini-${name}"></canvas></div>
+    <div class="cov-row">
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.min(covPct,100)}%;background:${covPct>=100?'#2ECC71':'#E74C3C'}"></div></div>
+      <div class="cov-pct">${covPct.toFixed(1)}%</div>
+    </div>
+    <div style="font-size:10.5px;color:var(--text-muted);margin-top:4px;">Pipeline Quota Coverage (${wowLabel})</div>
+  </div>`;
+}
+
+function renderMarketDetail(wowLabel){
+  const el = document.getElementById('marketDetailGrid');
+  const order = ['DACH','RO','UK','ANZ'];
+  el.innerHTML = order.map(n=>marketDetailCard(n, wowLabel)).join('');
+  order.forEach(name=>{
+    const m = MARKET_WOW[name];
+    new Chart(document.getElementById('mini-'+name), {
+      type:'bar',
+      data:{ labels:['Pipeline','Closed'], datasets:[
+        {label:DATA.all.WoW.prevLabel, data:[m.pg.prev, m.ca.prev], backgroundColor:'#B8C4E0'},
+        {label:DATA.all.WoW.curLabel, data:[m.pg.cur, m.ca.cur], backgroundColor:'#1F2D5C'}
+      ]},
+      options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, ticks:{callback:v=>'$'+(v/1000).toFixed(0)+'k'}}} }
+    });
+  });
+}
+
+let keyRendered = false;
+function renderKeyMarkets(){
+  if(keyRendered) return;
+  keyRendered = true;
+  const monthLabel = DATA.all.MoM.curLabel;
+  const wowLabel = DATA.all.WoW.prevLabel + ' vs ' + DATA.all.WoW.curLabel;
+  const el = document.getElementById('keyMarketsView');
+  el.innerHTML = `
+    <div class="section-title">Pipeline Quota Coverage · ${monthLabel}, 2026</div>
+    <div class="goal-grid" id="goalGrid"></div>
+    <div class="chart-card"><h3>Pipeline vs Quota by Market</h3><div class="chart-holder"><canvas id="quotaChart"></canvas></div></div>
+    <div class="section-title">Market Detail — WoW (${wowLabel})</div>
+    <div id="marketDetailGrid"></div>
+  `;
+  renderGoals(monthLabel);
+  renderMarketDetail(monthLabel);
+}
+
+document.getElementById('scopeRow').addEventListener('click', e=>{
+  const t = e.target.closest('[data-scope]'); if(!t) return;
+  const scope = t.dataset.scope;
+  document.querySelectorAll('#scopeRow .tab').forEach(el=>el.classList.toggle('active', el.dataset.scope===scope));
+  document.getElementById('allMarketsView').classList.toggle('hidden', scope!=='all');
+  document.getElementById('keyMarketsView').classList.toggle('hidden', scope!=='key');
+  if(scope==='key') renderKeyMarkets();
+});
+
+renderAllMarkets();
+</script>
+</body>
+</html>
