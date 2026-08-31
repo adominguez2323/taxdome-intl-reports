@@ -95,31 +95,34 @@
   <div id="keyMarketsView" class="hidden"></div>
 
   <div class="footnote">
-    <strong>Reporting cutoff = Aug 30, 2026 (today excluded):</strong> per the standing rule, Aug 31 is left out of every window —
-    MoM compares Jul 1–30 vs Aug 1–30 (matched 30-day ranges), YoY compares Aug 1–30 in 2025 vs 2026, WoW compares
-    Aug 17–23 vs Aug 24–30.<br><br>
-    <strong>✓ DACH crossed 100% of quota this cycle:</strong> a $27,517 pipeline week (vs $4,800 the week before) pushed DACH's
-    month-to-date pipeline to $36,576 against a $29,735 August quota — 123.0%, up from 19.7% last cycle. Romania's $0 pipeline
-    week last cycle also recovered — $22,532 generated this week.<br><br>
+    <strong>MoM/YoY include today (Aug 31) this cycle — one-time exception:</strong> Andrea asked specifically for MoM and YoY through
+    today for this edition, so both now run Jul 1–31 vs Aug 1–31 (MoM) and Aug 1–31 2025 vs 2026 (YoY) — the standard "exclude today"
+    rule is NOT applied to those two this time. Quota-tracking's "pipeline so far this month" figure also now runs through Aug 31 for
+    consistency. WoW is unaffected either way (Aug 17–23 vs Aug 24–30). Next cycle reverts to the default "exclude today" rule for all
+    comparisons unless told otherwise.<br><br>
+    <strong>✓ DACH crossed 100% of quota this cycle:</strong> DACH's month-to-date pipeline (thru Aug 31) is $52,093 against a $29,735
+    August quota — 175.2%. That includes 3 deals totaling $15,517 with a demo date on Aug 31 itself (2 Switzerland, 1 Germany) — real
+    deals, not a data artifact, but flagging since it's a meaningful chunk of the month's total landing on the very last day. Romania's
+    $0 pipeline week two cycles back has also fully recovered.<br><br>
     Source: HubSpot CSV exports (International pipeline generated, Closed deals) — International markets only, US/Canada excluded.
     Pipeline Generated = ARR of deals with a 1:1 Upcoming Demo Date in the period (not create date). Closed Deals = ARR of deals
     won/upsold in the "Sales International" pipeline, by close date. Quota coverage uses each market's full monthly quota
-    (not prorated) against pipeline generated so far this month, through Aug 30. No run-rates or projections are used anywhere in this report.
+    (not prorated) against pipeline generated so far this month. No run-rates or projections are used anywhere in this report.
   </div>
 
 </div>
 
 <script>
-const REPORT_DATE = new Date(Date.UTC(2026,7,30)); // 2026-08-30 (today, Aug 31, excluded per standing rule)
+const REPORT_DATE = new Date(Date.UTC(2026,7,31)); // 2026-08-31 (MoM/YoY through today, per Andrea's one-time request this cycle)
 const MONTH_NAME = REPORT_DATE.toLocaleDateString('en-US',{month:'long',year:'numeric',timeZone:'UTC'});
 document.getElementById('cycleMonth').textContent = MONTH_NAME;
 
 const DATA = {
   all: {
-    MoM: { label:"MONTH-OVER-MONTH", range:"Jul 1–30 → Aug 1–30", prevLabel:"Jul 1–30", curLabel:"Aug 1–30",
-      pg:{cur:566748.16, prev:845220.02}, ca:{cur:22529.88, prev:37700.43} },
-    YoY: { label:"YEAR-OVER-YEAR", range:"Aug 1–30 2025 → Aug 1–30 2026", prevLabel:"Aug 1–30 '25", curLabel:"Aug 1–30 '26",
-      pg:{cur:566748.16, prev:198813.01}, ca:{cur:22529.88, prev:37572.83} },
+    MoM: { label:"MONTH-OVER-MONTH", range:"Jul 1–31 → Aug 1–31", prevLabel:"Jul 1–31", curLabel:"Aug 1–31",
+      pg:{cur:595065.16, prev:874020.02}, ca:{cur:23604.16, prev:45188.54} },
+    YoY: { label:"YEAR-OVER-YEAR", range:"Aug 1–31 2025 → Aug 1–31 2026", prevLabel:"Aug 1–31 '25", curLabel:"Aug 1–31 '26",
+      pg:{cur:595065.16, prev:198813.01}, ca:{cur:23604.16, prev:37572.83} },
     WoW: { label:"WEEK-OVER-WEEK", range:"Aug 17–23 → Aug 24–30", prevLabel:"Aug 17–23", curLabel:"Aug 24–30",
       pg:{cur:126165.29, prev:57433.10}, ca:{cur:11274.96, prev:5356.84} }
   }
@@ -136,7 +139,7 @@ const MARKET_WOW = {
 };
 
 const GOALS_MONTHLY = { UK:563021, RO:271361, ANZ:44120, DACH:29735 };
-const MTD_PIPELINE  = { UK:120848.12, RO:162691.58, ANZ:148028.66, DACH:36576.36 };
+const MTD_PIPELINE  = { UK:120848.12, RO:173091.58, ANZ:150428.66, DACH:52093.36 };
 const FLAGS = { UK:"🇬🇧", RO:"🇷🇴", ANZ:"🇦🇺", DACH:"🇩🇪" };
 
 function pct(cur, prev){ if(prev===0) return cur===0?0:null; return ((cur-prev)/prev)*100; }

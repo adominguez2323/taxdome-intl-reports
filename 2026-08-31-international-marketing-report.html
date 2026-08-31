@@ -93,16 +93,12 @@
   <table class="summary" id="summaryTable"></table>
 
   <div class="footnote">
-    <strong>Reporting cutoff = Aug 30, 2026 (today excluded):</strong> per the standing rule, Aug 31 is left out of every window —
-    MoM compares Jul 1–30 vs Aug 1–30 (matched 30-day ranges), YoY compares Aug 1–30 in 2025 vs 2026, WoW compares
-    Aug 17–23 vs Aug 24–30.<br><br>
+    <strong>MoM/YoY include today (Aug 31) this cycle — one-time exception:</strong> Andrea asked specifically for MoM and YoY through
+    today for this edition, so both now run Jul 1–31 vs Aug 1–31 (MoM) and Aug 1–31 2025 vs 2026 (YoY) — the standard "exclude today"
+    rule is NOT applied to those two this time. WoW is unaffected either way (Aug 17–23 vs Aug 24–30 — Aug 31 is a Monday and doesn't
+    complete a new week yet). Next cycle reverts to the default "exclude today" rule for all comparisons unless told otherwise.<br><br>
     <strong>DACH's lead spike has normalized:</strong> last cycle's one-day bulk-import/event spike (167 leads, mostly Aug 17) is fully
     behind us — DACH is back to 10 leads this week, in line with its typical range.<br><br>
-    <strong>Small data drift on last cycle's numbers:</strong> re-summing Aug 17–23 from this fresh export gives slightly different
-    totals than what was published last cycle for that same week (Leads matched exactly at 292; MQL came in at 91 vs 93 published;
-    SQL at 16 vs 15 published) — a few records likely got backfilled into that week since the last export. Small enough not to change
-    any conclusions, but flagging per usual so it isn't mistaken for an error. This report always uses the freshest export as source
-    of truth.<br><br>
     Source: HubSpot CSV exports (Lead generation, Total MQLs, Total SQL) — International markets only, US/Canada excluded.
     Leads = company create date. MQL = date entered Marketing Qualified Lead stage. SQL = date entered Sales Qualified Lead stage.
     No run-rates, projections, or prorated figures are used. Key Markets → Overall = DACH + UK + ANZ + RO combined.
@@ -113,14 +109,14 @@
 </div>
 
 <script>
-const REPORT_DATE = new Date(Date.UTC(2026,7,30)); // 2026-08-30 (today, Aug 31, excluded per standing rule)
+const REPORT_DATE = new Date(Date.UTC(2026,7,31)); // 2026-08-31 (MoM/YoY through today, per Andrea's one-time request this cycle)
 
 const DATA = {
   all: {
-    MoM: { label:"MONTH-OVER-MONTH", range:"Jul 1–30 vs Aug 1–30, 2026", prevLabel:"Jul 1–30", curLabel:"Aug 1–30", prevAbbr:"Jul", curAbbr:"Aug",
-      leads:{cur:623,prev:333}, mql:{cur:326,prev:287}, sql:{cur:72,prev:87} },
-    YoY: { label:"YEAR-OVER-YEAR", range:"Aug 1–30, 2025 vs 2026", prevLabel:"Aug 1–30 '25", curLabel:"Aug 1–30 '26", prevAbbr:"'25", curAbbr:"'26",
-      leads:{cur:623,prev:303}, mql:{cur:326,prev:175}, sql:{cur:72,prev:41} },
+    MoM: { label:"MONTH-OVER-MONTH", range:"Jul 1–31 vs Aug 1–31, 2026", prevLabel:"Jul 1–31", curLabel:"Aug 1–31", prevAbbr:"Jul", curAbbr:"Aug",
+      leads:{cur:628,prev:336}, mql:{cur:329,prev:292}, sql:{cur:74,prev:89} },
+    YoY: { label:"YEAR-OVER-YEAR", range:"Aug 1–31, 2025 vs 2026", prevLabel:"Aug 1–31 '25", curLabel:"Aug 1–31 '26", prevAbbr:"'25", curAbbr:"'26",
+      leads:{cur:628,prev:304}, mql:{cur:329,prev:177}, sql:{cur:74,prev:42} },
     WoW: { label:"WEEK-OVER-WEEK", range:"Aug 17–23 vs Aug 24–30, 2026", prevLabel:"Aug 17–23", curLabel:"Aug 24–30", prevAbbr:"Aug 17–23", curAbbr:"Aug 24–30",
       leads:{cur:108,prev:292}, mql:{cur:59,prev:91}, sql:{cur:11,prev:16} }
   },
