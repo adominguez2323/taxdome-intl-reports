@@ -2,282 +2,304 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Campaign Status Board</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #f4f5f7;
-    --card: #ffffff;
-    --border: #e7e8ec;
-    --text: #1a1c23;
-    --muted: #7c8087;
-    --green-bg: #e6f6ea; --green-text: #1e8e3e;
-    --purple-bg: #f1edfb; --purple-text: #6b3fd4;
-    --orange-bg: #fdf0e2; --orange-text: #c9770a;
-    --pink-bg: #fcebf1; --pink-text: #d13b78;
-    --gray-bg: #eef0f2; --gray-text: #6b7076;
-    --blue-dot: #3b7dd8;
-    --gray-dot: #b9bcc2;
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #F8F9FA; color: #1F2D5C; padding: 24px; font-size: 14px; }
+
+  h1 { font-size: 20px; font-weight: 700; color: #1F2D5C; margin-bottom: 4px; }
+  .subtitle { font-size: 12px; color: #888; margin-bottom: 28px; }
+
+  .section-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #888;
+    margin: 28px 0 12px; padding-bottom: 6px;
+    border-bottom: 1.5px solid #e0e0e0;
   }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: var(--bg);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Arial, sans-serif;
-    color: var(--text);
-    padding: 32px 16px 80px;
+
+  .campaign-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+    margin-bottom: 8px;
   }
-  .board {
-    max-width: 640px;
-    margin: 0 auto;
-  }
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    color: var(--muted);
-    text-transform: uppercase;
-    margin: 28px 0 12px;
-  }
-  .section-header:first-child { margin-top: 0; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .dot.active { background: #2ecc71; }
-  .dot.next { background: var(--blue-dot); }
-  .dot.hold { background: var(--gray-dot); }
 
   .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
+    background: #fff;
+    border-radius: 12px;
     padding: 16px 18px;
-    margin-bottom: 10px;
-    display: flex;
-    gap: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    border: 1px solid #eaeaea;
   }
-  .card.on-hold { border-style: dashed; background: #fbfbfc; }
-  .flag { font-size: 20px; line-height: 1; margin-top: 2px; }
-  .card-body { flex: 1; min-width: 0; }
-  .card-title { font-size: 15px; font-weight: 700; margin: 0 0 8px; }
-  .pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 12.5px;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 20px;
-  }
-  .pill.brand { background: var(--green-bg); color: var(--green-text); }
-  .pill.webinar { background: var(--purple-bg); color: var(--purple-text); }
-  .pill.content { background: var(--gray-bg); color: var(--gray-text); }
-  .pill.active-tag { background: var(--green-bg); color: var(--green-text); margin-left: 6px; }
-  .pill.demo { background: var(--blue-dot); color: #fff; background: #eaf1fc; color: #2f6fd1; }
-  .pill.magnet { background: var(--orange-bg); color: var(--orange-text); }
-  .pill.bootcamp { background: var(--pink-bg); color: var(--pink-text); }
-  .pill.hold-tag { background: var(--gray-bg); color: var(--gray-text); }
 
-  /* metrics row */
+  .card-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+  }
+  .card-flag { font-size: 22px; line-height: 1; }
+  .card-name { font-size: 14px; font-weight: 600; color: #1F2D5C; line-height: 1.3; }
+  .card-date { font-size: 11px; color: #aaa; margin-top: 2px; }
+
+  .card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .tag {
+    font-size: 11px; font-weight: 500; padding: 3px 9px;
+    border-radius: 20px; border: 1px solid;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .tag-webinar    { background: #EBF4FF; color: #1A5FA8; border-color: #90C2F5; }
+  .tag-brand      { background: #F0EEFF; color: #4B3AC2; border-color: #B5ADEE; }
+  .tag-lead       { background: #E6F9F0; color: #0D6E4E; border-color: #5DCAA5; }
+  .tag-demo       { background: #FFF4E5; color: #A05A00; border-color: #F0B060; }
+  .tag-content    { background: #F5F5F5; color: #555; border-color: #CCC; }
+  .tag-active     { background: #E6F9F0; color: #0D6E4E; border-color: #5DCAA5; }
+  .tag-new        { background: #FFF0F0; color: #C0392B; border-color: #F0A0A0; }
+  .tag-ebook      { background: #FEF9E7; color: #7D6608; border-color: #F4D03F; }
+  .tag-masterclass{ background: #F9EBFF; color: #6C3483; border-color: #C39BD3; }
+  .tag-bootcamp   { background: #FFF4E5; color: #A05A00; border-color: #F0B060; }
+
+  /* metrics grid */
   .metrics {
-    margin-top: 12px;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px 10px;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
   }
-  .metric {
-    background: #f7f8fa;
-    border-radius: 8px;
-    padding: 7px 8px;
-    text-align: center;
-  }
-  .metric .num { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.2; }
-  .metric .lbl { font-size: 9.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; margin-top: 1px; }
-  .metric.churn .num { color: #c0392b; }
-  .metric.reg .num { color: #1e6fd9; }
-  .metric.cust .num { color: #1e8e3e; }
-  .metrics.metrics-7 { grid-template-columns: repeat(4, 1fr); }
+  .metric { text-align: center; }
+  .metric-value { font-size: 18px; font-weight: 700; color: #1F2D5C; }
+  .metric-label { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+  .metric-value.green { color: #27AE60; }
+  .metric-value.amber { color: #E67E22; }
+  .metric-value.red   { color: #E74C3C; }
 
-  .metrics-pending {
-    margin-top: 12px;
-    font-size: 12px;
-    color: var(--muted);
-    font-style: italic;
-  }
+  /* simple stat line for cards without full breakdown */
+  .stat-line { font-size: 13px; color: #555; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f0f0f0; }
+  .stat-line strong { color: #1F2D5C; font-size: 18px; font-weight: 700; }
 
-  .new-badge {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 700;
-    color: #1e6fd9;
-    background: #eaf1fc;
-    padding: 1px 7px;
-    border-radius: 10px;
-    margin-left: 6px;
-    vertical-align: middle;
+  /* placeholder */
+  .no-data { font-size: 12px; color: #aaa; font-style: italic; margin-top: 8px; }
+
+  /* coming next plain cards */
+  .card-simple .card-body { font-size: 12px; color: #888; margin-top: 6px; }
+
+  /* on hold */
+  .empty-state { font-size: 13px; color: #bbb; font-style: italic; padding: 12px 0; }
+
+  .disclaimer {
+    margin-top: 32px; padding: 12px 14px;
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 10px;
+    font-size: 11px; color: #aaa; line-height: 1.6;
   }
 </style>
 </head>
 <body>
-<div class="board">
 
-  <div class="section-header"><span class="dot active"></span>ACTIVE NOW</div>
+<h1>🚀 Campaign Status Board</h1>
+<p class="subtitle">International Growth — updated Aug 31, 2026</p>
 
+<!-- ═══════════════════ ACTIVE NOW ═══════════════════ -->
+<div class="section-label">Active Now</div>
+<div class="campaign-grid">
+
+  <!-- AU Webinar -->
   <div class="card">
-    <div class="flag">🇷🇴</div>
-    <div class="card-body">
-      <p class="card-title">RO — Webinar</p>
-      <span class="pill webinar">🎓 Webinar</span>
-      <div class="metrics metrics-7">
-        <div class="metric reg"><div class="num">224</div><div class="lbl">Registrations</div></div>
-        <div class="metric"><div class="num">199</div><div class="lbl">Leads</div></div>
-        <div class="metric"><div class="num">166</div><div class="lbl">MQL</div></div>
-        <div class="metric"><div class="num">14</div><div class="lbl">SQL</div></div>
-        <div class="metric cust"><div class="num">21</div><div class="lbl">Customers</div></div>
-        <div class="metric"><div class="num">11</div><div class="lbl">Unqualified</div></div>
-        <div class="metric churn"><div class="num">2</div><div class="lbl">Churned Cust.</div></div>
+    <div class="card-header">
+      <span class="card-flag">🇦🇺</span>
+      <div>
+        <div class="card-name">AU — Webinar</div>
       </div>
     </div>
+    <div class="card-tags">
+      <span class="tag tag-webinar">🎓 Webinar</span>
+    </div>
+    <div class="stat-line"><strong>73</strong> Registrations</div>
   </div>
 
+  <!-- UK AccountingWEB -->
   <div class="card">
-    <div class="flag">🇨🇭</div>
-    <div class="card-body">
-      <p class="card-title">DACH — CH Webinar</p>
-      <span class="pill webinar">🎓 Webinar</span>
-      <div class="metrics metrics-7">
-        <div class="metric reg"><div class="num">30</div><div class="lbl">Registrations</div></div>
-        <div class="metric"><div class="num">25</div><div class="lbl">Leads</div></div>
-        <div class="metric"><div class="num">21</div><div class="lbl">MQL</div></div>
-        <div class="metric"><div class="num">2</div><div class="lbl">SQL</div></div>
-        <div class="metric cust"><div class="num">4</div><div class="lbl">Customers</div></div>
-        <div class="metric"><div class="num">2</div><div class="lbl">Unqualified</div></div>
-        <div class="metric churn"><div class="num">0</div><div class="lbl">Churned Cust.</div></div>
+    <div class="card-header">
+      <span class="card-flag">🇬🇧</span>
+      <div>
+        <div class="card-name">UK — AccountingWEB (online magazine)</div>
+        <div class="card-date">Until Sep 30, 2026</div>
       </div>
     </div>
-  </div>
-
-  <div class="card">
-    <div class="flag">🇦🇺</div>
-    <div class="card-body">
-      <p class="card-title">AU — Webinar</p>
-      <span class="pill webinar">🎓 Webinar</span>
-      <div class="metrics metrics-7">
-        <div class="metric reg"><div class="num">70</div><div class="lbl">Registrations</div></div>
-        <div class="metric"><div class="num">26</div><div class="lbl">Leads</div></div>
-        <div class="metric"><div class="num">10</div><div class="lbl">MQL</div></div>
-        <div class="metric"><div class="num">3</div><div class="lbl">SQL</div></div>
-        <div class="metric cust"><div class="num">44</div><div class="lbl">Customers</div></div>
-        <div class="metric"><div class="num">1</div><div class="lbl">Unqualified</div></div>
-        <div class="metric churn"><div class="num">0</div><div class="lbl">Churned Cust.</div></div>
-      </div>
+    <div class="card-tags">
+      <span class="tag tag-content">📰 Always-on content</span>
+      <span class="tag tag-active">✓ Active</span>
     </div>
   </div>
 
+  <!-- RO Women In Accounting -->
   <div class="card">
-    <div class="flag">🇬🇧</div>
-    <div class="card-body">
-      <p class="card-title">UK — AccountingWEB (online magazine)</p>
-      <span class="pill content">📰 Always-on content</span>
-      <span class="pill active-tag">✓ Active</span>
+    <div class="card-header">
+      <span class="card-flag">🇷🇴</span>
+      <div><div class="card-name">RO — Women In Accounting</div></div>
+    </div>
+    <div class="card-tags">
+      <span class="tag tag-brand">▶ Brand awareness</span>
     </div>
   </div>
 
+  <!-- DACH Brand Awareness -->
   <div class="card">
-    <div class="flag">🇷🇴</div>
-    <div class="card-body">
-      <p class="card-title">RO — Women In Accounting</p>
-      <span class="pill brand">▶ Brand awareness</span>
+    <div class="card-header">
+      <span class="card-flag">🇩🇪</span>
+      <div><div class="card-name">DACH — Brand Awareness Campaign</div></div>
+    </div>
+    <div class="card-tags">
+      <span class="tag tag-brand">▶ Brand awareness</span>
     </div>
   </div>
 
+  <!-- UK Brand Awareness -->
   <div class="card">
-    <div class="flag">🇩🇪</div>
-    <div class="card-body">
-      <p class="card-title">DACH — Brand Awareness Campaign</p>
-      <span class="pill brand">▶ Brand awareness</span>
+    <div class="card-header">
+      <span class="card-flag">🇬🇧</span>
+      <div><div class="card-name">UK — Brand Awareness Campaign</div></div>
+    </div>
+    <div class="card-tags">
+      <span class="tag tag-brand">▶ Brand awareness</span>
     </div>
   </div>
 
+  <!-- AU Brand Awareness -->
   <div class="card">
-    <div class="flag">🇬🇧</div>
-    <div class="card-body">
-      <p class="card-title">UK — Brand Awareness Campaign</p>
-      <span class="pill brand">▶ Brand awareness</span>
+    <div class="card-header">
+      <span class="card-flag">🇦🇺</span>
+      <div><div class="card-name">AU — Brand Awareness Campaign</div></div>
+    </div>
+    <div class="card-tags">
+      <span class="tag tag-brand">▶ Brand awareness</span>
     </div>
   </div>
 
+  <!-- RO DASR -->
   <div class="card">
-    <div class="flag">🇦🇺</div>
-    <div class="card-body">
-      <p class="card-title">AU — Brand Awareness Campaign</p>
-      <span class="pill brand">▶ Brand awareness</span>
+    <div class="card-header">
+      <span class="card-flag">🇷🇴</span>
+      <div><div class="card-name">RO — DASR</div></div>
+    </div>
+    <div class="card-tags">
+      <span class="tag tag-active">✓ Active</span>
     </div>
   </div>
-
-  <div class="card">
-    <div class="flag">🇷🇴</div>
-    <div class="card-body">
-      <p class="card-title">RO — DASR<span class="new-badge">MOVED</span></p>
-      <span class="pill active-tag" style="margin-left:0;">✓ Active</span>
-    </div>
-  </div>
-
-  <div class="section-header"><span class="dot next"></span>COMING NEXT</div>
-
-  <div class="card">
-    <div class="flag">🇬🇧</div>
-    <div class="card-body">
-      <p class="card-title">UK — Webinar</p>
-      <span class="pill webinar">🎓 Webinar</span>
-      <div class="metrics-pending">No submissions yet — metrics will populate once the webinar launches.</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="flag">🇷🇴</div>
-    <div class="card-body">
-      <p class="card-title">RO — Book a Demo Campaign</p>
-      <span class="pill demo">🎯 Book a demo</span>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="flag">🇷🇴</div>
-    <div class="card-body">
-      <p class="card-title">RO — Lead Magnet</p>
-      <span class="pill magnet">📄 Lead magnet</span>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="flag">🇩🇪</div>
-    <div class="card-body">
-      <p class="card-title">DACH — Lead Magnet<span class="new-badge">NEW</span></p>
-      <span class="pill magnet">📄 Lead magnet</span>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="flag">🇬🇧</div>
-    <div class="card-body">
-      <p class="card-title">UK — Lead Magnet</p>
-      <span class="pill magnet">📄 Lead magnet</span>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="flag">🇷🇴</div>
-    <div class="card-body">
-      <p class="card-title">RO — Bootcamp</p>
-      <span class="pill bootcamp">🏕 Bootcamp</span>
-    </div>
-  </div>
-
-  <div class="section-header"><span class="dot hold"></span>ON HOLD</div>
-
-  <p style="color: var(--muted); font-size: 13px; margin: 0 4px;">Nothing on hold right now.</p>
 
 </div>
+
+<!-- ═══════════════════ COMING NEXT ═══════════════════ -->
+<div class="section-label">Coming Next</div>
+<div class="campaign-grid">
+
+  <!-- RO Book a Demo -->
+  <div class="card card-simple">
+    <div class="card-header">
+      <span class="card-flag">🇷🇴</span>
+      <div><div class="card-name">RO — Book a Demo Campaign</div></div>
+    </div>
+    <div class="card-tags">
+      <span class="tag tag-demo">🎯 Book a demo</span>
+    </div>
+  </div>
+
+  <!-- UK Webinar -->
+  <div class="card card-simple">
+    <div class="card-header">
+      <span class="card-flag">🇬🇧</span>
+      <div><div class="card-name">UK — Webinar</div></div>
+    </div>
+    <div class="card-tags">
+      <span class="tag tag-webinar">🎓 Webinar</span>
+    </div>
+    <p class="no-data">No submissions yet — metrics will populate once the webinar launches.</p>
+  </div>
+
+  <!-- RO Lead Magnet -->
+  <div class="card card-simple">
+    <div class="card-header">
+      <span class="card-flag">🇷🇴</span>
+      <div><div class="card-name">RO — Lead Magnet</div></div>
+    </div>
+    <div class="card-tags">
+      <span class="tag tag-lead">📄 Lead magnet</span>
+    </div>
+  </div>
+
+  <!-- DACH Lead Magnet -->
+  <div class="card card-simple">
+    <div class="card-header">
+      <span class="card-flag">🇩🇪</span>
+      <div><div class="card-name">DACH — Lead Magnet</div></div>
+    </div>
+    <div class="card-tags">
+      <span class="tag tag-lead">📄 Lead magnet</span>
+      <span class="tag tag-new">NEW</span>
+    </div>
+  </div>
+
+  <!-- UK Lead Magnet -->
+  <div class="card card-simple">
+    <div class="card-header">
+      <span class="card-flag">🇬🇧</span>
+      <div><div class="card-name">UK — Lead Magnet</div></div>
+    </div>
+    <div class="card-tags">
+      <span class="tag tag-lead">📄 Lead magnet</span>
+    </div>
+  </div>
+
+  <!-- Mini Ebooks DACH + RO + AU -->
+  <div class="card card-simple">
+    <div class="card-header">
+      <span class="card-flag">🇩🇪</span>
+      <div><div class="card-name">Mini Ebooks — DACH + RO + AU</div></div>
+    </div>
+    <div class="card-tags">
+      <span class="tag tag-ebook">📘 Ebook</span>
+      <span class="tag tag-new">NEW</span>
+    </div>
+    <div class="card-body">Reusing webinar material across DACH, RO and AU markets.</div>
+  </div>
+
+  <!-- RO Masterclass -->
+  <div class="card card-simple">
+    <div class="card-header">
+      <span class="card-flag">🇷🇴</span>
+      <div>
+        <div class="card-name">RO — Masterclass</div>
+        <div class="card-date">Oct 7, 2026</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag tag-masterclass">🎓 Masterclass</span>
+    </div>
+  </div>
+
+  <!-- DACH Webinar Oct -->
+  <div class="card card-simple">
+    <div class="card-header">
+      <span class="card-flag">🇩🇪</span>
+      <div>
+        <div class="card-name">DACH — Webinar</div>
+        <div class="card-date">3rd week of Oct 2026</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag tag-webinar">🎓 Webinar</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════ ON HOLD ═══════════════════ -->
+<div class="section-label">On Hold</div>
+<p class="empty-state">Nothing on hold right now.</p>
+
+<div class="disclaimer">
+  * Submission and registration numbers are raw totals and do not exclude duplicates, test submissions, or paid customers.
+</div>
+
 </body>
 </html>
