@@ -22,8 +22,8 @@
   .market-pill{padding:6px 14px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;background:#fff;border:1px solid var(--card-border);color:var(--navy);}
   .market-pill.active{background:#2ECC71;color:#fff;border-color:#2ECC71;}
   .period-label{font-size:11.5px;font-weight:800;letter-spacing:0.05em;color:var(--text-muted);text-transform:uppercase;margin:4px 0 10px;}
-  .kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px;}
-  @media (max-width:700px){.kpi-grid{grid-template-columns:repeat(1,1fr);}}
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;}
+  @media (max-width:700px){.kpi-grid{grid-template-columns:repeat(2,1fr);}}
   .kpi-card{background:#fff;border:1px solid var(--card-border);border-radius:10px;padding:12px 10px;}
   .kpi-card .lbl{font-size:10.5px;color:var(--text-muted);font-weight:700;text-transform:uppercase;margin-bottom:5px;}
   .kpi-card .val{font-size:19px;font-weight:800;color:var(--navy);}
@@ -74,9 +74,16 @@
   <table class="summary" id="summaryTable"></table>
 
   <div class="footnote">
+    <strong>Two targets shown, on purpose:</strong> "% of YTD Target" compares achieved-so-far against only the Jan–Aug quota
+    (since Sep–Dec haven't happened yet). "% of Full-Year Target" compares the same achieved-so-far number against the full
+    Jan–Dec quota for context — International Total's full-year target is $6,263,972, matching Andrea's own quota table exactly.
+    Neither number is prorated — both use full quota amounts, just summed over a different number of months.<br><br>
+    <strong>⚠ ANZ full-year total, minor discrepancy:</strong> summing ANZ's 12 monthly quota cells gives $1,035,023, but Andrea's
+    quota table lists ANZ's printed "2026 Total" as $1,035,083 — a $60 gap. Using the summed monthly cells ($1,035,023) here since
+    the monthly breakdown is what drives every other number in this report; flagging in case one of the monthly cells has a typo.<br><br>
     Pipeline Generated = ARR of deals with a 1:1 Upcoming Demo Date in the period (not create date). International markets only,
     US/Canada excluded. DACH = Germany + Austria + Switzerland. ANZ = Australia + New Zealand. Quotas are used in full — never
-    prorated. Achieved figures are month-to-date/actuals as exported; September–December are not shown since those months haven't
+    prorated. Achieved figures are actuals as exported; September–December show no achieved figure since those months haven't
     happened yet. No run-rates or projections are used anywhere in this report.
   </div>
 
@@ -87,15 +94,15 @@ const MONTHS = ['January','February','March','April','May','June','July','August
 const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'];
 
 const DATA = {
-  ALL:  { name:"International Total", flag:"🌐", quota:[468251,300881,369453,420522,597015,538777,571221,908237],
+  ALL:  { name:"International Total", flag:"🌐", fullYearTarget:6263972, quota:[468251,300881,369453,420522,597015,538777,571221,908237],
           achieved:[662796.21,672603.07,824517.44,744071.01,1007512.27,1277037.64,874020.02,595065.16] },
-  UK:   { name:"UK", flag:"🇬🇧", quota:[20250,129113,129915,131513,263038,307779,166667,563021],
+  UK:   { name:"UK", flag:"🇬🇧", fullYearTarget:2281418, quota:[20250,129113,129915,131513,263038,307779,166667,563021],
           achieved:[32130.85,378499.32,195782.74,218354.56,290753.61,444606.07,164042.11,120848.12] },
-  RO:   { name:"Romania", flag:"🇷🇴", quota:[234667,38061,78022,82509,244445,61667,274075,271361],
+  RO:   { name:"Romania", flag:"🇷🇴", fullYearTarget:1987833, quota:[234667,38061,78022,82509,244445,61667,274075,271361],
           achieved:[189354.22,19015.66,126387.35,287969.77,364648.10,245187.11,174229.36,173091.58] },
-  ANZ:  { name:"ANZ", flag:"🇦🇺", quota:[100000,67040,48122,64833,48715,55997,94489,44120],
+  ANZ:  { name:"ANZ", flag:"🇦🇺", fullYearTarget:1035023, quota:[100000,67040,48122,64833,48715,55997,94489,44120],
           achieved:[130986.08,108274.25,201563.33,173660.55,165151.21,424716.77,140183.72,150428.66] },
-  DACH: { name:"DACH", flag:"🇩🇪", quota:[113334,66667,113334,141667,40817,113334,35990,29735],
+  DACH: { name:"DACH", flag:"🇩🇪", fullYearTarget:959638, quota:[113334,66667,113334,141667,40817,113334,35990,29735],
           achieved:[52211.74,63498.30,70948.32,27686.13,108990.53,67880.87,168256.44,52093.36] }
 };
 
@@ -119,10 +126,13 @@ function render(){
   const ytdPct = pct(ytdAchieved, ytdQuota);
   const above = ytdPct >= 100;
 
+  const fullYearPct = pct(ytdAchieved, d.fullYearTarget);
+
   document.getElementById('kpiGrid').innerHTML = `
     <div class="kpi-card">
       <div class="lbl">YTD Quota Target</div>
       <div class="val">${moneyShort(ytdQuota)}</div>
+      <div class="sub">Jan–Aug only</div>
     </div>
     <div class="kpi-card">
       <div class="lbl">YTD Achieved</div>
@@ -132,6 +142,11 @@ function render(){
       <div class="lbl">% of YTD Target</div>
       <div class="val">${ytdPct.toFixed(1)}%</div>
       <div class="badge2 ${above?'badge-above':'badge-below'}">${above?'✓ ABOVE TARGET':'✗ BELOW TARGET'}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="lbl">% of Full-Year Target</div>
+      <div class="val">${fullYearPct.toFixed(1)}%</div>
+      <div class="sub">of ${moneyShort(d.fullYearTarget)} (Jan–Dec)</div>
     </div>
   `;
 
