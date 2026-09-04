@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Key Markets — Pipeline Quota Coverage (YTD)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<style>
+  :root{
+    color-scheme: light;
+    --navy:#1F2D5C; --navy2:#2E4172; --blue:#4B9CD3; --green:#1E9E52; --red:#C0392B;
+    --grey-bg:#F4F6FA; --card-border:#E6E9F0; --text-muted:#6B7280; --slate:#7A87A8;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--grey-bg);color:var(--navy);}
+  .wrap{max-width:780px;margin:0 auto;padding:20px 20px 40px;}
+  .head{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);border-radius:14px;color:#fff;padding:20px 22px;display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+  .head h1{margin:0 0 4px;font-size:19px;font-weight:800;}
+  .head .sub{font-size:12.5px;opacity:0.85;margin:0;}
+  .head .badge{background:rgba(255,255,255,0.16);border-radius:999px;padding:5px 12px;font-size:11px;font-weight:700;white-space:nowrap;}
+  .market-pills{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+  .market-pill{padding:6px 14px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;background:#fff;border:1px solid var(--card-border);color:var(--navy);}
+  .market-pill.active{background:#2ECC71;color:#fff;border-color:#2ECC71;}
+  .period-label{font-size:11.5px;font-weight:800;letter-spacing:0.05em;color:var(--text-muted);text-transform:uppercase;margin:4px 0 10px;}
+  .kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px;}
+  @media (max-width:700px){.kpi-grid{grid-template-columns:repeat(1,1fr);}}
+  .kpi-card{background:#fff;border:1px solid var(--card-border);border-radius:10px;padding:12px 10px;}
+  .kpi-card .lbl{font-size:10.5px;color:var(--text-muted);font-weight:700;text-transform:uppercase;margin-bottom:5px;}
+  .kpi-card .val{font-size:19px;font-weight:800;color:var(--navy);}
+  .kpi-card .sub{font-size:11px;color:var(--text-muted);margin-top:4px;}
+  .kpi-card .badge2{display:inline-block;margin-top:7px;padding:3px 9px;border-radius:999px;font-size:10.5px;font-weight:800;}
+  .badge-above{background:#E7F9EF;color:#1E9E52;} .badge-below{background:#FCEBEA;color:#C0392B;}
+  .chart-card{background:#fff;border:1px solid var(--card-border);border-radius:10px;padding:14px;margin-bottom:18px;}
+  .chart-card h3{font-size:11.5px;letter-spacing:0.04em;margin:0 0 10px;color:var(--text-muted);font-weight:800;text-transform:uppercase;}
+  .chart-holder{position:relative;height:260px;}
+  table.summary{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--card-border);border-radius:10px;overflow:hidden;font-size:12.5px;}
+  table.summary th{text-align:left;background:#F7F8FB;color:var(--text-muted);font-size:10.5px;text-transform:uppercase;font-weight:800;padding:9px 12px;border-bottom:1px solid var(--card-border);}
+  table.summary td{padding:9px 12px;border-bottom:1px solid var(--card-border);}
+  table.summary tr:last-child td{border-bottom:none;}
+  table.summary tr.ytd-row td{background:#F7F8FB;font-weight:800;}
+  .chg-up{color:var(--green);font-weight:700;} .chg-down{color:var(--red);font-weight:700;}
+  .section-title{font-size:13px;font-weight:800;margin:20px 0 10px;color:var(--navy);}
+  .footnote{font-size:11px;color:var(--text-muted);line-height:1.5;margin-top:16px;padding-top:12px;border-top:1px solid var(--card-border);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div>
+      <h1>Key Markets — Pipeline Quota Coverage</h1>
+      <p class="sub">Target vs Achieved · Month by Month · Year to Date</p>
+    </div>
+    <div class="badge">JAN–AUG 2026</div>
+  </div>
+
+  <div class="market-pills" id="marketRow">
+    <div class="market-pill active" data-market="ALL">🌐 International Total</div>
+    <div class="market-pill" data-market="UK">🇬🇧 UK</div>
+    <div class="market-pill" data-market="RO">🇷🇴 Romania</div>
+    <div class="market-pill" data-market="ANZ">🇦🇺 ANZ</div>
+    <div class="market-pill" data-market="DACH">🇩🇪 DACH</div>
+  </div>
+
+  <div class="period-label" id="periodBar"></div>
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <div class="chart-card">
+    <h3 id="chartTitle">Target vs Achieved by Month</h3>
+    <div class="chart-holder"><canvas id="monthChart"></canvas></div>
+  </div>
+
+  <div class="section-title">Full Summary — <span id="summaryLabel">International Total</span></div>
+  <table class="summary" id="summaryTable"></table>
+
+  <div class="footnote">
+    Pipeline Generated = ARR of deals with a 1:1 Upcoming Demo Date in the period (not create date). International markets only,
+    US/Canada excluded. DACH = Germany + Austria + Switzerland. ANZ = Australia + New Zealand. Quotas are used in full — never
+    prorated. Achieved figures are month-to-date/actuals as exported; September–December are not shown since those months haven't
+    happened yet. No run-rates or projections are used anywhere in this report.
+  </div>
+
+</div>
+
+<script>
+const MONTHS = ['January','February','March','April','May','June','July','August'];
+const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'];
+
+const DATA = {
+  ALL:  { name:"International Total", flag:"🌐", quota:[468251,300881,369453,420522,597015,538777,571221,908237],
+          achieved:[662796.21,672603.07,824517.44,744071.01,1007512.27,1277037.64,874020.02,595065.16] },
+  UK:   { name:"UK", flag:"🇬🇧", quota:[20250,129113,129915,131513,263038,307779,166667,563021],
+          achieved:[32130.85,378499.32,195782.74,218354.56,290753.61,444606.07,164042.11,120848.12] },
+  RO:   { name:"Romania", flag:"🇷🇴", quota:[234667,38061,78022,82509,244445,61667,274075,271361],
+          achieved:[189354.22,19015.66,126387.35,287969.77,364648.10,245187.11,174229.36,173091.58] },
+  ANZ:  { name:"ANZ", flag:"🇦🇺", quota:[100000,67040,48122,64833,48715,55997,94489,44120],
+          achieved:[130986.08,108274.25,201563.33,173660.55,165151.21,424716.77,140183.72,150428.66] },
+  DACH: { name:"DACH", flag:"🇩🇪", quota:[113334,66667,113334,141667,40817,113334,35990,29735],
+          achieved:[52211.74,63498.30,70948.32,27686.13,108990.53,67880.87,168256.44,52093.36] }
+};
+
+let state = { market:'ALL' };
+let monthChart;
+
+function moneyShort(v){ return '$'+Math.round(v).toLocaleString('en-US'); }
+function pct(cur, prev){ if(prev===0) return null; return (cur/prev)*100; }
+
+function ytd(arr){ return arr.reduce((a,b)=>a+b,0); }
+
+function render(){
+  document.querySelectorAll('#marketRow .market-pill').forEach(b=>b.classList.toggle('active', b.dataset.market===state.market));
+  const d = DATA[state.market];
+  document.getElementById('periodBar').textContent = d.flag + ' ' + d.name + ' · Jan–Aug 2026';
+  document.getElementById('summaryLabel').textContent = d.name;
+  document.getElementById('chartTitle').textContent = d.name + ' — Target vs Achieved by Month';
+
+  const ytdQuota = ytd(d.quota);
+  const ytdAchieved = ytd(d.achieved);
+  const ytdPct = pct(ytdAchieved, ytdQuota);
+  const above = ytdPct >= 100;
+
+  document.getElementById('kpiGrid').innerHTML = `
+    <div class="kpi-card">
+      <div class="lbl">YTD Quota Target</div>
+      <div class="val">${moneyShort(ytdQuota)}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="lbl">YTD Achieved</div>
+      <div class="val">${moneyShort(ytdAchieved)}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="lbl">% of YTD Target</div>
+      <div class="val">${ytdPct.toFixed(1)}%</div>
+      <div class="badge2 ${above?'badge-above':'badge-below'}">${above?'✓ ABOVE TARGET':'✗ BELOW TARGET'}</div>
+    </div>
+  `;
+
+  if(monthChart) monthChart.destroy();
+  monthChart = new Chart(document.getElementById('monthChart'), {
+    type:'bar',
+    data:{ labels: MONTH_ABBR, datasets:[
+      { label:'Target', data:d.quota, backgroundColor:'#D7DCE5' },
+      { label:'Achieved', data:d.achieved, backgroundColor: d.achieved.map((v,i)=> v>=d.quota[i] ? '#2ECC71' : '#4B9CD3') }
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:10}}}}, scales:{y:{beginAtZero:true, ticks:{callback:v=>'$'+(v/1000).toFixed(0)+'k'}}} }
+  });
+
+  const rows = MONTHS.map((m,i)=>{
+    const q = d.quota[i], a = d.achieved[i], p = pct(a,q);
+    return [m, moneyShort(q), moneyShort(a), p];
+  });
+  const bodyRows = rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td class="${r[3]>=100?'chg-up':'chg-down'}">${r[3].toFixed(1)}%</td></tr>`).join('');
+  const ytdRow = `<tr class="ytd-row"><td>YTD (Jan–Aug)</td><td>${moneyShort(ytdQuota)}</td><td>${moneyShort(ytdAchieved)}</td><td class="${ytdPct>=100?'chg-up':'chg-down'}">${ytdPct.toFixed(1)}%</td></tr>`;
+
+  document.getElementById('summaryTable').innerHTML =
+    `<thead><tr><th>Month</th><th>Target</th><th>Achieved</th><th>% of Target</th></tr></thead>
+     <tbody>${bodyRows}${ytdRow}</tbody>`;
+}
+
+document.getElementById('marketRow').addEventListener('click', e=>{
+  const t = e.target.closest('[data-market]'); if(!t) return;
+  state.market = t.dataset.market; render();
+});
+
+render();
+</script>
+</body>
+</html>
