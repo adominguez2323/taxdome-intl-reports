@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Int'l Marketing x Sales | Weekly status</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/*
+  HOW TO UPDATE EACH WEEK
+  Only edit the WEEK object in the <script> at the bottom of this file.
+  Everything on the page is drawn from it. Keep the file name the same
+  so the Confluence iframe never needs to change.
+*/
+:root{
+  --ink:#0e0e0e; --ink-2:#4a4a4a; --ink-3:#646464;
+  --paper:#ffffff; --paper-2:#f4f4f2; --paper-3:#ececea;
+  --line:#e2e2df; --line-2:#cfcfcb;
+  --blue:#266de8; --blue-soft:#e8f0fd;
+  --yellow:#ffe629;
+  --live:#1d7a4f; --live-bg:#e9f6ef;
+  --ready:#266de8; --ready-bg:#e8f0fd;
+  --prod:#8a5a00; --prod-bg:#fff4d6;
+  --plan:#555555; --plan-bg:#efefed;
+  --hold:#b42b30; --hold-bg:#fdecec;
+  --done:#646464; --done-bg:#f2f2f2;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --ink:#f2f2f0; --ink-2:#c9c9c6; --ink-3:#a5a5a1;
+    --paper:#151515; --paper-2:#1e1e1d; --paper-3:#272726;
+    --line:#2f2f2e; --line-2:#3c3c3a;
+    --blue:#6f9ff2; --blue-soft:#1b2a44;
+    --yellow:#ffe629;
+    --live:#6fd3a0; --live-bg:#163326;
+    --ready:#8fb4f5; --ready-bg:#1b2a44;
+    --prod:#f3c86a; --prod-bg:#352a10;
+    --plan:#bdbdba; --plan-bg:#2a2a29;
+    --hold:#f3888b; --hold-bg:#3a1c1d;
+    --done:#a5a5a1; --done-bg:#232322;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:"Inter Tight","Suisse Intl",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 28px 40px}
+
+/* Header */
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;
+  padding-bottom:20px;border-bottom:2px solid var(--ink)}
+.top h1{margin:0;font-size:34px;line-height:1.05;font-weight:500;letter-spacing:-0.035em}
+.top .sub{margin:6px 0 0;color:var(--ink-3);font-size:15px}
+.week{display:flex;align-items:center;gap:10px}
+.week .date{background:var(--yellow);color:#0e0e0e;font-weight:500;padding:6px 12px;border-radius:999px;font-size:15px;white-space:nowrap}
+.runsheet{display:flex;gap:0;margin:18px 0 0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.runsheet div{flex:1;padding:10px 14px;font-size:13px;color:var(--ink-3);border-left:1px solid var(--line)}
+.runsheet div:first-child{border-left:0}
+.runsheet b{display:block;color:var(--ink);font-weight:500;font-size:14px}
+
+/* Heads-up strip */
+.headsup{margin:18px 0 0;display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-radius:10px;background:var(--paper-2)}
+.headsup .tag{flex:none;background:var(--ink);color:var(--paper);font-size:12px;font-weight:500;padding:3px 9px;border-radius:999px;margin-top:2px}
+.headsup p{margin:0;color:var(--ink-2)}
+.headsup p b{color:var(--ink);font-weight:500}
+.hlist p+p{margin-top:8px}
+
+/* This week's numbers */
+.numbers{margin:18px 0 0;padding:18px 20px;border:1px solid var(--line);border-radius:12px}
+.numbers h2{margin:0;font-size:18px;font-weight:500;letter-spacing:-0.02em}
+.nnote{margin:6px 0 14px;color:var(--ink-2);font-size:14.5px;max-width:78ch}
+.nlinks{display:grid;grid-template-columns:minmax(0,560px);gap:12px}
+.nlink{display:flex;flex-direction:column;gap:4px;padding:14px 16px;border-radius:10px;background:var(--blue-soft);text-decoration:none;color:var(--ink);transition:background-color .2s ease}
+.nlink:hover{background:var(--blue);color:#fff}
+.nlink:hover .nh{color:#fff}
+.nlink:focus-visible{outline:1px solid var(--blue);outline-offset:2px}
+.nl{font-weight:500;font-size:15.5px;color:inherit}
+.nl .ext{color:var(--blue)}
+.nlink:hover .nl .ext{color:#fff}
+.nh{font-size:13.5px;color:var(--ink-2)}
+@media (max-width:900px){.nlinks{grid-template-columns:1fr}}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;margin:26px 0 0;flex-wrap:wrap}
+.tab{appearance:none;border:1px solid var(--line-2);background:var(--paper);color:var(--ink);
+  font:inherit;font-weight:500;font-size:15px;padding:9px 16px;border-radius:8px;cursor:pointer;
+  transition:background-color .2s ease, color .2s ease, border-color .2s ease}
+.tab:hover{border-color:var(--blue);color:var(--blue)}
+.tab[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.tab:focus-visible{outline:1px solid var(--blue);outline-offset:2px}
+.tab .n{font-weight:400;opacity:.65;margin-left:6px;font-size:13px}
+.hint{margin:8px 0 0;color:var(--ink-3);font-size:12.5px}
+
+/* Market panel */
+.panel{margin-top:20px}
+.panel[hidden]{display:none}
+.mhead{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
+.mhead h2{margin:0;font-size:28px;font-weight:500;letter-spacing:-0.03em}
+.mhead .summary{margin:0;color:var(--ink-2);max-width:62ch}
+
+/* Signal (the one memorable element) */
+.signal{margin:18px 0 0;padding:20px 22px;border-radius:12px;background:var(--paper-2)}
+.signal h3{margin:0 0 4px;font-size:16px;font-weight:500}
+.signal .note{margin:0 0 16px;color:var(--ink-3);font-size:14px}
+.flow{display:grid;grid-template-columns:repeat(var(--steps),1fr);gap:0;align-items:end}
+.step{padding:0 10px 0 0}
+.step .val{font-size:30px;font-weight:500;letter-spacing:-0.03em;line-height:1}
+.step .lab{font-size:13px;color:var(--ink-3);margin-top:6px}
+.step .bar{height:10px;border-radius:5px;background:var(--blue);margin-top:10px;min-width:4px}
+.step.leak .val{color:var(--hold)}
+.step.leak .bar{background:var(--hold)}
+.metrics{display:flex;gap:18px;flex-wrap:wrap;margin:16px 0 0;padding-top:14px;border-top:1px solid var(--line);font-size:13.5px;color:var(--ink-3)}
+.metrics b{color:var(--ink);font-weight:500}
+
+/* Three columns */
+.cols{display:grid;grid-template-columns:1.25fr 1fr .95fr;gap:22px;margin-top:22px}
+.cols.two{grid-template-columns:1fr 1fr}
+.col h3{margin:0 0 10px;font-size:14px;font-weight:500;color:var(--ink-3);padding-bottom:8px;border-bottom:1px solid var(--line)}
+.item{padding:12px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.item .row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.item .name{font-weight:500;font-size:15.5px;line-height:1.3}
+.item .when{font-size:13px;color:var(--blue);font-weight:500;margin-top:2px}
+.item p{margin:4px 0 0;color:var(--ink-2);font-size:14px}
+.chip{flex:none;font-size:12px;font-weight:500;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.chip.live{color:var(--live);background:var(--live-bg)}
+.chip.ready{color:var(--ready);background:var(--ready-bg)}
+.chip.prod{color:var(--prod);background:var(--prod-bg)}
+.chip.progress{color:var(--prod);background:var(--prod-bg)}
+.chip.plan{color:var(--plan);background:var(--plan-bg)}
+.chip.hold{color:var(--hold);background:var(--hold-bg)}
+.chip.done{color:var(--done);background:var(--done-bg)}
+.ask{background:var(--blue-soft);border-radius:12px;padding:16px 18px}
+.ask h3{border-bottom-color:transparent;color:var(--blue);padding-bottom:2px}
+.ask ol{margin:0;padding-left:20px}
+.ask li{margin:0 0 10px;font-size:15px;line-height:1.4}
+.ask li:last-child{margin-bottom:0}
+.empty{color:var(--ink-3);font-size:14px;padding:12px 14px;border:1px dashed var(--line-2);border-radius:8px}
+
+/* Overview grid */
+.ov{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:20px}
+.ovcard{border:1px solid var(--line);border-radius:12px;padding:18px 20px;cursor:pointer;background:var(--paper);
+  transition:border-color .2s ease}
+.ovcard:hover{border-color:var(--blue)}
+.ovcard:focus-visible{outline:1px solid var(--blue);outline-offset:2px}
+.ovcard h3{margin:0;font-size:20px;font-weight:500;letter-spacing:-0.02em}
+.ovcard .headline{margin:6px 0 12px;color:var(--ink-2);font-size:14.5px}
+.ovcard ul{list-style:none;margin:0;padding:0}
+.ovcard li{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--line);font-size:14px}
+
+/* Experiments + actions */
+.block{margin-top:34px}
+.block h2{margin:0 0 4px;font-size:22px;font-weight:500;letter-spacing:-0.02em}
+.block .lede{margin:0 0 14px;color:var(--ink-3);font-size:14px}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:14px}
+th{text-align:left;font-weight:500;color:var(--ink-3);font-size:13px;padding:10px 14px;background:var(--paper-2);border-bottom:1px solid var(--line)}
+td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td .mk{font-weight:500}
+table.num td:not(:first-child),table.num th:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
+td .sn{font-size:12.5px;color:var(--ink-3);margin-top:2px}
+td .zero{color:var(--line-2)}
+tr.tot td{font-weight:500;background:var(--paper-2)}
+.wbar{height:8px;border-radius:4px;background:var(--blue);margin-left:auto}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.tile{border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.tl{font-size:13px;color:var(--ink-3)}
+.tv{font-size:30px;font-weight:500;letter-spacing:-0.03em;line-height:1.15;margin-top:4px;font-variant-numeric:tabular-nums}
+.ts{font-size:13px;color:var(--ink-2)}
+.delta{font-size:13px;margin-top:6px;color:var(--ink-3)}
+.delta.up{color:var(--live)}
+.delta.down{color:var(--hold)}
+@media (max-width:900px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.wbar.none{background:var(--hold)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.foot{margin-top:30px;padding-top:14px;border-top:1px solid var(--line);color:var(--ink-3);font-size:12.5px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+@media (max-width:900px){
+  .cols,.cols.two{grid-template-columns:1fr}
+  .ov{grid-template-columns:1fr}
+  .flow{grid-template-columns:repeat(2,1fr);row-gap:16px}
+  .runsheet{flex-direction:column}
+  .runsheet div{border-left:0;border-top:1px solid var(--line)}
+  .runsheet div:first-child{border-top:0}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Int'l Marketing x Sales</h1>
+      <p class="sub">Are the leads we generate the leads we can close, and what do we change next?</p>
+    </div>
+    <div class="week"><span class="date" id="weekDate"></span></div>
+  </header>
+
+  <div class="runsheet" id="runsheet"></div>
+  <div class="headsup" id="headsup"></div>
+  <section class="numbers" id="numbers" aria-labelledby="numTitle"></section>
+
+  <nav class="tabs" role="tablist" aria-label="Markets" id="tabs"></nav>
+  <p class="hint">Use the left and right arrow keys to move between markets while presenting.</p>
+
+  <main id="panels"></main>
+
+  <section class="block" aria-labelledby="actTitle">
+    <h2 id="actTitle">Last week's actions</h2>
+    <div id="actions"></div>
+  </section>
+
+  <footer class="foot">
+    <span id="footLeft"></span>
+    <span>Owner: Andrea Dominguez · Wednesdays 8:00 to 9:00 AM ET</span>
+  </footer>
+</div>
+
+<script>
+/* ================================================================
+   WEEK DATA: the only part to edit each week.
+   status values: "live", "ready", "progress" (in progress), "prod" (in production), "plan", "hold", "done"
+   ask: questions for sales (leave [] to hide that column)
+   experiments: per market (leave out or [] to hide)
+   ================================================================ */
+const WEEK = {
+  date: "Wed 14 Oct 2026",
+  updated: "13 Oct 2026",
+
+  // Lead sources: new companies created in HubSpot in this window, by original source,
+  // counted by their lifecycle stage today. Columns: lead, mqlLow (MQL low intent), mql, sql, unq (unqualified).
+  sourcesPeriod: "30 Sep to 13 Oct",
+
+  // Win rate: deals in the Sales International pipeline that HELD A DEMO and then closed (won or lost).
+  // Win rate = won / closed. winTrend values are [won, closed].
+  winPeriod: "year to date (1 Jan to 13 Oct)",
+  winLabels: { mtd: "October so far", last: "September", prev: "August", ytd: "Year to date", ly: "Same period 2025" },
+
+  runsheet: [
+    { time: "5 min",  what: "Format and last week's actions" },
+    { time: "30 min", what: "Three market blocks, about 10 min each" },
+    { time: "10 min", what: "Agree experiments in each block" },
+    { time: "5 min",  what: "Read back owners and dates" }
+  ],
+
+  // All-markets updates. One line each. Use <b>...</b> to bold the topic.
+  headsUp: {
+    tag: "All markets",
+    items: [
+      "<b>New Pricing 2.0:</b> the product won't be ready on 2 November. We still update the website, position the new pricing and sell the new plans, with some manual work behind the scenes.",
+      "<b>Lost deals report:</b> built a report of deals lost where the demo notes say pricing was not appealing. These are the first firms to retarget once the new pricing is live."
+    ]
+  },
+
+  // This week's numbers: links to HubSpot. Set "note" to "" to hide the message.
+  numbers: {
+    note: "This is our first session, so this week the numbers live in HubSpot instead of on this page. Sorry for the extra clicks, I know it's not the smoothest setup and I'd much rather present it all in one view. But something is better than nothing, and the upside is that you can click any bar to see the companies behind it. From next week, Yonis is helping us set up an automated pre-read for this call, so everything will be in one place. Thank you, Yonis, for making that happen.",
+    links: [
+      { label: "Lead funnel by market", url: "https://app.hubspot.com/reports-dashboard/46271156/view/20267537", hint: "Use the country filter to see your market. Scroll down to the end: leads by source is the second-last section." }
+    ]
+  },
+
+  markets: [
+    {
+      id: "dach",
+      name: "DACH",
+      headline: "Paid isn't converting, organic is. We're shifting focus to organic and lower-commitment offers.",
+      signal: {
+        title: "Book a Demo campaign (Meta): where people drop off",
+        note: "Strong top of funnel, then the demo page stops nearly everyone.",
+        steps: [
+          { val: 59600, label: "People reached" },
+          { val: 1356,  label: "Ad clicks" },
+          { val: 904,   label: "Demo page visits" },
+          { val: 1,     label: "Lead", leak: true }
+        ],
+        metrics: [
+          ["CTR", "1.79%", "well above B2B benchmarks"],
+          ["CPC", "$0.86", ""],
+          ["Visit to lead", "0.11%", ""],
+          ["Cost per lead", "$1,163", ""]
+        ]
+      },
+      live: [
+        { name: "Book a Demo campaign (Meta)", status: "live", text: "1 lead from 904 demo page visits. Targeting and creative work; the blocker is on the page or the ask." },
+        { name: "Webcast with Dr. Mathias Hildebrandt", status: "live", text: "Paid: 3 MQLs (2 paid, 1 organic). Organic: his post passed 100 likes, and several demo prospects said they booked because they saw it." }
+      ],
+      next: [
+        { name: "Webcast goes live", when: "Tue 27 Oct, 14:00 CET", status: "ready", text: "Client communication and documentation, for German firms with 2 to 15 employees." },
+        { name: "Workflows ebook", when: "Final stage", status: "prod", text: "Free, lower first step than a demo. UTMs on every organic post and email so leads stay trackable." },
+        { name: "Treuhand 4.0 Publireportage (CH)", when: "Content review with Maria on Mon 19 Oct", status: "prod", text: "Partnership placement on treuhand40.ch for November, deadlines and workflows angle." }
+      ],
+      ask: [
+        "Why do German firms visit the demo page but not book? Is a direct demo too big a first step in DACH?",
+        "Demos are mentioning Mathias's LinkedIn post. Should we do more partnerships and customer voices like Treuhand 4.0 and Mathias?",
+        "The DATEV cloud move (2029) is coming up in calls. What content would help you handle it? For example, a one-pager for prospects: what changes with DATEV in 2029, and what TaxDome already fixes for your clients today."
+      ],
+      sources: [
+        { source: "Paid social", lead: 0, mqlLow: 2, mql: 2, sql: 0, unq: 0, note: "Webcast ads 3, Book a Demo 1" },
+        { source: "Direct traffic", lead: 0, mqlLow: 0, mql: 2, sql: 1, unq: 2 },
+        { source: "Offline", lead: 2, mqlLow: 0, mql: 0, sql: 2, unq: 0, note: "Added manually or imported" },
+        { source: "Organic search", lead: 0, mqlLow: 0, mql: 0, sql: 2, unq: 0 }
+      ],
+      winTrend: { mtd: [2, 5], last: [0, 8], prev: [3, 8], ytd: [39, 106], ly: [27, 87] },
+      winrate: [
+        { source: "Organic search", won: 15, closed: 45 },
+        { source: "Offline", won: 9, closed: 29 },
+        { source: "Direct traffic", won: 14, closed: 26 },
+        { source: "Paid social", won: 0, closed: 2 },
+        { source: "Other (AI referrals, organic social)", won: 1, closed: 5 }
+      ],
+      experiments: [
+        { idea: "Show the Workflows ebook to people who visited the demo page or engaged with the webcast, instead of asking for a demo straight away.", measure: "Leads and MQLs over 3 weeks", owner: "To agree", due: "To agree" }
+      ]
+    },
+    {
+      id: "ro",
+      name: "Romania",
+      headline: "Book a Demo is back with tighter copy, and three lead magnets are lined up ahead of DASR next week.",
+      live: [
+        { name: "Book a Demo campaign (relaunched)", status: "live", text: "After bookings from non-accounting companies, every ad now names accounting explicitly (12 Oct). Andrea checks lead quality on Thu and Fri." },
+        { name: "DASR 26 promotion and sponsors", status: "live", text: "Sponsor agreements still in progress. All sponsor logos were updated in their agreed placements on the website on 12 Oct." },
+        { name: "Women in Accounting", status: "live", text: "Ongoing promotion." }
+      ],
+      next: [
+        { name: "Digital Accounting Summit Romania", when: "Thu 22 Oct, Bucharest and online", status: "progress", text: "" },
+        { name: "SAF-T & e-Factura ebook (refreshed)", when: "Ready to launch", status: "ready", text: "Last year's ebook, refreshed. The ads talk about chasing client documents every month, not about SAF-T rules." },
+        { name: "HR & Payroll ebook", when: "Ready to launch", status: "ready", text: "" },
+        { name: "Productivity and Digitalization ebook", when: "Final stage", status: "prod", text: "Built from a self-assessment of 13 Romanian firms." }
+      ],
+      ask: [
+        "Since the ad copy change on 12 Oct, are you seeing fewer bookings from non-accounting companies?"
+      ],
+      sources: [
+        { source: "Paid social", lead: 0, mqlLow: 0, mql: 13, sql: 5, unq: 7, note: "All from Book a Demo" },
+        { source: "Organic search", lead: 0, mqlLow: 2, mql: 6, sql: 1, unq: 3 },
+        { source: "Direct traffic", lead: 0, mqlLow: 6, mql: 5, sql: 0, unq: 0 },
+        { source: "Referrals", lead: 0, mqlLow: 0, mql: 1, sql: 1, unq: 0 },
+        { source: "Organic social", lead: 0, mqlLow: 0, mql: 0, sql: 1, unq: 0 }
+      ],
+      winTrend: { mtd: [0, 14], last: [1, 6], prev: [3, 16], ytd: [32, 240], ly: [24, 53] },
+      winrate: [
+        { source: "Offline", won: 15, closed: 122 },
+        { source: "Organic search", won: 7, closed: 42 },
+        { source: "Direct traffic", won: 6, closed: 39 },
+        { source: "Paid social", won: 3, closed: 23 },
+        { source: "Organic social", won: 0, closed: 9 },
+        { source: "Other (referrals, AI referrals, campaigns)", won: 1, closed: 5 }
+      ]
+    },
+    {
+      id: "anz",
+      name: "ANZ",
+      headline: "The pipeline is empty for the first time. Three pieces are in production to refill it.",
+      live: [],
+      emptyLive: "No campaigns live right now.",
+      next: [
+        { name: "Book a Demo campaign", when: "Delivered next week", status: "prod", text: "Paid only, no landing page. Two customers from our July webinar, Naveed Anwar (ANS Accounting) and Geraldine Major (Baker Major & Associates), for 2 to 9 seat practices. Editing and design in progress. Designs and video edit go to Joanne and Paolo next week for review." },
+        { name: "Workflow ebook", when: "Launches 1 Nov", status: "prod", text: "Built from Nicole Wright's webinar \"EOFY Without the Stress\": how one accountant replaced a multi-tab spreadsheet with pipelines, tags, organisers and the client app in about a day. For firms of 5 to 25 people." },
+        { name: "December webinar", when: "Tue 1 Dec", status: "plan", text: "How to close the year before the Christmas shutdown without leaving work piled up for January. Joanne is reaching out to Daniel Taylor (19 licenses) and Ana Santucci (15 licenses) as speakers." }
+      ],
+      ask: [],
+      sources: [
+        { source: "Organic search", lead: 0, mqlLow: 0, mql: 0, sql: 1, unq: 1 },
+        { source: "Direct traffic", lead: 0, mqlLow: 0, mql: 1, sql: 0, unq: 1 }
+      ],
+      winTrend: { mtd: [0, 3], last: [4, 24], prev: [4, 13], ytd: [50, 207], ly: [42, 101] },
+      winrate: [
+        { source: "Offline", won: 11, closed: 84 },
+        { source: "Organic search", won: 24, closed: 79 },
+        { source: "Direct traffic", won: 11, closed: 27 },
+        { source: "Paid social", won: 1, closed: 14 },
+        { source: "Other (referrals, AI referrals, campaigns)", won: 3, closed: 5 }
+      ]
+    }
+  ],
+
+  // Leave empty for the first session. Afterwards copy open items from the Action Tracker.
+  lastWeekActions: []
+};
+
+/* ================================================================
+   Rendering. No need to edit below this line.
+   ================================================================ */
+const STATUS = { live:"Live", ready:"Ready", progress:"In progress", prod:"In production", plan:"Planning", hold:"On hold", done:"Done" };
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt = n => n >= 10000 ? (Math.round(n/100)/10).toLocaleString("en-US") + "K" : n.toLocaleString("en-US");
+
+document.getElementById("weekDate").textContent = WEEK.date;
+document.getElementById("footLeft").textContent = "Last updated " + WEEK.updated;
+
+document.getElementById("runsheet").innerHTML = WEEK.runsheet
+  .map(r => `<div><b>${esc(r.time)}</b>${esc(r.what)}</div>`).join("");
+
+const hu = document.getElementById("headsup");
+if (WEEK.headsUp && WEEK.headsUp.items && WEEK.headsUp.items.length) {
+  hu.innerHTML = `<span class="tag">${esc(WEEK.headsUp.tag)}</span><div class="hlist">${WEEK.headsUp.items.map(t => `<p>${t}</p>`).join("")}</div>`;
+} else { hu.remove(); }
+
+function itemHTML(it){
+  return `<div class="item">
+    <div class="row"><div><div class="name">${esc(it.name)}</div>${it.when ? `<div class="when">${esc(it.when)}</div>` : ""}</div>
+    <span class="chip ${esc(it.status)}">${STATUS[it.status] || esc(it.status)}</span></div>
+    ${it.text ? `<p>${esc(it.text)}</p>` : ""}
+  </div>`;
+}
+
+function signalHTML(s){
+  if (!s) return "";
+  const max = Math.log10(Math.max(...s.steps.map(x => x.val)) + 1);
+  const steps = s.steps.map(x => {
+    const w = Math.max(2, Math.round(Math.log10(x.val + 1) / max * 100));
+    return `<div class="step${x.leak ? " leak" : ""}"><div class="val">${fmt(x.val)}</div><div class="lab">${esc(x.label)}</div><div class="bar" style="width:${w}%"></div></div>`;
+  }).join("");
+  const metrics = (s.metrics || []).map(m => `<span>${esc(m[0])} <b>${esc(m[1])}</b>${m[2] ? " " + esc(m[2]) : ""}</span>`).join("");
+  return `<div class="signal"><h3>${esc(s.title)}</h3><p class="note">${esc(s.note)}</p>
+    <div class="flow" style="--steps:${s.steps.length}" role="img" aria-label="${esc(s.steps.map(x => fmt(x.val) + " " + x.label).join(", "))}">${steps}</div>
+    ${metrics ? `<div class="metrics">${metrics}</div>` : ""}</div>`;
+}
+
+function marketHTML(m){
+  const live = m.live.length ? m.live.map(itemHTML).join("") : `<div class="empty">${esc(m.emptyLive || "Nothing live this week.")}</div>`;
+  const next = m.next.length ? m.next.map(itemHTML).join("") : `<div class="empty">${esc(m.emptyNext || "Nothing scheduled yet.")}</div>`;
+  const hasAsk = m.ask && m.ask.length;
+  const ask = hasAsk ? `<div class="col ask"><h3>We need your read on</h3><ol>${m.ask.map(q => `<li>${esc(q)}</li>`).join("")}</ol></div>` : "";
+  const src = m.sources || [];
+  const tot = k => src.reduce((a, r) => a + (r[k] || 0), 0);
+  const rowTotal = r => (r.lead||0)+(r.mqlLow||0)+(r.mql||0)+(r.sql||0)+(r.unq||0);
+  const cell = v => v ? v : `<span class="zero">0</span>`;
+  const srcHTML = src.length ? `<div class="block"><h2>Where this period's leads came from</h2>
+    <p class="lede">New companies in HubSpot, ${esc(WEEK.sourcesPeriod)}, by original source and where they stand today.</p>
+    <div class="tablewrap"><table class="num"><thead><tr><th style="width:30%">Source</th><th>New</th><th>Lead</th><th>MQL low intent</th><th>MQL</th><th>SQL</th><th>Unqualified</th></tr></thead>
+    <tbody>${src.map(r => `<tr><td><span class="mk">${esc(r.source)}</span>${r.note ? `<div class="sn">${esc(r.note)}</div>` : ""}</td><td><b>${rowTotal(r)}</b></td><td>${cell(r.lead)}</td><td>${cell(r.mqlLow)}</td><td>${cell(r.mql)}</td><td>${cell(r.sql)}</td><td>${cell(r.unq)}</td></tr>`).join("")}
+    <tr class="tot"><td>Total</td><td>${src.reduce((a,r)=>a+rowTotal(r),0)}</td><td>${tot("lead")}</td><td>${tot("mqlLow")}</td><td>${tot("mql")}</td><td>${tot("sql")}</td><td>${tot("unq")}</td></tr></tbody></table></div></div>` : "";
+  const wr = m.winrate || [];
+  const pct = (w, c) => c ? Math.round(w / c * 1000) / 10 : 0;
+  const wW = wr.reduce((a, r) => a + r.won, 0), wC = wr.reduce((a, r) => a + r.closed, 0);
+  const wrMax = Math.max(1, ...wr.map(r => pct(r.won, r.closed)));
+  const tr = m.winTrend, L = WEEK.winLabels;
+  const rate = a => a && a[1] ? pct(a[0], a[1]) : null;
+  const diff = (a, b, vsLabel) => { const x = rate(a), y = rate(b); if (x === null || y === null) return ""; const d = Math.round((x - y) * 10) / 10;
+    return `<div class="delta ${d > 0 ? "up" : d < 0 ? "down" : ""}">${d > 0 ? "Up" : d < 0 ? "Down" : "No change"}${d ? " " + Math.abs(d) + " pts" : ""} vs ${esc(vsLabel)}</div>`; };
+  const tile = (label, a, extra) => `<div class="tile"><div class="tl">${esc(label)}</div><div class="tv">${rate(a) === null ? "n/a" : rate(a) + "%"}</div><div class="ts">${a[0]} won of ${a[1]} closed</div>${extra || ""}</div>`;
+  const trHTML = tr ? `<div class="block"><h2>Win rate over time</h2>
+    <p class="lede">Deals in the Sales International pipeline that held a demo and then closed. Win rate is won divided by closed.</p>
+    <div class="tiles">${tile(L.mtd, tr.mtd, `<div class="delta">Month still running</div>`)}${tile(L.last, tr.last, diff(tr.last, tr.prev, L.prev))}${tile(L.ytd, tr.ytd, diff(tr.ytd, tr.ly, "last year"))}${tile(L.ly, tr.ly)}</div></div>` : "";
+  const wrHTML = wr.length ? `<div class="block"><h2>Win rate by source</h2>
+    <p class="lede">Same definition, ${esc(WEEK.winPeriod)}, by the deal's original source.</p>
+    <div class="tablewrap"><table class="num wr"><thead><tr><th style="width:34%">Source</th><th>Closed</th><th>Won</th><th>Win rate</th><th style="width:26%"><span class="sr">Bar</span></th></tr></thead>
+    <tbody>${wr.map(r => { const v = pct(r.won, r.closed); return `<tr><td class="mk">${esc(r.source)}</td><td>${r.closed}</td><td>${cell(r.won)}</td><td><b>${v}%</b></td><td><div class="wbar${v === 0 ? " none" : ""}" style="width:${v === 0 ? 2 : Math.max(4, Math.round(v / wrMax * 100))}%"></div></td></tr>`; }).join("")}
+    <tr class="tot"><td>All sources</td><td>${wC}</td><td>${wW}</td><td>${pct(wW, wC)}%</td><td></td></tr></tbody></table></div></div>` : "";
+  const exps = (m.experiments || []);
+  const expHTML = exps.length ? `<div class="block"><h2>Experiment to agree</h2><p class="lede">Named owner and due date before we close. Agreed ones move to the Action Tracker.</p>
+    <div class="tablewrap"><table><thead><tr><th style="width:50%">Experiment</th><th style="width:22%">How we measure it</th><th style="width:14%">Owner</th><th style="width:14%">Due</th></tr></thead>
+    <tbody>${exps.map(x => `<tr><td>${esc(x.idea)}</td><td>${esc(x.measure)}</td><td>${esc(x.owner)}</td><td>${esc(x.due)}</td></tr>`).join("")}</tbody></table></div></div>` : "";
+  return `<div class="mhead"><h2>${esc(m.name)}</h2><p class="summary">${esc(m.headline)}</p></div>
+    ${signalHTML(m.signal)}
+    <div class="cols${hasAsk ? "" : " two"}">
+      <div class="col"><h3>Live now</h3>${live}</div>
+      <div class="col"><h3>Next two weeks</h3>${next}</div>
+      ${ask}
+    </div>${srcHTML}${trHTML}${wrHTML}${expHTML}`;
+}
+
+function overviewHTML(){
+  return `<div class="mhead"><h2>All markets</h2><p class="summary">Select a market to open its block.</p></div>
+  <div class="ov">${WEEK.markets.map(m => {
+    const rows = [...m.live, ...m.next].slice(0,5).map(it => `<li><span>${esc(it.name)}</span><span class="chip ${esc(it.status)}">${STATUS[it.status]}</span></li>`).join("");
+    return `<div class="ovcard" tabindex="0" role="button" data-go="${esc(m.id)}" aria-label="Open ${esc(m.name)}">
+      <h3>${esc(m.name)}</h3><p class="headline">${esc(m.headline)}</p><ul>${rows}</ul></div>`;
+  }).join("")}</div>`;
+}
+
+const nb = document.getElementById("numbers");
+if (WEEK.numbers && WEEK.numbers.links && WEEK.numbers.links.length) {
+  nb.innerHTML = `<h2 id="numTitle">This week's numbers</h2>
+    ${WEEK.numbers.note ? `<p class="nnote">${esc(WEEK.numbers.note)}</p>` : ""}
+    <div class="nlinks">${WEEK.numbers.links.map(l => `<a class="nlink" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">
+      <span class="nl">${esc(l.label)} <span class="ext" aria-hidden="true">&#8599;</span><span class="sr"> (opens HubSpot in a new tab)</span></span>
+      <span class="nh">${esc(l.hint)}</span></a>`).join("")}</div>`;
+} else { nb.remove(); }
+
+const views = [{ id:"all", name:"Overview" }, ...WEEK.markets.map(m => ({ id:m.id, name:m.name, count:m.live.length + m.next.length }))];
+const tabs = document.getElementById("tabs");
+const panels = document.getElementById("panels");
+
+views.forEach((v, i) => {
+  const b = document.createElement("button");
+  b.className = "tab"; b.id = "tab-" + v.id; b.setAttribute("role","tab");
+  b.setAttribute("aria-controls","panel-" + v.id);
+  b.innerHTML = esc(v.name) + (v.count ? `<span class="n">${v.count}</span>` : "");
+  b.addEventListener("click", () => show(v.id));
+  tabs.appendChild(b);
+
+  const p = document.createElement("section");
+  p.className = "panel"; p.id = "panel-" + v.id; p.setAttribute("role","tabpanel");
+  p.setAttribute("aria-labelledby","tab-" + v.id);
+  p.innerHTML = v.id === "all" ? overviewHTML() : marketHTML(WEEK.markets.find(m => m.id === v.id));
+  panels.appendChild(p);
+});
+
+let current = "all";
+function show(id, focus){
+  current = id;
+  views.forEach(v => {
+    const sel = v.id === id;
+    document.getElementById("tab-" + v.id).setAttribute("aria-selected", sel);
+    document.getElementById("tab-" + v.id).tabIndex = sel ? 0 : -1;
+    document.getElementById("panel-" + v.id).hidden = !sel;
+  });
+  if (focus) document.getElementById("tab-" + id).focus();
+}
+show("all");
+
+panels.addEventListener("click", e => { const c = e.target.closest("[data-go]"); if (c) show(c.dataset.go, true); });
+panels.addEventListener("keydown", e => {
+  const c = e.target.closest("[data-go]");
+  if (c && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); show(c.dataset.go, true); }
+});
+document.addEventListener("keydown", e => {
+  if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+  if (["INPUT","TEXTAREA"].includes(document.activeElement.tagName)) return;
+  const i = views.findIndex(v => v.id === current);
+  const n = e.key === "ArrowRight" ? Math.min(views.length - 1, i + 1) : Math.max(0, i - 1);
+  show(views[n].id, true);
+});
+
+/* Last week's actions */
+const act = document.getElementById("actions");
+if (WEEK.lastWeekActions.length) {
+  act.innerHTML = `<div class="tablewrap"><table><thead><tr><th style="width:52%">Action</th><th style="width:16%">Owner</th><th style="width:16%">Due</th><th style="width:16%">Status</th></tr></thead><tbody>${
+    WEEK.lastWeekActions.map(a => `<tr><td>${esc(a.action)}</td><td>${esc(a.owner)}</td><td>${esc(a.due)}</td><td>${esc(a.status)}</td></tr>`).join("")
+  }</tbody></table></div>`;
+} else {
+  act.innerHTML = `<div class="empty">First session. Actions agreed today will show here next week.</div>`;
+}
+</script>
+</body>
+</html>
