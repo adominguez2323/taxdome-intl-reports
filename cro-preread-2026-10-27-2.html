@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>International marketing numbers, pre-read 27 Oct 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --navy:#1F2D5C; --blue:#4B9CD3; --green:#1E9E5A; --red:#D64535; --amber:#C98210;
+    --bg:#F8F9FA; --surface:#FFFFFF; --line:#E3E7EE; --muted:#6B7385; --ink:#1A2133;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:14px;line-height:1.45}
+  .wrap{max-width:1040px;margin:0 auto;padding:16px 12px 24px}
+  @media (max-width:640px){th,td{padding:8px 5px}.cur{font-size:14px}th:first-child,td:first-child{width:70px}}
+  header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}
+  h1{margin:0;font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-0.01em}
+  .sub{margin:4px 0 0;color:var(--muted);font-size:13px}
+  .seg{display:inline-flex;background:#E9EDF4;border-radius:999px;padding:4px}
+  .seg button{border:0;background:transparent;font:inherit;font-weight:600;font-size:13px;color:var(--navy);padding:8px 16px;border-radius:999px;cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+  .seg button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  .period{font-size:13px;color:var(--muted);margin:0 0 12px}
+  .period strong{color:var(--navy)}
+  .tablebox{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow-x:auto}
+  table{width:100%;border-collapse:collapse;table-layout:fixed}
+  th,td{padding:10px 8px;text-align:right;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:13px;font-weight:600;color:var(--muted);background:#FBFCFD}
+  th:first-child,td:first-child{text-align:left;width:92px}
+  tr:last-child td{border-bottom:0}
+  td.metric{font-weight:600;color:var(--navy);white-space:normal}
+  th.total,td.total{background:#F3F6FB}
+  .cur{display:block;font-size:16px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+  .prev{display:block;font-size:11.5px;white-space:nowrap;color:var(--muted);font-variant-numeric:tabular-nums}
+  .d{display:block;font-weight:600;font-size:11.5px;white-space:nowrap}
+  .up{color:var(--green)} .down{color:var(--red)} .flat{color:var(--muted)}
+  .flag{color:var(--amber);font-weight:700;margin-left:2px}
+  .grid{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px}
+  @media (max-width:760px){.grid{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .panel h2{margin:0 0 10px;font-size:15px;color:var(--navy)}
+  .chartbox{position:relative;height:240px}
+  ul.notes{margin:0;padding-left:18px;color:var(--ink)}
+  ul.notes li{margin-bottom:8px}
+  ul.notes li:last-child{margin-bottom:0}
+  footer{margin-top:14px;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>International marketing numbers</h1>
+      <p class="sub">Pre-read for the Int’l Managers and CRO call, 27 Oct 2026. Source: HubSpot, exported 26 Oct.</p>
+    </div>
+    <div class="seg" role="group" aria-label="Comparison view">
+      <button type="button" data-view="wow" aria-pressed="true">Week over week</button>
+      <button type="button" data-view="mom" aria-pressed="false">Month over month</button>
+      <button type="button" data-view="ytd" aria-pressed="false">Year to date</button>
+    </div>
+  </header>
+
+  <p class="period" id="period"></p>
+  <div class="tablebox"><table id="tbl" aria-live="polite"></table></div>
+
+  <div class="grid">
+    <div class="panel">
+      <h2 id="chartTitle">Demo pipeline by market</h2>
+      <div class="chartbox"><canvas id="chart" aria-label="Demo pipeline by market"></canvas></div>
+    </div>
+  </div>
+
+  <footer>Rest excludes the US, Canada and records with no country. Demo pipeline is counted by demo date, so the latest week keeps growing as demos are booked.</footer>
+</div>
+
+<script>
+const markets=["Total","ANZ","DACH","UK","RO","Rest"];
+const metrics=[
+  {key:"leads",label:"Leads",money:false},
+  {key:"mqls",label:"MQLs",money:false},
+  {key:"sqls",label:"SQLs",money:false},
+  {key:"demos",label:"Demos",money:false},
+  {key:"pipe",label:"Demo pipeline",money:true},
+  {key:"closed",label:"Closed ARR",money:true}
+];
+const data={
+  wow:{
+    period:"<strong>Oct 19 to 25</strong> compared with Oct 12 to 18",
+    prevLabel:"Oct 12 to 18", curLabel:"Oct 19 to 25",
+    prev:{leads:[53,0,10,5,24,14],mqls:[55,3,4,4,36,8],sqls:[16,0,5,3,5,3],demos:[39,1,11,7,11,9],pipe:[288896,0,75200,90400,79200,44096],closed:[9700,0,3622,1591,2697,1790]},
+    cur:{leads:[38,1,1,2,14,20],mqls:[24,1,1,1,13,8],sqls:[9,2,6,0,0,1],demos:[33,6,8,12,2,5],pipe:[113694,2400,48800,31199,800,30495],closed:[3543,0,0,3543,0,0]}
+  },
+  mom:{
+    period:"<strong>Oct 1 to 25</strong> compared with the same days in September (Sep 1 to 25)",
+    prevLabel:"Sep 1 to 25", curLabel:"Oct 1 to 25",
+    prev:{leads:[283,1,25,51,130,76],mqls:[263,37,14,15,91,106],sqls:[81,13,22,13,22,11],demos:[91,22,12,16,27,14],pipe:[409755,52088,66802,48876,189189,52800],closed:[20069,5490,0,8088,6491,0]},
+    cur:{leads:[231,2,21,52,80,76],mqls:[199,8,11,48,78,54],sqls:[107,3,17,50,18,19],demos:[108,8,24,24,30,22],pipe:[712611,2400,149222,241599,160000,159390],closed:[15239,0,4824,5928,2697,1790]}
+  },
+  ytd:{
+    period:"<strong>Jan 1 to Oct 25, 2026</strong>. MQLs are only tracked by market from September, so they are not shown here.",
+    curLabel:"Jan 1 to Oct 25",
+    cur:{leads:[5021,306,462,1832,1581,840],sqls:[909,176,120,316,156,141],demos:[1416,334,161,389,338,194],pipe:[7807170,1537609,826391,2062618,1982169,1398383],closed:[363713,87905,87425,48609,119324,20450]}
+  }
+};
+
+const fmt=(v,money)=>{
+  if(!money) return v.toLocaleString("en-US");
+  if(v>=1e6) return (v/1e6).toFixed(2)+"M";
+  if(v>=1e3) return (v/1e3).toFixed(1)+"k";
+  return v===0?"0":v.toFixed(0);
+};
+const delta=(p,c,money)=>{
+  const diff=c-p;
+  if(diff===0) return '<span class="d flat">=</span>';
+  const cls=diff>0?"up":"down", arrow=diff>0?"▲":"▼";
+  const txt=p>0?Math.abs(Math.round(diff/p*100))+"%":fmt(Math.abs(diff),money);
+  return '<span class="d '+cls+'">'+arrow+" "+txt+"</span>";
+};
+
+let chart;
+function render(view){
+  const v=data[view];
+  document.getElementById("period").innerHTML=v.period;
+  let h="<thead><tr><th>Metric</th>"+markets.map((m,i)=>'<th class="'+(i===0?"total":"")+'">'+m+"</th>").join("")+"</tr></thead><tbody>";
+  metrics.filter(mt=>v.cur[mt.key]).forEach(mt=>{
+    h+='<tr><td class="metric">'+mt.label+"</td>";
+    markets.forEach((m,i)=>{
+      const c=v.cur[mt.key][i];
+      const flag="";
+      let inner='<span class="cur">'+fmt(c,mt.money)+flag+"</span>";
+      if(v.prev){
+        const p=v.prev[mt.key][i];
+        inner+='<span class="prev">from '+fmt(p,mt.money)+"</span>"+delta(p,c,mt.money);
+      }
+      h+='<td class="'+(i===0?"total":"")+'">'+inner+"</td>";
+    });
+    h+="</tr>";
+  });
+  document.getElementById("tbl").innerHTML=h+"</tbody>";
+
+  let labels, ds=[], showLegend=true;
+  const title=document.getElementById("chartTitle");
+  if(view==="ytd"){
+    title.textContent="Demo pipeline by month, 2026 (all markets)";
+    labels=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct (to 25th)"];
+    const vals=[662796,672603,824517,740871,1009057,1197038,874017,645208,468453,712611];
+    ds.push({label:"Demo pipeline",data:vals,backgroundColor:vals.map((_,i)=>i===9?"#9FB3D6":"#1F2D5C"),borderRadius:4});
+    showLegend=false;
+  } else {
+    title.textContent="Demo pipeline by market";
+    labels=markets.slice(1);
+    ds.push({label:v.prevLabel,data:v.prev.pipe.slice(1),backgroundColor:"#C9D6EA",borderRadius:4});
+    ds.push({label:v.curLabel,data:v.cur.pipe.slice(1),backgroundColor:"#1F2D5C",borderRadius:4});
+  }
+  if(chart) chart.destroy();
+  chart=new Chart(document.getElementById("chart"),{
+    type:"bar",
+    data:{labels,datasets:ds},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:showLegend,position:"bottom",labels:{boxWidth:12,font:{family:"Inter"}}},
+        tooltip:{callbacks:{label:c=>c.dataset.label+": "+fmt(c.raw,true)}}},
+      scales:{y:{ticks:{callback:x=>fmt(x,true),font:{family:"Inter"}},grid:{color:"#EEF1F5"}},
+              x:{grid:{display:false},ticks:{font:{family:"Inter"}}}}
+    }
+  });
+}
+
+document.querySelectorAll(".seg button").forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.querySelectorAll(".seg button").forEach(x=>x.setAttribute("aria-pressed","false"));
+    b.setAttribute("aria-pressed","true");
+    render(b.dataset.view);
+  });
+});
+render("wow");
+</script>
+</body>
+</html>
